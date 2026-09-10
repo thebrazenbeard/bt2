@@ -10,7 +10,8 @@ ALTER TABLE bt2.training_packages
   ADD COLUMN package_tree_git_sha1 text,
   ADD COLUMN manifest_blob_git_sha1 text,
   ADD COLUMN preservation_receipt_id uuid,
-  ADD COLUMN source_binding_verified_at timestamptz;
+  ADD COLUMN source_binding_verified_at timestamptz,
+  ADD COLUMN updated_at timestamptz NOT NULL DEFAULT clock_timestamp();
 
 ALTER TABLE bt2.training_packages
   ADD CONSTRAINT training_packages_source_binding_state_check
