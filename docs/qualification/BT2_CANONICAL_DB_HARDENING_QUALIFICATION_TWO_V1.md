@@ -18,9 +18,10 @@ The canonical database definition is now represented in GitHub by:
 
 - `database/schema/0001_bt2_runtime_baseline.sql`
 - `database/schema/0002_bt2_runtime_indexes_views_functions.sql`
-- ordered hardening migrations `0003` through `0011`
+- ordered hardening migrations `0003` through `0012`
+- `database/admin/BT2_INTERNAL_SCHEMA_ACCESS_BOUNDARY_V1.sql` for privilege hardening that WoWSQL's MCP safety layer intentionally does not execute.
 
-The source chain captures the pre-hardening WoWSQL runtime and then applies reviewed changes. The live WoWSQL target has been advanced through the same logical hardening sequence. No old repository/schema retirement or canonical cutover is implied.
+The source chain captures the pre-hardening WoWSQL runtime and then applies reviewed changes. The live WoWSQL target has been advanced through the same logical hardening sequence through the executable `0012` access assertion. No old repository/schema retirement or canonical cutover is implied.
 
 ## Identity, topology, training and recovery
 
@@ -119,6 +120,24 @@ Non-authorizing rollback qualification reached `LANTERN_NEGATIVE_ROLLBACK_PASS` 
 
 A positive simultaneous-distinct-admission test is intentionally **not claimed**. There is no current producer authorization, and this workstream does not authorize manufacturing one for testing. Source-equivalent lineage serialization is now installed; positive concurrent admission remains a future qualification case when an authorized isolated qualification subject exists.
 
+## WoWSQL internal access boundary
+
+Disposition: **PASS FOR CURRENT OBSERVED HOSTED ACCESS STATE / ADMIN ACL HARDENING SCRIPT STAGED**.
+
+Fresh project metadata shows the BT2 WoWSQL project uses `api_and_direct` connections, application Auth is disabled, Realtime is disabled, and Storage is enabled. WoWSQL's hosted MCP is nevertheless OAuth-protected; application Auth state and MCP access are separate concerns.
+
+The live PostgreSQL privilege audit established:
+
+- `anon`, `authenticated`, and `service_role` have no `USAGE` or `CREATE` privilege on `bt2` or `bt2_legacy`;
+- those three roles have zero SELECT/INSERT/UPDATE/DELETE privileges on all canonical and legacy relations;
+- no view or ordinary function in `public` bridges to `bt2`;
+- the shared PostgreSQL host contains 34 additional non-superuser login roles, and every one of those roles also has no schema usage and no CRUD privilege on `bt2` or `bt2_legacy`;
+- the `postgres` superuser remains an administrator/control-plane principal and is intentionally outside the unprivileged-isolation assertion.
+
+`0012_internal_schema_access_assertion_v1.sql` installs `bt2.assert_internal_access_boundary_v1()`, which checks all non-super login roles plus standard API roles and fails closed if schema usage, relation CRUD, or a `public` bridge appears. The strengthened assertion passed on the live target.
+
+An explicit deny-by-default ACL hardening script is preserved at `database/admin/BT2_INTERNAL_SCHEMA_ACCESS_BOUNDARY_V1.sql`. WoWSQL's MCP SQL safety layer rejects `REVOKE`, and Two did not bypass or obfuscate that control. The current runtime already satisfies the intended deny boundary; applying the admin script is defense-in-depth through a future authorized administrative route, not a prerequisite to claim the current observed isolation.
+
 ## GitHub Projects / GraphQL-capable route check
 
 At Patrick's direction, Two explicitly checked the connected GitHub surface beyond ordinary REST wrappers before declaring any GitHub capability absent. GraphQL-backed PR review and review-thread routes are available and were used to inspect BT2 PRs #1, #2, and #3. No submitted reviews or inline review threads were present at that check. No Projects-v2/board-specific wrapper was exposed by connector discovery under `project`, `board`, or the available GraphQL-capable function set. This is a connector-surface observation, not a claim that GitHub itself lacks Projects GraphQL APIs.
@@ -130,7 +149,6 @@ This qualification does **not** establish full canonical-platform cutover readin
 - positive authorized concurrent material-admission qualification;
 - complete legacy/history import and digest/count verification;
 - canonical training-package and qualification population from One's recovered source universe after relational hardening integration;
-- access-control/service-boundary qualification for WoWSQL;
 - blank-database rebuild from the canonical source chain and execution of the full migration acceptance suite;
 - final compatibility/retirement proof for old repositories/APIs/schemas;
 - explicit Patrick-authorized cutover/retirement decision.
