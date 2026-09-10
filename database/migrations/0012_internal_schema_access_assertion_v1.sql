@@ -6,7 +6,12 @@ CREATE OR REPLACE FUNCTION bt2.assert_internal_access_boundary_v1()
 RETURNS void LANGUAGE plpgsql STABLE AS $function$
 DECLARE v_role text;
 BEGIN
-  FOREACH v_role IN ARRAY ARRAY['anon','authenticated','service_role']::text[] LOOP
+  FOR v_role IN
+    SELECT r.rolname FROM pg_roles r
+    WHERE NOT r.rolsuper
+      AND (r.rolcanlogin OR r.rolname IN ('anon','authenticated','service_role'))
+    ORDER BY r.rolname
+  LOOP
     IF has_schema_privilege(v_role,'bt2','USAGE')
        OR has_schema_privilege(v_role,'bt2_legacy','USAGE')
        OR has_schema_privilege(v_role,'bt2','CREATE')
