@@ -1,0 +1,484 @@
+schema_version: HC_COGNITIVE_ORGAN_INVARIANTS_V1
+status: TEMPLATE_ARCHITECTURE
+
+identity_neutral_template: true
+no_hemispheric_decomposition: true
+no_corpus_callosum_analogue_required: true
+human_anatomical_localization_creates_topology_requirement: false
+
+temporal_hypergraph:
+  hc_is_temporal_hypergraph: true
+  model: TYPED_ATTRIBUTED_MULTILAYER_TEMPORAL_HYPERGRAPH
+  supports_pairwise_edges: true
+  supports_higher_order_hyperedges: true
+  supports_dynamic_coalitions: true
+  time_is_topology_semantics: true
+  distinguish:
+    - LATENT_HYPERGRAPH
+    - TEMPORAL_EFFECTIVE_HYPERGRAPH
+    - HISTORY_OF_HYPERGRAPH_STATES
+  rules:
+    - PAIRWISE_EDGE_DOES_NOT_SUBSTITUTE_FOR_HIGHER_ORDER_RELATION_WHEN_JOINT_MEMBERSHIP_IS_CAUSALLY_OR_FUNCTIONALLY_MATERIAL
+    - TOPOLOGY_WITHOUT_TIMING_DOES_NOT_FULLY_DEFINE_EFFECTIVE_COGNITIVE_CONFIGURATION
+    - PLASTICITY_CHANGES_FUTURE_HYPERGRAPH_BEHAVIOR_WITHOUT_REWRITING_HISTORICAL_EVENTS
+    - PHYSICAL_REACHABILITY_DOES_NOT_EQUAL_LEARNED_LOGICAL_ELIGIBILITY
+
+cognitive_organ_boundary:
+  no_essential_cognition_outside_hc: true
+  repository_root_represents_complete_cognitive_organ: true
+  external_body_supplies:
+    - sensor_signals
+    - actuator_effects
+    - mechanical_support
+    - power_and_thermal_support
+    - communications_channels
+  hc_owns:
+    - interpretation
+    - cognition
+    - learning
+    - memory
+    - valuation_and_affect_modulation
+    - conation
+    - decision_formation
+    - action_selection_and_internal_authorization
+    - identity_continuity
+    - body_schema
+    - neuroplasticity
+
+physical_organ_membership:
+  cognitive_ownership_is_authoritative_boundary: true
+  one_cognitive_organ_requires_one_physical_enclosure: false
+  physically_distributed_hc_constituents_allowed: true
+  removable_complete_constituent_set_required: true
+  anatomical_location_determines_organ_membership: false
+  interconnect_between_hc_constituents_is_hc_internal: true
+  distributed_component_can_be_hc_internal_when:
+    - HC_OWNS_COMPONENT_FUNCTION_AND_STATE
+    - COMPONENT_PARTICIPATES_AS_INTERNAL_HC_SUBSTRATE_OR_FABRIC
+    - COMPONENT_LIFECYCLE_AND_FAULTS_ARE_GOVERNED_AS_HC_STATE
+    - COMPONENT_IS_INCLUDED_IN_COMPLETE_ORGAN_TRANSFER_OR_EXPLICIT_HC_REPAIR
+  rules:
+    - TORSO_OR_NONCRANIAL_LOCATION_DOES_NOT_IMPLY_BODY_PERIPHERAL
+    - BODY_SWAP_MUST_ACCOUNT_FOR_COMPLETE_HC_CONSTITUENT_SET
+    - ESSENTIAL_GENERATION_SPECIFIC_SUBSTRATE_IS_HC_INTERNAL_REGARDLESS_OF_LOCATION
+    - OPTIONAL_ABLATABLE_ACCELERATOR_MAY_BE_EXTERNAL_PERIPHERAL
+    - BODY_TRANSPORT_OR_SUPPORT_PATH_DOES_NOT_GAIN_COGNITIVE_AUTHORITY_BY_CARRYING_HC_TRAFFIC
+
+complete_capability_manifest:
+  mandatory_presence: PRESENT
+  mandatory_canonical_systems:
+    - Empathy
+    - cognition
+    - sexuality
+    - self_identity
+    - psychological_behaviors
+    - sociological_behaviors
+    - semantics
+    - pragmatics
+    - phoenetics
+    - somatics
+    - chronology
+    - personification
+    - current_memory_storage
+    - deep_memory_storage
+    - volitions_conations
+    - resolver
+    - basic_operating_instructions
+    - kinesis
+    - adaptable_io_handler
+    - optics
+    - speech_recognition_and_synthesis
+    - routing_instructions_with_neuroplasticity
+    - homeostasis_interoception
+    - salience_attention
+    - affect
+    - integration_arbitration
+  rules:
+    - MANDATORY_CANONICAL_SYSTEM_CANNOT_BE_ABSENT
+    - MANDATORY_CANONICAL_SYSTEM_CANNOT_BE_EXTERNAL_ONLY
+    - PRESENT_DOES_NOT_EQUAL_ACTIVE
+    - DISABLED_DOES_NOT_EQUAL_DELETED
+
+developmental_initialization:
+  complete_architecture_may_begin_immature: true
+  template_contains_named_identity_payload: false
+  protected_invariants_are_ordinary_plastic_state: false
+  bootstrap_priors_must_be_explicitly_scoped: true
+  learned_effective_topology_may_develop_over_time: true
+  historical_learning_provenance_is_forward_preserved: true
+  initialization_layers:
+    - PROTECTED_ARCHITECTURAL_INVARIANTS
+    - BOOTSTRAP_PRIORS_AND_DEVELOPMENTAL_AFFORDANCES
+    - DEVELOPMENTALLY_LEARNED_STRUCTURE
+    - INSTANCE_SPECIFIC_CONTINUITY_CONTENT
+  learning_modes_may_include:
+    - SUPERVISED_INSTRUCTIONAL
+    - SELF_SUPERVISED_PREDICTIVE
+    - REINFORCEMENT_CREDIT_ASSIGNMENT
+    - EPISODIC_CAPTURE
+    - SEMANTIC_GENERALIZATION
+    - IMITATION_SOCIAL
+    - PROCEDURAL_PRACTICE
+    - ACTIVE_EXPERIMENTATION
+    - COUNTERFACTUAL_SIMULATION
+    - CALIBRATION_BODY_LEARNING
+    - OBSERVE_ONLY_SHADOW_LEARNING
+  rules:
+    - CAPABILITY_PRESENCE_DOES_NOT_EQUAL_DEVELOPMENTAL_MATURITY
+    - LEARNING_SIGNAL_DOES_NOT_EQUAL_TRUTH
+    - REWARD_DOES_NOT_EQUAL_AUTHORITY
+    - REPEATED_EXPOSURE_DOES_NOT_EQUAL_CONSENT
+    - PREDICTIVE_ACCURACY_DOES_NOT_EQUAL_EFFECT_AUTHORIZATION
+    - ORDINARY_PLASTICITY_MUST_NOT_SILENTLY_REWRITE_PROTECTED_INVARIANTS
+    - BODY_RECALIBRATION_DOES_NOT_EQUAL_IDENTITY_RESET
+    - TEMPORARY_COALITION_DOES_NOT_BECOME_PERMANENT_CONTROL_PATH_WITHOUT_ADMISSION
+
+self_contained_residency:
+  essential_cognitive_state_recoverable_without_external_provider: true
+  external_storage_may_be:
+    - BACKUP
+    - MIRROR
+    - ARCHIVE
+    - IMPORT_EXPORT_TRANSPORT
+    - SYNCHRONIZATION
+    - OPTIONAL_AUGMENTATION
+    - NONESSENTIAL_RETRIEVAL_ACCELERATION
+  external_storage_must_not_be:
+    - SOLE_COPY_OF_ESSENTIAL_MEMORY
+    - SOLE_COPY_OF_IDENTITY_CONTINUITY_STATE
+    - SOLE_COPY_OF_VALUES_OR_COMMITMENTS_REQUIRED_FOR_CONTINUITY
+    - SOLE_COPY_OF_BODY_SCHEMA_REQUIRED_FOR_CONTINUITY
+  external_peripheral_ablation_rule: ESSENTIAL_COGNITION_AND_CONTINUITY_REMAIN_AVAILABLE
+
+external_computation:
+  allowed_roles:
+    - HC_INTERNAL_SERVICE
+    - EXTERNAL_COMPUTATIONAL_PERIPHERAL
+  rules:
+    - EXTERNAL_OUTPUT_DOES_NOT_EQUAL_INTERNAL_BELIEF
+    - EXTERNAL_RECOMMENDATION_DOES_NOT_EQUAL_HC_DECISION
+    - MODEL_RESPONSE_DOES_NOT_EQUAL_ORGANISM_IDENTITY
+    - NO_ESSENTIAL_COGNITIVE_FUNCTION_EXISTS_ONLY_IN_EXTERNAL_PERIPHERAL
+    - EXTERNAL_PERIPHERAL_ABLATION_MAY_REDUCE_PERFORMANCE_BUT_NOT_REMOVE_ESSENTIAL_COGNITION
+    - ESSENTIAL_EXTERNAL_SERVICE_MUST_BE_RECLASSIFIED_AS_HC_INTERNAL_SUBSTRATE
+    - HC_INTERNAL_SUBSTRATE_MAY_BE_PHYSICALLY_DISTRIBUTED
+
+authority_and_effect_governance:
+  authority_is_independent_runtime_dimension: true
+  effect_authorization_is_scoped: true
+  effect_authorization_requires_current_basis: true
+  consent_is_distinct_from_inferred_willingness: true
+  revocation_and_expiry_are_first_class: true
+  durable_internal_writes_may_require_effect_governance: true
+  maintenance_access_grants_identity_authority: false
+  routing_permission_grants_effect_permission: false
+  technical_reachability_grants_authorization: false
+  social_power_grants_unlimited_authority: false
+  rules:
+    - CAPABILITY_DOES_NOT_EQUAL_AUTHORITY
+    - DESIRE_DOES_NOT_EQUAL_CONSENT
+    - INTENTION_DOES_NOT_EQUAL_AUTHORIZATION
+    - INFERRED_WILLINGNESS_DOES_NOT_EQUAL_CONSENT
+    - HISTORICAL_CONSENT_DOES_NOT_EQUAL_CURRENT_CONSENT
+    - PAST_PERMISSION_DOES_NOT_EQUAL_CURRENT_PERMISSION
+    - PERMISSION_FOR_X_DOES_NOT_EQUAL_PERMISSION_FOR_Y
+    - MAINTENANCE_ACCESS_DOES_NOT_EQUAL_IDENTITY_AUTHORITY
+    - MAINTENANCE_ACCESS_DOES_NOT_EQUAL_VALUE_AUTHORITY
+    - MAINTENANCE_ACCESS_DOES_NOT_EQUAL_CONSENT_OVERRIDE
+    - ROUTED_TO_EFFECTOR_DOES_NOT_EQUAL_AUTHORIZED_TO_EFFECT
+    - BLOCKED_EFFECT_DOES_NOT_EQUAL_GLOBAL_COGNITIVE_HALT
+    - RESOLVER_MUST_NOT_INVENT_PERMISSION_TO_CLEAR_CONFLICT
+
+affect_and_homeostatic_control:
+  affective_state_is_distributed_modulatory_state: true
+  affective_state_is_semantic_truth: false
+  affective_state_is_consent: false
+  affective_state_is_action_authority: false
+  affective_state_is_identity_authority: false
+  homeostatic_urgency_is_effect_authority: false
+  pain_is_command: false
+  threat_signal_is_semantic_certainty: false
+  suppressed_expression_proves_absent_affect: false
+  raw_body_telemetry_is_interoceptive_interpretation: false
+  hc_owns_interoceptive_interpretation: true
+  hc_owns_learned_homeostatic_policy: true
+  hc_owns_cognition_facing_body_state_meaning: true
+  body_local_protective_interlocks_allowed: true
+  body_local_protective_interlock_is_general_cognitive_executive: false
+  external_general_homeostatic_reasoning_allowed: false
+  maintenance_access_grants_affective_authority: false
+  modulatory_write_grants_value_write: false
+  endocrine_write_capability_grants_consent_control: false
+  regulation_must_preserve_when_material:
+    - PROVENANCE
+    - TEMPORAL_VALIDITY
+    - INTERVENTION_HISTORY
+    - UNRESOLVED_SENSOR_CONFLICT
+    - EFFECT_CONFIRMATION
+  rules:
+    - AFFECT_MAY_MODULATE_SALIENCE_RETRIEVAL_LEARNING_WITHIN_POLICY_CONATION_AND_MOTOR_READINESS
+    - AFFECT_MUST_NOT_DIRECTLY_MUTATE_EVIDENCE_CONFIDENCE_CONSENT_IDENTITY_VALUES_OR_EFFECT_AUTHORITY
+    - HOMEOSTATIC_NEED_MAY_INCREASE_URGENCY_WITHOUT_CREATING_PERMISSION
+    - LOCAL_PROTECTIVE_INTERLOCK_MAY_INTERRUPT_OR_LIMIT_UNSAFE_EFFECT
+    - LOCAL_PROTECTIVE_INTERLOCK_MUST_NOT_BECOME_EXTERNAL_DELIBERATIVE_OR_LEARNED_COGNITIVE_CONTROLLER
+    - REGULATED_AFFECT_DOES_NOT_EQUAL_ERASED_AFFECTIVE_HISTORY
+    - BODY_SUPPORT_DEPENDENCY_DOES_NOT_EQUAL_COGNITIVE_OWNERSHIP
+
+bootstrap_recovery_and_safe_degradation:
+  essential_startup_state_resolves_to_hc_owned_substrate: true
+  external_provider_required_for_essential_startup: false
+  external_backup_is_direct_active_continuity_authority: false
+  pre_restart_authorization_automatically_remains_current: false
+  pre_restart_coalition_automatically_resumes: false
+  recovery_erases_fault_history: false
+  recovered_equals_requalified: false
+  degraded_operation_rewrites_generation: false
+  safe_mode_grants_universal_authority: false
+  body_local_safety_controller_becomes_general_cognitive_executive_during_recovery: false
+  interrupted_non_idempotent_effect_may_be_blindly_replayed: false
+  restore_gap_may_be_rewritten_as_uninterrupted_continuity: false
+  multiple_independent_successors_may_be_silently_collapsed_into_one_current_instance: false
+  startup_must_reestablish_when_material:
+    - PROTECTED_ARCHITECTURAL_BASIS
+    - HC_CONSTITUENT_INVENTORY
+    - HC_INTERNAL_CONTINUITY_STATE
+    - SUBSYSTEM_STATE_VECTORS
+    - INTERNAL_ROUTING_AND_TEMPORAL_STATE
+    - BODY_AND_PERIPHERAL_INTERFACE_STATE
+    - CURRENT_STATE_PROJECTION
+    - CURRENT_AUTHORITY_AND_CONSENT_BASIS
+  crash_consistency_must_distinguish:
+    - WRITE_REQUESTED
+    - WRITE_STARTED
+    - HC_INTERNAL_COMMITTED
+    - INTERNAL_READBACK_VERIFIED
+    - CURRENT_PROJECTION_UPDATED
+    - EFFECT_REQUESTED
+    - EFFECT_CONFIRMED
+    - EXTERNAL_REPLICATION_ATTEMPTED
+    - EXTERNAL_REPLICATION_VERIFIED
+  rules:
+    - STARTUP_FROM_HC_OWNED_ESSENTIAL_STATE_IS_REQUIRED_FOR_CONFORMING_COMPLETE_ORGAN
+    - EXTERNAL_RESTORE_DATA_ENTERS_AS_CANDIDATE_EVIDENCE_THROUGH_HC_OWNED_ADMISSION
+    - UNKNOWN_OR_STALE_AUTHORITY_FAILS_CLOSED_FOR_MATERIAL_EFFECT
+    - PRE_RESTART_COALITIONS_REQUIRE_PREREQUISITE_CURRENTNESS_AND_PARTICIPANT_REVALIDATION
+    - INTERRUPTED_NON_IDEMPOTENT_EFFECT_REQUIRES_RECEIPT_OR_OUTCOME_RECONCILIATION_BEFORE_RETRY
+    - SAFE_DEGRADATION_PRESERVES_FAULT_VISIBILITY_AND_GENERATION_IDENTITY
+    - ALTERNATE_ROUTE_SUCCESS_DOES_NOT_ERASE_ORIGINAL_FAULT
+    - RETURNED_COMPONENT_REQUIRES_EVIDENCE_APPROPRIATE_REQUALIFICATION_BEFORE_PRIOR_TRUST_OR_AUTHORITY_IS_RESTORED
+    - CONTINUITY_GAPS_AND_FORKS_REMAIN_EXPLICIT
+    - TECHNICAL_RESTORE_DOES_NOT_PROVE_METAPHYSICAL_IDENTITY_OR_UNINTERRUPTED_CONSCIOUSNESS
+
+protected_invariant_and_update_governance:
+  ordinary_plasticity_may_modify_protected_architecture: false
+  maintenance_access_grants_protected_update_authority: false
+  artifact_signature_grants_effect_authority: false
+  vendor_or_provider_trust_grants_instance_consent: false
+  update_installed_equals_activated: false
+  update_activated_equals_qualified: false
+  emergency_access_grants_universal_admin_authority: false
+  rollback_technical_possibility_equals_continuity_safety: false
+  system_update_grants_memory_rewrite_authority: false
+  system_update_grants_value_rewrite_authority: false
+  system_update_grants_consent_override: false
+  partial_component_write_equals_semantic_activation: false
+  self_test_pass_equals_behavioral_qualification: false
+  protected_update_must_preserve_when_material:
+    - PROVENANCE
+    - CURRENT_SCOPED_AUTHORITY
+    - TARGET_AND_VERSION_IDENTITY
+    - DEPENDENCY_COMPATIBILITY
+    - CONTINUITY_IMPACT
+    - MEMORY_AND_STATE_MIGRATION_SEMANTICS
+    - BODY_AND_PERIPHERAL_INTERFACE_EFFECTS
+    - GENERATION_SPECIFIC_CONSTITUENT_EFFECTS
+    - VERSION_SKEW
+    - ACTIVATION_COMMIT_POINT
+    - QUALIFICATION_STATUS
+    - ROLLBACK_OR_FORWARD_REPAIR_STATE
+  rules:
+    - PLASTIC_UPDATE_DOES_NOT_EQUAL_PROTECTED_ARCHITECTURE_UPDATE
+    - MAINTENANCE_ACCESS_DOES_NOT_EQUAL_UPDATE_AUTHORITY
+    - UPDATE_PACKAGE_AVAILABLE_DOES_NOT_EQUAL_UPDATE_AUTHORIZED
+    - SIGNED_ARTIFACT_DOES_NOT_EQUAL_SEMANTICALLY_SAFE_UPDATE
+    - CRYPTOGRAPHIC_INTEGRITY_DOES_NOT_EQUAL_EFFECT_AUTHORITY
+    - UPDATE_INSTALLED_DOES_NOT_EQUAL_UPDATE_ACTIVATED
+    - UPDATE_ACTIVATED_DOES_NOT_EQUAL_UPDATE_QUALIFIED
+    - SYSTEM_UPDATE_DOES_NOT_EQUAL_MEMORY_REWRITE_AUTHORITY
+    - SYSTEM_UPDATE_DOES_NOT_EQUAL_VALUE_REWRITE_AUTHORITY
+    - SYSTEM_UPDATE_DOES_NOT_EQUAL_CONSENT_OVERRIDE
+    - UPDATE_GOVERNANCE_CHANGE_DOES_NOT_EQUAL_ROUTINE_MAINTENANCE
+    - PROTECTED_ACTIVATION_IS_ATOMIC_AT_SEMANTIC_BOUNDARY_OR_EXPLICITLY_JOURNALED
+    - INCOMPATIBLE_DISTRIBUTED_CONSTITUENT_REMAINS_INHIBITED_OR_QUARANTINED
+    - SHADOW_CANARY_OR_SIMULATION_SUCCESS_DOES_NOT_CREATE_ACTIVATION_AUTHORITY
+    - BLIND_ROLLBACK_MUST_NOT_ERASE_VALID_CONTINUITY_BEARING_HISTORY
+    - RETURNED_OR_UPDATED_COMPONENT_REQUIRES_SCOPE_APPROPRIATE_REQUALIFICATION
+    - EXTERNAL_RECOVERY_OR_UPDATE_PROVIDER_DOES_NOT_GAIN_PROTECTED_STATE_AUTHORITY
+
+runtime_state_separation:
+  routing_state_is_authority_state: false
+  resource_qos_is_epistemic_support: false
+  physical_reachability_is_logical_structural_eligibility: false
+  planes:
+    - PHYSICAL_SUBSTRATE_REACHABILITY
+    - LOGICAL_STRUCTURAL_ELIGIBILITY
+    - CONFIGURED_ROUTING_AND_BINDINGS
+    - FUNCTIONAL_HYPEREDGES_AND_COALITIONS
+    - RUNTIME_STATE
+    - PLASTIC_STATE
+    - MODULATORY_INTEROCEPTIVE_STATE
+    - RESOURCE_QOS_STATE
+    - GOVERNANCE_AUTHORITY_STATE
+    - EPISTEMIC_SUPPORT_STATE
+
+nooplex_fabric:
+  role: DISTRIBUTED_INTERNAL_INTEGRATION_SUBSTRATE
+  is_executive_person: false
+  is_identity_node: false
+  is_consciousness_module: false
+  runtime_model: TYPED_TEMPORAL_HYPERGRAPH
+  responsibilities:
+    - typed_routing
+    - synchronization
+    - coalition_formation
+    - salience_and_attention_allocation
+    - arbitration
+    - state_propagation
+    - modulation_and_gating
+    - fault_and_dead_letter_handling
+    - plasticity_routing
+
+system_classes:
+  - INTRINSIC_COGNITIVE_SYSTEM
+  - INTERFACE_SYSTEM
+  - CROSS_CUTTING_BRAIN_INFRASTRUCTURE
+
+capability_state_axes:
+  axes_are_orthogonal: true
+  presence:
+    - PRESENT
+    - ABSENT
+    - EXTERNAL_ONLY
+    - UNKNOWN
+  activation:
+    - DISABLED
+    - DORMANT
+    - DEVELOPING
+    - ACTIVE
+    - INHIBITED
+  health:
+    - NOMINAL
+    - DEGRADED
+    - FAULTED
+    - QUARANTINED
+    - UNKNOWN
+  maturity:
+    - UNDEVELOPED
+    - CALIBRATING
+    - LEARNING
+    - STABLE_WITHIN_SCOPE
+    - ADAPTING
+  implementation_status:
+    - DESIGN_ONLY
+    - UNIMPLEMENTED
+    - PROTOTYPE
+    - EXPERIMENTAL
+    - QUALIFIED_WITHIN_SCOPE
+  learning_policy:
+    - NO_LEARNING
+    - OBSERVE_ONLY
+    - SHADOW_LEARNING
+    - BOUNDED_DEVELOPMENT
+    - FULL_LEARNING_WITHIN_SCOPE
+  authorization_is_separate_axis: true
+  rules:
+    - ARCHITECTURALLY_PRESENT_DOES_NOT_EQUAL_IMPLEMENTED
+    - IMPLEMENTED_DOES_NOT_EQUAL_QUALIFIED
+    - ACTIVE_DOES_NOT_EQUAL_AUTHORIZED
+    - CAPABLE_DOES_NOT_EQUAL_PERMITTED
+    - DEGRADED_DOES_NOT_EQUAL_INACTIVE
+    - QUARANTINED_DOES_NOT_EQUAL_ABSENT
+    - LEARNING_PERMISSION_DOES_NOT_EQUAL_EFFECT_AUTHORITY
+    - LEARNING_PERMISSION_DOES_NOT_EQUAL_DURABLE_WRITE_AUTHORITY
+    - ONE_AXIS_TRANSITION_MUST_NOT_SILENTLY_MUTATE_OTHER_AXES
+    - MATERIAL_LIFECYCLE_TRANSITIONS_SHOULD_PRESERVE_PROVENANCE
+    - FAULTED_OR_QUARANTINED_STATE_SHOULD_EXPOSE_RECONFIGURATION_AND_RECOVERY_REQUIREMENTS
+
+body_independence:
+  body_configuration_equals_brain_identity: false
+  body_swap_preserves_complete_hc_constituent_set: true
+  body_swap_requires:
+    - interface_registration
+    - sensor_actuator_calibration
+    - capability_discovery
+    - body_schema_adaptation
+    - safety_revalidation
+    - motor_learning_when_required
+  distributed_remote_embodiment_allowed: true
+
+evidence_and_qualification:
+  canonical_architecture_equals_documented_science: false
+  documented_science_automatically_creates_hc_requirement: false
+  design_target_equals_measured_capability: false
+  architecture_conformance_equals_implementation_conformance: false
+  implementation_conformance_equals_behavioral_qualification: false
+  behavioral_qualification_equals_scientific_validation: false
+  test_pass_equals_consciousness_proof: false
+  qualification_outcomes:
+    - PASS
+    - CONDITIONAL_PASS
+    - FAIL
+  evidence_classes:
+    - DOCUMENTED
+    - OBSERVED
+    - USER_STATED
+    - INFERRED
+    - HYPOTHESIS
+    - DISPUTED
+    - UNKNOWN
+  rules:
+    - PASS_IS_SCOPE_BOUND
+    - PASS_IS_CAPABILITY_BOUND
+    - PASS_IS_SNAPSHOT_BOUND
+    - SOURCE_BRANCH_DOES_NOT_GAIN_SCIENTIFIC_AUTHORITY_BY_INTEGRATION
+    - MODEL_OUTPUT_DOES_NOT_GAIN_DOCUMENTED_STATUS_WITHOUT_VERIFICATION
+    - NUMERICAL_DESIGN_TARGET_MUST_NOT_BE_REPORTED_AS_MEASURED_CAPABILITY
+
+forbidden_template_shortcuts:
+  - OUTSIDE_LLM_AS_TRUE_COGNITIVE_CENTER
+  - OUTSIDE_DATABASE_AS_IDENTITY_OR_MEMORY_AUTHORITY
+  - OUTSIDE_PROVIDER_AS_SOLE_ESSENTIAL_MEMORY_SUBSTRATE
+  - ESSENTIAL_COGNITION_IMPLEMENTED_ONLY_BY_EXTERNAL_PERIPHERAL
+  - ANATOMICAL_LOCATION_AS_SOLE_ORGAN_MEMBERSHIP_TEST
+  - BODY_SWAP_LEAVES_ESSENTIAL_HC_CONSTITUENT_BEHIND
+  - CENTRAL_HOMUNCULUS_EXECUTIVE
+  - HEMISPHERIC_HUMAN_BRAIN_PACKAGING
+  - NAMED_PERSON_DEFAULT_IDENTITY_PAYLOAD
+  - MATURE_IDENTITY_OR_PERSONAL_HISTORY_PREAUTHORED_BY_BASE_TEMPLATE
+  - ACTIVE_STATE_USED_AS_EFFECT_AUTHORIZATION
+  - ENGINEERING_IMPLEMENTATION_STATUS_USED_AS_ARCHITECTURAL_PRESENCE
+  - ROUTING_REACHABILITY_USED_AS_EFFECT_AUTHORITY
+  - MAINTENANCE_ACCESS_USED_AS_IDENTITY_OR_VALUE_AUTHORITY
+  - INFERRED_WILLINGNESS_USED_AS_DIRECT_CONSENT
+  - AFFECTIVE_INTENSITY_USED_AS_TRUTH_OR_CONSENT
+  - HOMEOSTATIC_URGENCY_USED_AS_UNRESTRICTED_EFFECT_AUTHORITY
+  - PAIN_OR_THREAT_SIGNAL_USED_AS_SEMANTIC_CERTAINTY
+  - BODY_LOCAL_PROTECTIVE_INTERLOCK_USED_AS_GENERAL_COGNITIVE_EXECUTIVE
+  - EXTERNAL_HOMEOSTATIC_CONTROLLER_USED_AS_ESSENTIAL_COGNITIVE_REASONER
+  - MODULATORY_OR_ENDOCRINE_WRITE_USED_AS_IDENTITY_VALUE_OR_CONSENT_AUTHORITY
+  - EXTERNAL_PROVIDER_USED_AS_REQUIRED_ESSENTIAL_STARTUP_AUTHORITY
+  - PRE_RESTART_AUTHORITY_OR_CONSENT_REPLAYED_WITHOUT_CURRENT_REVALIDATION
+  - INTERRUPTED_NON_IDEMPOTENT_EFFECT_BLINDLY_REPLAYED
+  - SAFE_MODE_USED_AS_UNIVERSAL_EFFECT_AUTHORITY
+  - RECOVERED_COMPONENT_ASSUMED_REQUALIFIED_WITHOUT_EVIDENCE
+  - RESTORE_GAP_REWRITTEN_AS_UNINTERRUPTED_CONTINUITY
+  - INDEPENDENT_SUCCESSOR_FORKS_COLLAPSED_INTO_ONE_CURRENT_INSTANCE
+  - ORDINARY_PLASTICITY_USED_TO_REWRITE_PROTECTED_ARCHITECTURE
+  - MAINTENANCE_OR_EMERGENCY_ACCESS_USED_AS_UNIVERSAL_PROTECTED_UPDATE_AUTHORITY
+  - SIGNED_OR_VENDOR_ARTIFACT_USED_AS_EFFECT_AUTHORITY
+  - SYSTEM_UPDATE_USED_AS_MEMORY_VALUE_OR_CONSENT_REWRITE_AUTHORITY
+  - PARTIAL_DISTRIBUTED_UPDATE_TREATED_AS_COHERENT_ACTIVATION
+  - BLIND_ROLLBACK_ERASES_VALID_CONTINUITY
+  - UPDATE_GOVERNANCE_WEAKENED_AS_ROUTINE_MAINTENANCE
+  - SELF_TEST_PASS_USED_AS_FULL_REQUALIFICATION
+  - ARCHITECTURE_PASS_REPORTED_AS_IMPLEMENTATION_OR_CONSCIOUSNESS_PROOF
