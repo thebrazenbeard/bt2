@@ -33,10 +33,12 @@ ALTER TABLE bt2.operation_events
   ADD COLUMN actor_agent_key text;
 
 UPDATE bt2.operation_events e
-SET actor_agent_key=COALESCE(rs.agent_key,o.actor_agent_key)
-FROM bt2.operations o
-LEFT JOIN bt2.runtime_sessions rs ON rs.runtime_session_id=e.runtime_session_id
-WHERE o.operation_id=e.operation_id;
+SET actor_agent_key=COALESCE(
+  (SELECT rs.agent_key FROM bt2.runtime_sessions rs
+   WHERE rs.runtime_session_id=e.runtime_session_id),
+  (SELECT o.actor_agent_key FROM bt2.operations o
+   WHERE o.operation_id=e.operation_id)
+);
 
 ALTER TABLE bt2.operation_events
   ADD CONSTRAINT operation_events_actor_agent_key_fkey
