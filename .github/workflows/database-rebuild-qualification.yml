@@ -64,7 +64,13 @@ jobs:
           done
 
       - name: Run rebuild smoke qualification
-        run: psql -v ON_ERROR_STOP=1 -f database/tests/0001_rebuild_smoke.sql
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in database/tests/*.sql; do
+            echo "Testing $file"
+            psql -v ON_ERROR_STOP=1 -f "$file"
+          done
 
       - name: Catalog summary
         run: |
