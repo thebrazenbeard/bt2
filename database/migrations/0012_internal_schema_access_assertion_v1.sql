@@ -11,7 +11,7 @@ BEGIN
        OR has_schema_privilege(v_role,'bt2_legacy','USAGE')
        OR has_schema_privilege(v_role,'bt2','CREATE')
        OR has_schema_privilege(v_role,'bt2_legacy','CREATE') THEN
-      RAISE EXCEPTION 'BT2_INTERNAL_SCHEMA_EXPOSED_TO_ROLE:%',v_role;
+      RAISE EXCEPTION USING MESSAGE='BT2_INTERNAL_SCHEMA_EXPOSED_TO_ROLE:'||v_role;
     END IF;
 
     IF EXISTS(
@@ -25,7 +25,7 @@ BEGIN
           OR has_table_privilege(v_role,c.oid,'DELETE')
         )
     ) THEN
-      RAISE EXCEPTION 'BT2_INTERNAL_RELATION_EXPOSED_TO_ROLE:%',v_role;
+      RAISE EXCEPTION USING MESSAGE='BT2_INTERNAL_RELATION_EXPOSED_TO_ROLE:'||v_role;
     END IF;
   END LOOP;
 
