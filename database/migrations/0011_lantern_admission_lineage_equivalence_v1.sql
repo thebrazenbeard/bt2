@@ -51,8 +51,8 @@ CREATE OR REPLACE FUNCTION bt2.append_material_v1(
 ) RETURNS uuid
 LANGUAGE plpgsql AS $function$
 DECLARE
-  v_permit bt2.material_producer_permits%ROWTYPE;
-  v_policy bt2.material_schema_policy%ROWTYPE;
+  v_permit record;
+  v_policy record;
   v_payload_json json; v_payload jsonb; v_receipt uuid:=gen_random_uuid();
   v_semantic_key text; v_canonical_digest text;
   v_pre record; v_locked record;
