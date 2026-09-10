@@ -1,0 +1,122 @@
+{
+  "schema_version": "BT2_SOURCE_SNAPSHOTS_V1",
+  "exported_at": "2026-09-10",
+  "source_table": "bt2.source_snapshots",
+  "target_backend": "bt2-479e4ad9",
+  "semantics": {
+    "visibility": "captured observation at captured_at; not a claim of current repository visibility",
+    "source_commit": "for GitHub rows, frozen source commit; for Project Lantern runtime row, accepted profile digest stored by the current canonical-candidate schema",
+    "source_tree": "GitHub tree when applicable",
+    "evidence_class": "classification stored by the canonical-candidate database"
+  },
+  "snapshots": [
+    {
+      "source_snapshot_id": "ccfe4a40-c247-4c39-9d12-730a2ad5d82e",
+      "source_kind": "GITHUB",
+      "source_name": "build-team-2.0",
+      "canonical_locator": "thebrazenbeard/build-team-2.0",
+      "source_ref": "main",
+      "source_commit": "ec2987e45f64a588ac92f6cae9964cb3725b9485",
+      "source_tree": "8db9f54b59e908f0ad35fbf6bf2f2ff8b48e639f",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453312+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "workforce_core"}
+    },
+    {
+      "source_snapshot_id": "16f72b5e-b0b0-44dd-97a4-7a4249d0f360",
+      "source_kind": "GITHUB",
+      "source_name": "bugops",
+      "canonical_locator": "thebrazenbeard/bugops",
+      "source_ref": "main",
+      "source_commit": "39eb19bcf7669466c22703fbae7cc226bd44f714",
+      "source_tree": "16209d56150f7341f39492f66dfa52263437575c",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453573+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "defect_lifecycle"}
+    },
+    {
+      "source_snapshot_id": "ee935979-2109-47cf-acc9-0e86c6d20cee",
+      "source_kind": "GITHUB",
+      "source_name": "wip",
+      "canonical_locator": "thebrazenbeard/wip",
+      "source_ref": "main",
+      "source_commit": "12a7c23dbe0482fd7bfe63659e54526778efef1e",
+      "source_tree": "e2527117c7d25f92d2e6aa7365ae8b3d3b9a3c08",
+      "visibility": "public",
+      "captured_at": "2026-09-10T11:05:58.453596+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "recovery_and_effect_journal"}
+    },
+    {
+      "source_snapshot_id": "5e226439-35f7-46ca-b9e8-1a22d76367e0",
+      "source_kind": "GITHUB",
+      "source_name": "project-lantern",
+      "canonical_locator": "thebrazenbeard/project-lantern",
+      "source_ref": "feature/lantern-material-universe-v1",
+      "source_commit": "d0e05365883d8f670030fb1a1ff5fcd847937a77",
+      "source_tree": "3b155a88967f2f7a0f4ad6fa7b32ce3cbac73da0",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453609+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "governed_material_provenance"}
+    },
+    {
+      "source_snapshot_id": "319442b2-943c-40dc-b99a-69ecfa895051",
+      "source_kind": "GITHUB",
+      "source_name": "project-achilles",
+      "canonical_locator": "thebrazenbeard/project-achilles",
+      "source_ref": "main",
+      "source_commit": "dbf9ceb2391567463d864198405c9b5d1e77db09",
+      "source_tree": "1cd715bef0d2a33478d3a635bcc05155c95ab4f9",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453623+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "security_safety"}
+    },
+    {
+      "source_snapshot_id": "50468a41-cb8e-434d-8e28-b590fc521c17",
+      "source_kind": "GITHUB",
+      "source_name": "masamune",
+      "canonical_locator": "thebrazenbeard/masamune",
+      "source_ref": "collab",
+      "source_commit": "af20ff29a8419c20bd51ac4e731b670d505a452b",
+      "source_tree": "a76e3aac899a24f26af77454109e4a06978f8c30",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453636+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "masa_mune_pair"}
+    },
+    {
+      "source_snapshot_id": "c45cceff-cb99-436a-ae2b-4165dd316adc",
+      "source_kind": "GITHUB",
+      "source_name": "hephaestus",
+      "canonical_locator": "thebrazenbeard/hephaestus",
+      "source_ref": "main",
+      "source_commit": "78f6f22a0e5d14617855006a8383765589ac8c67",
+      "source_tree": "80eb19e26ff9b82f8c2eb4126c5b4e87a2318ce6",
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453648+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {"role": "independent_project_engineer"}
+    },
+    {
+      "source_snapshot_id": "abfa55d8-6482-4e59-a94f-388baa683159",
+      "source_kind": "SUPABASE",
+      "source_name": "Project Lantern",
+      "canonical_locator": "agvhmutlrolbaijzlbqk",
+      "source_ref": "runtime-cut",
+      "source_commit": "99ad3bcb89fdb16c5eff9fc870fdf210c5eed03b23c650c6e96352c902fa77a1",
+      "source_tree": null,
+      "visibility": "private",
+      "captured_at": "2026-09-10T11:05:58.453666+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {
+        "b0_b1_stable": true,
+        "policy_digest": "ae3ced9107a5a1adff9b85879847bb8cc0f8f4f7417e182f4c72e47593075445",
+        "material_count": 2
+      }
+    }
+  ]
+}
