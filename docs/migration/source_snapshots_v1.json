@@ -3,11 +3,13 @@
   "exported_at": "2026-09-10",
   "source_table": "bt2.source_snapshots",
   "target_backend": "bt2-479e4ad9",
+  "row_count": 12,
   "semantics": {
     "visibility": "captured observation at captured_at; not a claim of current repository visibility",
     "source_commit": "for GitHub rows, frozen source commit; for Project Lantern runtime row, accepted profile digest stored by the current canonical-candidate schema",
     "source_tree": "GitHub tree when applicable",
-    "evidence_class": "classification stored by the canonical-candidate database"
+    "evidence_class": "classification stored by the canonical-candidate database",
+    "training_package_rows": "exact distributed package source observations; package presence does not imply integrity verification, qualification, BASE_READY, or current activation"
   },
   "snapshots": [
     {
@@ -116,6 +118,86 @@
         "b0_b1_stable": true,
         "policy_digest": "ae3ced9107a5a1adff9b85879847bb8cc0f8f4f7417e182f4c72e47593075445",
         "material_count": 2
+      }
+    },
+    {
+      "source_snapshot_id": "45097757-a21c-4c26-a9db-8119c54163ca",
+      "source_kind": "GITHUB_TRAINING_PACKAGE",
+      "source_name": "two-v1.0.0",
+      "canonical_locator": "thebrazenbeard/build-team-2.0:training/roles/two/v1.0.0",
+      "source_ref": "two",
+      "source_commit": "47f26e2c5c9b37e6fc61134844278d524f095b51",
+      "source_tree": "f1599a046c7dd6882a4cfdc8054c21c255441a6a",
+      "visibility": "private",
+      "captured_at": "2026-09-10T13:29:48.870326+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {
+        "version": "1.0.0",
+        "agent_key": "two",
+        "manifest_path": "training/roles/two/v1.0.0/TRAINING_MANIFEST.yaml",
+        "recovery_state": "PACKAGE_FOUND_QUALIFICATION_UNPROVEN",
+        "package_tree_sha": "e42eeb5c3c269b8e42aa955b1e85846d63eafe98",
+        "manifest_blob_sha": "257eaeef34c568e1c8812f6e3451a276162b1fac"
+      }
+    },
+    {
+      "source_snapshot_id": "67601df6-ed9a-427e-badd-04d38a2d20af",
+      "source_kind": "GITHUB_TRAINING_PACKAGE",
+      "source_name": "three-v1.0.0",
+      "canonical_locator": "thebrazenbeard/build-team-2.0:training/roles/three/v1.0.0",
+      "source_ref": "training/three-role-v1.0.0",
+      "source_commit": "f5f43e61c85ed96df040c2a2d8e1df523706a215",
+      "source_tree": "594d2000ee0cb0f5dcbdc1edf6586430140049c2",
+      "visibility": "private",
+      "captured_at": "2026-09-10T13:29:48.870441+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {
+        "version": "1.0.0",
+        "agent_key": "three",
+        "manifest_path": "training/roles/three/v1.0.0/TRAINING_MANIFEST.json",
+        "recovery_state": "PACKAGE_FOUND_QUALIFICATION_UNPROVEN",
+        "package_tree_sha": "696484549f1e729bb04b546e50973efc1fa4439c",
+        "manifest_blob_sha": "315777e08bffc4808ebf68e715c8d58c2d00f2ee"
+      }
+    },
+    {
+      "source_snapshot_id": "3d037a1f-25d5-4699-877b-35756ead4678",
+      "source_kind": "GITHUB_TRAINING_PACKAGE",
+      "source_name": "seven-v1.0.0",
+      "canonical_locator": "thebrazenbeard/project-achilles:training/roles/seven/v1.0.0",
+      "source_ref": "main",
+      "source_commit": "dbf9ceb2391567463d864198405c9b5d1e77db09",
+      "source_tree": "1cd715bef0d2a33478d3a635bcc05155c95ab4f9",
+      "visibility": "private",
+      "captured_at": "2026-09-10T13:29:48.870463+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {
+        "version": "1.0.0",
+        "agent_key": "seven",
+        "manifest_path": "training/roles/seven/v1.0.0/TRAINING_MANIFEST.json",
+        "recovery_state": "PACKAGE_FOUND_QUALIFICATION_UNPROVEN",
+        "package_tree_sha": "86b38a66d7bb5d6b71e1bf9754dee3248e2e9792",
+        "manifest_blob_sha": "00e89de1dd4d37e54feb6a75341335c80e878595"
+      }
+    },
+    {
+      "source_snapshot_id": "8a1f7a10-0d70-439d-b7cf-55495a9e85aa",
+      "source_kind": "GITHUB_TRAINING_PACKAGE",
+      "source_name": "eight-v1.0.0",
+      "canonical_locator": "thebrazenbeard/build-team-2.0:training/roles/eight/v1.0.0",
+      "source_ref": "feature/eight-training-v1.0.0",
+      "source_commit": "7fb3f506a66324b5a54d7cda3103899d520c3f04",
+      "source_tree": "62fec5e73f39ba6583becc601a352f0892aa60bc",
+      "visibility": "private",
+      "captured_at": "2026-09-10T13:29:48.870482+00:00",
+      "evidence_class": "OBSERVED",
+      "metadata": {
+        "version": "1.0.0",
+        "agent_key": "eight",
+        "manifest_path": "training/roles/eight/v1.0.0/TRAINING_MANIFEST.yaml",
+        "recovery_state": "PACKAGE_FOUND_QUALIFICATION_UNPROVEN",
+        "package_tree_sha": "5217e383cefad53b9ef97f6e35544b0e10f8da58",
+        "manifest_blob_sha": "afb8042a344c01290bfd43685cc05ee489d12462"
       }
     }
   ]
