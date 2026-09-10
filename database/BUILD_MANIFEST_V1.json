@@ -4,7 +4,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "work/two-canonical-platform-integrity-v1",
-    "head_before_manifest": "2b8e96ad1d0152d911015ff89a599ceac2ba8d24"
+    "head_before_manifest": "57d109a140b07828b1a9c156b6993ac570de97d6"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -15,12 +15,12 @@
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "92a9a563c79466759887a1f201a4fa540282277e",
+    "migrations_tree": "94c578161726c243a4318aaeb91f431dd8b4b3df",
     "tests_tree": "59ec101a463dca025812d755362d0be11e006689",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:92a9a563c79466759887a1f201a4fa540282277e|tests:59ec101a463dca025812d755362d0be11e006689|admin:6447503b9ab4f4613c657488742da88abea7cffa|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "f940645a1065a376ac0fb15867e49ad609f7906124220611ef617adfb77910e2"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:94c578161726c243a4318aaeb91f431dd8b4b3df|tests:59ec101a463dca025812d755362d0be11e006689|admin:6447503b9ab4f4613c657488742da88abea7cffa|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "e6754b4b221cc30ea9458513221e9517a4e720834fd0421580c49dafcc28404d"
   },
   "ordered_apply": [
     {"path":"database/schema/0001_bt2_runtime_baseline.sql","git_blob":"30d895855829c722d93a0b0fbb1e8065dfe62cb6"},
@@ -35,10 +35,12 @@
     {"path":"database/migrations/0010_bugops_status_closure_scalar_fix_v1.sql","git_blob":"fd0a48c0eea08a71bf2da98602366b22c2d9567f"},
     {"path":"database/migrations/0011_lantern_admission_lineage_equivalence_v1.sql","git_blob":"7f4b0bd534b23952199e1e493659bf7d51ab64fc"},
     {"path":"database/migrations/0012_internal_schema_access_assertion_v1.sql","git_blob":"2ac4f622b1cc5cc2acc554b0d3bfc51200bf2096"},
-    {"path":"database/migrations/0013_runtime_identity_cross_binding_v1.sql","git_blob":"18928b0e5d6a2bb88d72d3bbe441b41d82edec4f"}
+    {"path":"database/migrations/0013_runtime_identity_cross_binding_v1.sql","git_blob":"18928b0e5d6a2bb88d72d3bbe441b41d82edec4f"},
+    {"path":"database/migrations/0014_training_source_state_separation_v1.sql","git_blob":"7b20752ef442f979c59d610f2b3857988c8af04d"}
   ],
   "qualification": {
     "smoke_test": {"path":"database/tests/0001_rebuild_smoke.sql","git_blob":"3655d60f84f2a6a54be7098a3fbe385cf454a7ed"},
+    "live_training_source_state_probe": "PASS_ROLLBACK_CONTAINED",
     "blank_rebuild_status": "PENDING_EXTERNAL_EXECUTION",
     "github_actions_status": "WORKFLOW_REGISTERED_BUT_JOB_FAILS_BEFORE_RUNNER_START"
   },
@@ -49,6 +51,8 @@
     "merge": false,
     "cutover": false,
     "legacy_retirement": false,
-    "producer_authorization": false
+    "producer_authorization": false,
+    "qualification_import": false,
+    "runtime_training_installation": false
   }
 }
