@@ -1,0 +1,66 @@
+name: Database rebuild qualification
+
+on:
+  pull_request:
+    paths:
+      - 'database/**'
+      - '.github/workflows/database-rebuild-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild-and-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bt2_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d bt2_ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      PGPASSWORD: postgres
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGDATABASE: bt2_ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify PostgreSQL
+        run: psql -v ON_ERROR_STOP=1 -c 'select version();'
+
+      - name: Apply captured baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in database/schema/*.sql; do
+            echo "Applying $file"
+            psql -v ON_ERROR_STOP=1 -f "$file"
+          done
+
+      - name: Apply canonical migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in database/migrations/*.sql; do
+            echo "Applying $file"
+            psql -v ON_ERROR_STOP=1 -f "$file"
+          done
+
+      - name: Run rebuild smoke qualification
+        run: psql -v ON_ERROR_STOP=1 -f database/tests/0001_rebuild_smoke.sql
+
+      - name: Catalog summary
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "select n.nspname,count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname in ('bt2','bt2_legacy') and c.relkind in ('r','v') group by n.nspname order by n.nspname;"
+          psql -v ON_ERROR_STOP=1 -c "select count(*) as bt2_functions from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='bt2';"
