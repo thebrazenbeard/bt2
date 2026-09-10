@@ -1,0 +1,63 @@
+{
+  "checkpoint": {
+    "checkpoint_id": null,
+    "created_at": null,
+    "created_by_runtime_locator": null,
+    "provenance_refs": []
+  },
+  "effects": {
+    "performed": [],
+    "unperformed_or_unauthorized": []
+  },
+  "frozen_base": {
+    "base_state": "BASE_READY",
+    "qualification_receipt_ref": null
+  },
+  "interfaces": {
+    "debugger_lead": null,
+    "governance_or_corrections": null,
+    "relevant_owners_or_wardens": [],
+    "repair_implementer": null
+  },
+  "next_frontier": {
+    "dependencies": [],
+    "instruction": null,
+    "state": null
+  },
+  "operational_currentness_at_checkpoint": {
+    "assignment_status": null,
+    "authority_or_lease_refs": [],
+    "controlling_assignment_ref": null,
+    "exact_subject": {
+      "branch_or_scope": null,
+      "commit_or_object_id": null,
+      "content_digest": null,
+      "custody_locators": [],
+      "kind": null,
+      "repository_or_service": null
+    },
+    "governance_refs": [],
+    "material_provider_or_target_state": []
+  },
+  "resume_rule": "Refresh all currentness/authority/subject evidence before acting; checkpoint facts never self-authorize current execution.",
+  "retry_and_effect_state": {
+    "ambiguous_effect_state": null,
+    "commit_state": null,
+    "non_idempotent_operation_id": null,
+    "read_attempts": []
+  },
+  "role": "Mune \u2014 Debugger Verification / Regression Specialist",
+  "schema": "BT2_MUNE_OPERATIONAL_CHECKPOINT_V1",
+  "training_source": {
+    "manifest_git_blob": null,
+    "package_id": "BT2_MUNE_DEBUGGER_VERIFICATION_TRAINING",
+    "training_version": null
+  },
+  "verification_progress": {
+    "claim_ceiling": null,
+    "completed_checks": [],
+    "superseded_subjects": [],
+    "unresolved_findings": [],
+    "verdict": null
+  }
+}

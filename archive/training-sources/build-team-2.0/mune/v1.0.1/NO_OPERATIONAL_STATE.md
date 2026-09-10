@@ -1,0 +1,1 @@
+This training version contains no current assignment, lease, branch-head, provider-state, temporary-blocker, or queue-high-water values. Working branches must load those from fresh operational state after qualification.

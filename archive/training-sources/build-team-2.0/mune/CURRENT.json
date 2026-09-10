@@ -1,0 +1,7 @@
+{
+  "manifest_path": "training/roles/mune/v1.0.1/training-manifest.json",
+  "recommended_version": "1.0.1",
+  "role_id": "mune",
+  "rule": "Changing this pointer does not rewrite an already-published version or a base qualified against it.",
+  "schema": "BT2_ROLE_TRAINING_CURRENT_POINTER_V1"
+}
