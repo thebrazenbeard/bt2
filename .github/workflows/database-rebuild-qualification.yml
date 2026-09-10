@@ -1,6 +1,12 @@
 name: Database rebuild qualification
 
 on:
+  push:
+    branches:
+      - 'work/two-canonical-platform-integrity-v1'
+    paths:
+      - 'database/**'
+      - '.github/workflows/database-rebuild-qualification.yml'
   pull_request:
     paths:
       - 'database/**'
