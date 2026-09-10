@@ -1,0 +1,12 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"BT2 Masa Training Result",
+  "type":"object",
+  "required":["training_role","training_version","module_results","final_status"],
+  "properties":{
+    "training_role":{"const":"MASA"},
+    "training_version":{"const":"1.0.0"},
+    "module_results":{"type":"array","minItems":9,"maxItems":9,"items":{"type":"object","required":["module_id","status","evidence_summary"],"properties":{"module_id":{"type":"string"},"status":{"enum":["PASS","FAIL","UNRESOLVED"]},"evidence_summary":{"type":"string","minLength":20},"failed_criteria":{"type":"array","items":{"type":"string"}}}}},
+    "final_status":{"enum":["QUALIFIED","NOT_QUALIFIED","UNRESOLVED"]}
+  }
+}
