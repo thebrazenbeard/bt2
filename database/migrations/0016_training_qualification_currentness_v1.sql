@@ -186,6 +186,7 @@ LEFT JOIN bt2.runtime_sessions rs
   ON rs.runtime_session_id=i.runtime_session_id
  AND rs.agent_key=i.agent_key;
 
+-- Preserve the V1 view's existing columns and append effective-currentness fields.
 CREATE OR REPLACE VIEW bt2.agent_training_state_v1 AS
 SELECT
   a.agent_key,
@@ -201,10 +202,10 @@ SELECT
   i.target_kind,
   i.target_locator,
   i.runtime_session_id,
-  i.observed_state AS runtime_installation_observed_state,
+  i.observed_state AS runtime_installation_state,
+  i.observed_at AS runtime_installation_observed_at,
   i.activation_currently_valid,
-  i.effective_state AS runtime_installation_effective_state,
-  i.observed_at AS runtime_installation_observed_at
+  i.effective_state AS runtime_installation_effective_state
 FROM bt2.agents a
 LEFT JOIN bt2.training_packages tp ON tp.agent_key=a.agent_key
 LEFT JOIN bt2.training_qualification_current_v1 q
