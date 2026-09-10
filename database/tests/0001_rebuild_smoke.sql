@@ -94,6 +94,61 @@ BEGIN
 END
 $test$;
 
+-- Training source preservation is not compatibility, qualification, or installation.
+INSERT INTO bt2.migration_receipts(
+  migration_key,source_system,target_component,migration_digest_sha256,
+  result_state,evidence,applied_at,verified_at
+) VALUES (
+  'CI-TRAINING-TWO-PRESERVATION','CI','archive/training-sources/ci/two/v1',
+  repeat('a',64),'VERIFIED',
+  jsonb_build_object(
+    'target_package_tree',repeat('b',40),
+    'qualification_effect','NONE',
+    'runtime_installation_effect','NONE'
+  ),clock_timestamp(),clock_timestamp()
+);
+
+DO $test$
+DECLARE v_id1 uuid; v_id2 uuid; v_rejected boolean:=false;
+BEGIN
+  SELECT bt2.register_preserved_training_package_v1(
+    'two','ci-v1','ci/source','ci-ref',repeat('c',40),repeat('d',40),
+    'training/roles/two/ci-v1','archive/training-sources/ci/two/v1/TRAINING_MANIFEST.yaml',
+    repeat('b',40),repeat('e',40),'CI-TRAINING-TWO-PRESERVATION'
+  ) INTO v_id1;
+  SELECT bt2.register_preserved_training_package_v1(
+    'two','ci-v1','ci/source','ci-ref',repeat('c',40),repeat('d',40),
+    'training/roles/two/ci-v1','archive/training-sources/ci/two/v1/TRAINING_MANIFEST.yaml',
+    repeat('b',40),repeat('e',40),'CI-TRAINING-TWO-PRESERVATION'
+  ) INTO v_id2;
+
+  IF v_id1 IS DISTINCT FROM v_id2 THEN RAISE EXCEPTION 'TRAINING_REGISTRATION_REPLAY_DIVERGED'; END IF;
+  IF EXISTS (
+    SELECT 1 FROM bt2.training_packages tp
+    WHERE tp.training_package_id=v_id1
+      AND (tp.status<>'REGISTERED' OR tp.source_binding_state<>'BYTE_PRESERVED_VERIFIED' OR tp.compatibility_state<>'UNASSESSED')
+  ) THEN
+    RAISE EXCEPTION 'TRAINING_SOURCE_STATE_COLLAPSED';
+  END IF;
+  IF (SELECT count(*) FROM bt2.training_qualifications WHERE training_package_id=v_id1)<>0 THEN
+    RAISE EXCEPTION 'TRAINING_PRESERVATION_CREATED_QUALIFICATION';
+  END IF;
+
+  BEGIN
+    UPDATE bt2.training_packages
+    SET status='QUALIFIED_BASE',compatibility_state='COMPATIBLE'
+    WHERE training_package_id=v_id1;
+  EXCEPTION WHEN OTHERS THEN
+    IF position('QUALIFIED_BASE_REQUIRES_COMPATIBLE_PASS_EVIDENCE' in SQLERRM)>0 THEN
+      v_rejected:=true;
+    ELSE
+      RAISE;
+    END IF;
+  END;
+  IF NOT v_rejected THEN RAISE EXCEPTION 'QUALIFIED_BASE_WITHOUT_PASS_ACCEPTED'; END IF;
+END
+$test$;
+
 -- No synthetic qualification fixture may be present after an empty rebuild.
 DO $test$
 BEGIN
