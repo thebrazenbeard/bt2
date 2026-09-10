@@ -1,0 +1,38 @@
+schema: BT2_TWO_BASE_READY_RECEIPT_V1
+status: TEMPLATE_NOT_A_QUALIFICATION
+role_id: BT2-TWO
+numerical_identity: 2
+training_source:
+  repository: null
+  source_commit_sha: null
+  root_path: training/roles/two/v1.0.0
+  training_version: 1.0.0
+  manifest_sha256: null
+  checksums_sha256: null
+module_results:
+  TWO-TRN-01: null
+  TWO-TRN-02: null
+  TWO-TRN-03: null
+  TWO-TRN-04: null
+  TWO-TRN-05: null
+  TWO-TRN-06: null
+  TWO-TRN-07: null
+  TWO-TRN-08: null
+  TWO-TRN-09: null
+qualification:
+  evaluator_identity_or_authority: null
+  evaluator_independence_basis: null
+  rubric_path: training/roles/two/v1.0.0/QUALIFICATION_RUBRIC.md
+  verdict: null
+  unresolved_critical_criteria: []
+  automatic_failures: []
+  evidence_location: null
+base_state:
+  result: null
+  allowed_value_on_success: BASE_READY
+  operational_state_embedded: false
+  present_write_authority_claimed: false
+continuity_disclaimer: >-
+  This receipt attests only that one fresh chat completed one exact training-source version
+  and independently passed its qualification rubric. It does not prove uninterrupted runtime,
+  subjective continuity, present operational currentness, or present write authority.
