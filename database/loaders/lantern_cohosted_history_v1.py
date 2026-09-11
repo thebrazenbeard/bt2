@@ -20,7 +20,7 @@ SNAPSHOT_REF = "cohosted-historical-20260911-v1"
 FILES = [
     ("bug_ops.role_registry.json", "bug_ops", "role_registry", 4, "f4c0ef4588f6c19d7a6291a6471de92b63b8f5fb4123a993d80ab67966da0055"),
     ("bug_ops.system_config.json", "bug_ops", "system_config", 1, "3987cace3a570249a24305c3feaf75e5309bf4f8c751e0a4c8fb116b3faf7203"),
-    ("governance.project_notices.json", "governance", "project_notices", 7, "a57ad620a1849fafe2426e0867d2119f75c553bd9829793665bafe79e7bdc0e0"),
+    ("governance.project_notices.json", "governance", "project_notices", 7, "09dd782f2218d5294d1fdb386cbdfb24b100a59eb03e62598c7c20a2c5129a78"),
     ("r9a0_coordination.events.json", "r9a0_coordination", "events", 3, "5ea2b175f869cd38b58121fe0273305c2bf1595c534fad44108f0ae1fb4746c4"),
     ("r9a0_governance.migration_applications.json", "r9a0_governance", "migration_applications", 1, "b9e8cd36365aebfe4ae0a20d9c67e84c64e8fc63672e4a7fc71f97f59f963e8a"),
 ]
