@@ -4,6 +4,15 @@
 -- qualification, runtime installation, assignment, authority, or currentness.
 
 SELECT bt2.register_preserved_training_package_v1(
+  'one','1.0.0','thebrazenbeard/build-team-2.0','training/one-role-v1.0.0',
+  'ed1f2c5515425deab4c77c2f4fd291a1086191d4','0cd6bca8a3d1aaab9e47f3f8b23d3a18a6f4d40a',
+  'training/roles/one/v1.0.0',
+  'archive/training-sources/build-team-2.0/one/v1.0.0/TRAINING_MANIFEST.yaml',
+  'e27ce67b67159fb445347ae9a8888fe3c480cdd1','e6d8e6b4a8139d8073b08fe7f346107f66a16458',
+  'BT2-TRAINING-ONE-V1.0.0-BYTE-PRESERVATION-V1'
+);
+
+SELECT bt2.register_preserved_training_package_v1(
   'two','1.0.0','thebrazenbeard/build-team-2.0','two',
   '47f26e2c5c9b37e6fc61134844278d524f095b51','f1599a046c7dd6882a4cfdc8054c21c255441a6a',
   'training/roles/two/v1.0.0',
