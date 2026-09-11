@@ -4,7 +4,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "work/two-canonical-platform-integrity-v1",
-    "head_before_manifest": "c438b3ada62bf173bdf55fc9f7249d6aa840b8d2"
+    "head_before_manifest": "3339aa39d2311f636d89af9dc945d96127946e5b"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -15,13 +15,15 @@
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "2c9aa4f2fcb2879e52c148dfa196f25c622a9a44",
+    "migrations_tree": "4a27d7a4619c956c4322ba022c582118d1e8b97b",
     "tests_tree": "7e08e5fe3fdd6810184ffa670201682e280ca790",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "45eaaaef686dcd79868d1088e64108667d099b7b",
+    "lantern_archive_tree": "0aae7f220704d34e101d43ae1102a1b51dd5776a",
+    "loaders_tree": "bc20078e1758948ae722c27f67705f5bfbc1ed45",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:2c9aa4f2fcb2879e52c148dfa196f25c622a9a44|tests:7e08e5fe3fdd6810184ffa670201682e280ca790|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:45eaaaef686dcd79868d1088e64108667d099b7b|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "08b8ac63405ea927d3b6ec2db5d0756df8ab80a5f10b631e950c1afc7f8e0994"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:4a27d7a4619c956c4322ba022c582118d1e8b97b|tests:7e08e5fe3fdd6810184ffa670201682e280ca790|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:45eaaaef686dcd79868d1088e64108667d099b7b|archive:0aae7f220704d34e101d43ae1102a1b51dd5776a|loaders:bc20078e1758948ae722c27f67705f5bfbc1ed45|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "f2388c412ce580f3254bb37c3df87be6154876c61a603559aea40826de37c8ff"
   },
   "ordered_apply": [
     {"path":"database/schema/0001_bt2_runtime_baseline.sql","git_blob":"30d895855829c722d93a0b0fbb1e8065dfe62cb6"},
@@ -39,38 +41,49 @@
     {"path":"database/migrations/0013_runtime_identity_cross_binding_v1.sql","git_blob":"18928b0e5d6a2bb88d72d3bbe441b41d82edec4f"},
     {"path":"database/migrations/0014_training_source_state_separation_v1.sql","git_blob":"7b20752ef442f979c59d610f2b3857988c8af04d"},
     {"path":"database/migrations/0015_training_installation_evidence_v1.sql","git_blob":"0fae912b115ba1cf3b065468f9c9662e06c38b77"},
-    {"path":"database/migrations/0016_training_qualification_currentness_v1.sql","git_blob":"966f6668cbb080cd217794634c8cd3b0db7c6751"}
+    {"path":"database/migrations/0016_training_qualification_currentness_v1.sql","git_blob":"966f6668cbb080cd217794634c8cd3b0db7c6751"},
+    {"path":"database/migrations/0017_legacy_source_archive_integrity_v1.sql","git_blob":"3a05a86e0a7b921bfd264c30bccd57cb4fdef093"}
   ],
   "post_preservation_data_loads": [
     {
       "path": "database/data/0001_verified_training_source_registry_v1.sql",
       "git_blob": "e313af9b735a06caf21d6d132d5afc5be8eab4ab",
-      "precondition": "referenced byte-preservation migration receipts exist as VERIFIED",
-      "effect_ceiling": "register preserved training source only; no compatibility, qualification, installation, assignment, authority, or currentness effect",
-      "live_result": "8 package-level source bindings registered; all REGISTERED/BYTE_PRESERVED_VERIFIED/UNASSESSED; zero qualifications; zero installation events"
+      "effect_ceiling": "register preserved training source only",
+      "live_result": "8-package predecessor frontier historically applied"
     },
     {
       "path": "database/data/0002_verified_training_source_registry_receipt_v2.sql",
       "git_blob": "bae0c51366fe4348612578cdf8812b204ff90e7b",
-      "precondition": "the eight-package registry subject exists exactly with zero qualification/install effects",
-      "effect_ceiling": "append a VERIFIED migration receipt for the eight-package registry frontier; preserve V1 as historical seven-package evidence",
-      "live_result": "BT2-TRAINING-SOURCE-REGISTRY-POPULATION-V2 VERIFIED with digest ab185318e8865136228efd684382d3e67601abfa357ffcabc3be6ca1c8312e11"
+      "effect_ceiling": "record exact eight-package frontier",
+      "live_result": "VERIFIED historical eight-package frontier"
     },
     {
       "path": "database/data/0003_four_verified_training_source_registration_v1.sql",
       "git_blob": "c2ce2cd725032b81e8ef38756910949a0e8b008d",
-      "precondition": "Four v1.0.1 source/destination package trees independently reproduce exact identity 0953afaeeec7543697f97711e5a2326d954e9fa3",
-      "effect_ceiling": "append Four byte-preservation receipt and register Four source only; no compatibility, qualification, installation, activation, assignment, authority, or currentness effect",
-      "live_result": "STAGED_NOT_APPLIED"
+      "effect_ceiling": "Four source preservation receipt and source registration only; no compatibility, qualification, installation, activation, assignment, authority, or currentness",
+      "live_result": "OBSERVED_APPLIED_EXACT_SUBJECT; writer attribution not established in Two lane"
     },
     {
       "path": "database/data/0004_verified_training_source_registry_receipt_v3.sql",
       "git_blob": "d4d74b7e6ce2d44b887d9fa16e703ecdcab298a8",
-      "precondition": "the nine-package registry subject exists exactly with Four v1.0.1 preserved/unassessed and zero qualification/install effects",
-      "effect_ceiling": "append VERIFIED V3 receipt for nine-package frontier while retaining V2 as historical eight-package evidence",
-      "live_result": "STAGED_NOT_APPLIED"
+      "effect_ceiling": "record exact nine-package frontier while preserving V2 as historical eight-package evidence",
+      "live_result": "VERIFIED; nine packages, zero qualifications, zero installation events"
     }
   ],
+  "historical_archive_inputs": {
+    "project_lantern_cohosted_history": {
+      "archive_path": "archive/supabase-project-lantern/cohosted-historical/2026-09-11",
+      "archive_tree": "0aae7f220704d34e101d43ae1102a1b51dd5776a",
+      "manifest": "archive/supabase-project-lantern/cohosted-historical/2026-09-11/ARCHIVE_MANIFEST_V1.json",
+      "row_count": 16,
+      "combined_rows_sha256": "6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712",
+      "classification": "HISTORICAL_PROVENANCE_ONLY",
+      "loader": "database/loaders/lantern_cohosted_history_v1.py",
+      "loader_tree": "bc20078e1758948ae722c27f67705f5bfbc1ed45",
+      "live_result": "STAGED_NOT_APPLIED",
+      "effect_ceiling": "bt2.source_snapshots historical binding plus bt2_legacy.source_rows only; active governance, coordination, workforce, training, and BugOps counts must remain unchanged"
+    }
+  },
   "qualification": {
     "smoke_tests": [
       {"path":"database/tests/0001_rebuild_smoke.sql","git_blob":"5a231d5461e8fa54a8dde1156bb7ac050a4a45bc"},
@@ -78,14 +91,12 @@
       {"path":"database/tests/0003_training_source_registry_reconstruction_smoke.sql","git_blob":"31c96a79b5382c6825254a047a3259be7a3b70a6"},
       {"path":"database/tests/0004_four_training_source_frontier_smoke.sql","git_blob":"43d55f1947d58a9e04278aac691b707d4afbeb77"}
     ],
-    "live_training_source_state_probe": "PASS_ROLLBACK_CONTAINED",
-    "live_training_installation_currentness_probe": "PASS_ROLLBACK_CONTAINED",
-    "live_verified_training_source_registry_population": "PASS_8_SOURCE_BINDINGS_ONLY",
-    "live_training_source_registry_replay": "PASS_ROLLBACK_CONTAINED",
-    "live_training_source_registry_population_receipt_v2": "VERIFIED",
-    "four_nine_package_source_frontier": "SOURCE_BOUND_TEST_PRESENT_LIVE_EFFECT_NOT_APPLIED",
+    "lantern_historical_archive_reconstruction": "SOURCE_BOUND_CLEAN_ROOM_PATH_PRESENT_LIVE_LOAD_NOT_APPLIED",
+    "live_training_source_registry_population": "PASS_9_SOURCE_BINDINGS_ONLY",
+    "live_training_qualification_count": 0,
+    "live_training_installation_event_count": 0,
     "blank_rebuild_status": "PENDING_EXTERNAL_EXECUTION",
-    "github_actions_status": "WORKFLOW_REGISTERED_BUT_JOB_FAILS_BEFORE_RUNNER_START"
+    "github_actions_status": "WORKFLOW_REGISTERED_BUT_PRIOR_JOBS_FAIL_BEFORE_RUNNER_START"
   },
   "admin_only": [
     {"path":"database/admin/BT2_INTERNAL_SCHEMA_ACCESS_BOUNDARY_V1.sql","git_blob":"3aa52810d95c244610323d884a2cc7f47e19fb7f","status":"STAGED_NOT_APPLIED","reason":"WoWSQL MCP safety layer rejects privilege mutation; current hosted boundary independently passes"}
@@ -94,6 +105,7 @@
     "merge": false,
     "cutover": false,
     "legacy_retirement": false,
+    "project_lantern_supabase_delete": false,
     "producer_authorization": false,
     "qualification_import": false,
     "runtime_training_installation": false
