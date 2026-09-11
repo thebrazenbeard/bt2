@@ -1,6 +1,64 @@
--- Project Lantern WoWSQL successor-runtime smoke qualification V1.
--- Read-only. Verifies governed-cut stability, payload cross-binding, payload digest integrity,
--- and fail-closed behavior for an unknown project scope.
+-- Project Lantern WoWSQL successor-runtime clean-room smoke qualification V1.
+-- Self-contained and rollback-only: creates a synthetic governed-material universe,
+-- verifies stable cut + payload cross-binding + payload digest integrity + fail-closed
+-- unknown-scope behavior, then removes every fixture effect with ROLLBACK.
+
+BEGIN;
+
+INSERT INTO bt2.material_schema_policy(
+  schema_version,canonicalizer_digest,semantic_projector_digest,semantic_fields
+) VALUES (
+  'BT2_LANTERN_RUNTIME_SMOKE_V1',
+  repeat('c',64),
+  repeat('d',64),
+  ARRAY['semantic_role','subject_key']::text[]
+);
+
+INSERT INTO bt2.material_profiles(
+  project_scope,profile_digest,predecessor_digest,policy_digest,accepted
+) VALUES (
+  'BT2_LANTERN_RUNTIME_SMOKE',repeat('a',64),NULL,repeat('b',64),true
+);
+
+INSERT INTO bt2.material_producer_permits(
+  permit_id,project_scope,producer_principal,schema_version,
+  profile_digest,policy_digest,valid_from,valid_until,invalidated_at
+) VALUES (
+  '00000000-0000-4000-8000-000000000501'::uuid,
+  'BT2_LANTERN_RUNTIME_SMOKE','bt2-test-fixture','BT2_LANTERN_RUNTIME_SMOKE_V1',
+  repeat('a',64),repeat('b',64),clock_timestamp()-interval '1 hour',
+  clock_timestamp()+interval '1 hour',NULL
+);
+
+WITH p AS (
+  SELECT '{"semantic_role":"TEST","subject_key":"LANTERN_RUNTIME_SMOKE"}'::jsonb AS payload
+)
+INSERT INTO bt2.materials(
+  material_id,project_scope,schema_version,semantic_key,
+  canonical_digest,source_digest,canonical_payload
+)
+SELECT
+  '00000000-0000-4000-8000-000000000502'::uuid,
+  'BT2_LANTERN_RUNTIME_SMOKE','BT2_LANTERN_RUNTIME_SMOKE_V1',
+  encode(public.digest(convert_to(
+    jsonb_build_array(payload->'semantic_role',payload->'subject_key')::text,'UTF8'),'sha256'),'hex'),
+  encode(public.digest(convert_to(payload::text,'UTF8'),'sha256'),'hex'),
+  repeat('e',64),payload
+FROM p;
+
+INSERT INTO bt2.material_receipts(
+  receipt_id,material_id,project_scope,producer_principal,permit_id,
+  profile_digest,policy_digest,schema_version,semantic_key,
+  canonical_digest,source_digest
+)
+SELECT
+  '00000000-0000-4000-8000-000000000503'::uuid,
+  m.material_id,m.project_scope,'bt2-test-fixture',
+  '00000000-0000-4000-8000-000000000501'::uuid,
+  repeat('a',64),repeat('b',64),m.schema_version,m.semantic_key,
+  m.canonical_digest,m.source_digest
+FROM bt2.materials m
+WHERE m.material_id='00000000-0000-4000-8000-000000000502'::uuid;
 
 DO $test$
 DECLARE
@@ -13,13 +71,13 @@ DECLARE
   v_unknown_count integer;
 BEGIN
   SELECT count(*) INTO v_cut_count
-  FROM bt2.material_cut_v1('PROJECT_LANTERN');
+  FROM bt2.material_cut_v1('BT2_LANTERN_RUNTIME_SMOKE');
   IF v_cut_count <> 1 THEN
     RAISE EXCEPTION 'LANTERN_WOWSQL_CUT_NOT_SINGULAR';
   END IF;
 
   SELECT * INTO STRICT v_b0
-  FROM bt2.material_cut_v1('PROJECT_LANTERN');
+  FROM bt2.material_cut_v1('BT2_LANTERN_RUNTIME_SMOKE');
 
   IF v_b0.facade_id <> 'BT2_MATERIAL_CUT_V1' THEN
     RAISE EXCEPTION 'LANTERN_WOWSQL_FACADE_ID_MISMATCH';
@@ -34,7 +92,7 @@ BEGIN
          ) ORDER BY material_id),'[]'::jsonb)
   INTO v_payload_count,v_payload_members
   FROM bt2.runtime_visible_materials_v1
-  WHERE project_scope='PROJECT_LANTERN';
+  WHERE project_scope='BT2_LANTERN_RUNTIME_SMOKE';
 
   IF v_payload_count IS DISTINCT FROM v_b0.material_count THEN
     RAISE EXCEPTION 'LANTERN_WOWSQL_PAYLOAD_COUNT_MISMATCH';
@@ -46,7 +104,7 @@ BEGIN
 
   SELECT count(*) INTO v_mismatch_count
   FROM bt2.runtime_visible_materials_v1
-  WHERE project_scope='PROJECT_LANTERN'
+  WHERE project_scope='BT2_LANTERN_RUNTIME_SMOKE'
     AND (
       profile_digest IS DISTINCT FROM v_b0.profile_digest
       OR policy_digest IS DISTINCT FROM v_b0.policy_digest
@@ -61,7 +119,7 @@ BEGIN
   END IF;
 
   SELECT * INTO STRICT v_b1
-  FROM bt2.material_cut_v1('PROJECT_LANTERN');
+  FROM bt2.material_cut_v1('BT2_LANTERN_RUNTIME_SMOKE');
 
   IF v_b1.facade_id IS DISTINCT FROM v_b0.facade_id
      OR v_b1.profile_digest IS DISTINCT FROM v_b0.profile_digest
@@ -80,3 +138,5 @@ BEGIN
   END IF;
 END
 $test$;
+
+ROLLBACK;
