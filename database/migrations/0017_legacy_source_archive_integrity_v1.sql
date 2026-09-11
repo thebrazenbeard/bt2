@@ -138,7 +138,8 @@ BEGIN
     IF FOUND THEN
       IF v_existing.row_data IS DISTINCT FROM v_row_data
          OR v_existing.source_snapshot_id IS DISTINCT FROM p_source_snapshot_id THEN
-        RAISE EXCEPTION 'LEGACY_SOURCE_ROW_REPLAY_CONFLICT:%:%:%',v_schema,v_relation,v_primary_key;
+        RAISE EXCEPTION USING MESSAGE =
+          'LEGACY_SOURCE_ROW_REPLAY_CONFLICT:' || v_schema || ':' || v_relation || ':' || v_primary_key;
       END IF;
       CONTINUE;
     END IF;
