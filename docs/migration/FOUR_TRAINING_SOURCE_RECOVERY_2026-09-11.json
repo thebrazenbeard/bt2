@@ -1,0 +1,95 @@
+{
+  "schema": "BT2_FOUR_TRAINING_SOURCE_RECOVERY_ATTEMPT_V1",
+  "date": "2026-09-11",
+  "coordination_id": "BT2-CANONICAL-PLATFORM-20260910",
+  "assignment_message": "one-0163",
+  "status": "SOURCE_SELECTED_PRESERVATION_BLOCKED",
+  "source": {
+    "repository": "thebrazenbeard/build-team-2.0",
+    "source_ref": "training/four-v1.1.0",
+    "source_commit": "c21ed8ba4fa0db02a9ea2671adbef9f6c9442c0e",
+    "source_commit_tree": "c78c06584aefdc8a613c3850d3e89908692a2426",
+    "package_path": "training/roles/four/v1.1.0",
+    "package_tree": "84177f5ae9f1ab1f7c06f68bb0cf6429bbfc7bdb",
+    "manifest_blob": "e1e129f1f428b5df0020894d3e3e17a0140d60f3",
+    "manifest_sha256": "5e4ca3ed038382cc3f8054671d0530287049e27c3fd491088adb6f781052c278",
+    "package_content_sha256": "2feb1a2bb00ee68057c8ba03ed30123030fd99099f789fef51c95216f31a5061",
+    "version": "1.1.0",
+    "declared_status": "PUBLISHED_VERSIONED_TRAINING_SOURCE"
+  },
+  "selection_evidence": {
+    "training_index_blob": "c85259099033ebe3329fdafa833ffe7ed1b95093",
+    "selection_rule": "highest non-deprecated STABLE version after fresh index retrieval",
+    "observed_four_training_refs": [
+      "training/four-v1.0.0",
+      "training/four-v1.1.0",
+      "four"
+    ],
+    "stale_recovery_record_version": "1.0.1",
+    "stale_recovery_record_commit": "bf045dd627aef5650b9ed85c036b9a6340afe68f",
+    "result": "v1.1.0 supersedes the stale recovery-record candidate for preservation selection"
+  },
+  "target": {
+    "repository": "thebrazenbeard/bt2",
+    "base_branch": "work/source-preservation-v1",
+    "base_commit": "692b72e423077ad47fc2f8c3f104742ce7216c5f",
+    "child_branch": "work/preserve-four-v1",
+    "intended_archive_path": "archive/training-sources/build-team-2.0/four/v1.1.0"
+  },
+  "byte_transfer_evidence": {
+    "target_git_blobs_created_but_unreferenced": [
+      {
+        "path": "BOOTSTRAP.md",
+        "sha": "ab9c540ec494d193db728df8e574ce688cef5843",
+        "matches_source_blob": true
+      },
+      {
+        "path": "checkpoint/README.md",
+        "sha": "3405324312d3298bf401c91088881cc11bf37506",
+        "matches_source_blob": true
+      },
+      {
+        "path": "checkpoint/BASE_READY_RECEIPT.schema.json",
+        "sha": "0c1ae8f85accde464f5dbee1db22c8f8c9b1c0d8",
+        "matches_source_blob": true
+      },
+      {
+        "path": "checkpoint/OPERATIONAL_CHECKPOINT.schema.json",
+        "sha": "0b9ca0af21c61bea11af7ae88ea550c5050b5f93",
+        "matches_source_blob": true
+      }
+    ],
+    "blocking_file_class": "training module prose",
+    "blocked_source_examples": [
+      "modules/01-governed-role-recovery.md",
+      "modules/02-evidence-currentness-discipline.md"
+    ],
+    "attempted_write_routes": [
+      "GitHub create_blob utf-8",
+      "GitHub create_file",
+      "GitHub create_blob base64",
+      "GitHub create_tree inline content"
+    ],
+    "blocker": "OpenAI connector safety classification could not determine safety status and blocked exact-byte writes. Rewriting source bytes is prohibited by the preservation assignment.",
+    "local_authenticated_git_route": "UNAVAILABLE"
+  },
+  "probe_branch_note": {
+    "branch": "work/preserve-four-v1-object-probe",
+    "state": "INERT_EXTRA_BRANCH",
+    "created_from": "692b72e423077ad47fc2f8c3f104742ce7216c5f",
+    "cleanup": "NOT_PERFORMED; branch deletion requires separate authority"
+  },
+  "preservation_result": "INCOMPLETE",
+  "qualification_state": "UNPROVEN",
+  "runtime_installation_state": "NOT_ESTABLISHED",
+  "activation_state": "NOT_ESTABLISHED",
+  "non_effects": [
+    "no merge",
+    "no source rewrite",
+    "no qualification promotion",
+    "no training installation or activation",
+    "no provider mutation",
+    "no legacy retirement"
+  ],
+  "required_next_step": "Use an authorized Git route capable of copying the exact private source subtree without content rewriting, then require target package_tree == 84177f5ae9f1ab1f7c06f68bb0cf6429bbfc7bdb before verification handoff."
+}
