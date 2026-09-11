@@ -153,6 +153,7 @@ def _docker_exec_psql_file(container: str, rel: str) -> subprocess.CompletedProc
     ])
 
 
+
 def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: str) -> tuple[str, str]:
     if _SHA40.fullmatch(expected_commit) is None or _SHA40.fullmatch(expected_tree) is None:
         fail('SOURCE_BINDING_INVALID')
@@ -167,7 +168,6 @@ def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: 
     if status:
         fail('SOURCE_WORKTREE_DIRTY')
     return commit, tree
-
 
 def build_receipt(
     *,
