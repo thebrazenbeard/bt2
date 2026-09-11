@@ -111,7 +111,7 @@ BEGIN
   FOR v_elem IN SELECT value FROM jsonb_array_elements(p_rows)
   LOOP
     IF jsonb_typeof(v_elem) <> 'object'
-       OR (SELECT array_agg(k ORDER BY k) FROM jsonb_object_keys(v_elem) k)
+       OR (SELECT array_agg(key ORDER BY key) FROM jsonb_object_keys(v_elem) AS keys(key))
           IS DISTINCT FROM ARRAY['row_data','source_primary_key','source_relation','source_schema']::text[] THEN
       RAISE EXCEPTION 'INVALID_LEGACY_SOURCE_ROW_ENVELOPE';
     END IF;
