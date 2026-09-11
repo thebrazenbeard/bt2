@@ -146,6 +146,7 @@ def _docker_exec_psql(container: str, sql: str) -> subprocess.CompletedProcess[s
     ], input_text=sql)
 
 
+
 def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: str) -> tuple[str, str]:
     if _SHA40.fullmatch(expected_commit) is None or _SHA40.fullmatch(expected_tree) is None:
         fail('SOURCE_BINDING_INVALID')
@@ -160,7 +161,6 @@ def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: 
     if status:
         fail('SOURCE_WORKTREE_DIRTY')
     return commit, tree
-
 
 def build_receipt(
     *,
@@ -215,6 +215,7 @@ def run_qualification(
     if not docker_version:
         fail('DOCKER_VERSION_UNAVAILABLE')
 
+    started = False
     try:
         _run([
             'docker', 'run', '--detach', '--name', container,
@@ -222,6 +223,7 @@ def run_qualification(
             '-e', 'POSTGRES_DB=bt2_ci',
             postgres_image,
         ])
+        started = True
 
         ready = False
         for _ in range(60):
@@ -271,6 +273,7 @@ def run_qualification(
             stage_results=stage_results,
         )
     finally:
+        # Even if startup partially failed, cleanup is safe/idempotent and never touches WoWSQL.
         _run(['docker', 'rm', '-f', container], check=False)
 
 
