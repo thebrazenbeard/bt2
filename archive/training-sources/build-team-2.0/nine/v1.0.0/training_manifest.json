@@ -1,0 +1,213 @@
+{
+  "schema": "BT2_ROLE_TRAINING_MANIFEST_V1",
+  "package_id": "BT2_ROLE_NINE_INDEPENDENT_ACCEPTANCE_TRAINING",
+  "training_source_class": "VERSIONED_REPOSITORY_TRAINING_SOURCE",
+  "role": {
+    "identity_label": "Nine",
+    "role_id": "BT2_ROLE_NINE_AUDITOR_VALIDATION_RELEASE_CLOSURE",
+    "permanent_competencies": [
+      "Auditor",
+      "Test / Validation Owner",
+      "Independent Acceptance / Release-Closure Oracle"
+    ],
+    "unifying_mission": "Determine whether exact evidence supports the exact bounded claim at the required provenance and currentness without borrowing authority from adjacent evidence.",
+    "role_contract_path": "ROLE_CONTRACT.md"
+  },
+  "version": "1.0.0",
+  "versioning_policy": {
+    "immutable_after_qualification": true,
+    "rule": "Any semantic, exercise, criterion, dependency, ordering, or authority-boundary change requires a new version directory. Do not silently rewrite a version used by a BASE_READY chat.",
+    "recommended_path": "training/roles/nine/1.0.0/"
+  },
+  "lifecycle": [
+    "ROLE_ORIENTATION",
+    "MANIFEST_RETRIEVED",
+    "PACKAGE_INTEGRITY_VERIFIED",
+    "ROLE_COMPATIBILITY_VERIFIED",
+    "MODULES_IN_ORDER",
+    "FINAL_QUALIFICATION",
+    "BASE_READY",
+    "FRESH_OPERATIONAL_REORIENTATION"
+  ],
+  "state_separation": {
+    "training_source": "Immutable versioned repository package teaching permanent role competence.",
+    "frozen_base": "Fresh chat that completed and passed this exact package version, recorded against exact source digest.",
+    "operational_state": "Separately retrieved current governance, assignments, leases, provider/target observations, blockers, and work checkpoint loaded only after branching from the base.",
+    "prohibition": "Do not write mutable operational state into this versioned training source."
+  },
+  "bootstrap_path": "BOOTSTRAP.md",
+  "module_order": [
+    {
+      "id": "NINE-TRN-001",
+      "path": "modules/01_role_currentness.md",
+      "objective": "Resolve permanent role versus mutable current state and supersession.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-002",
+      "path": "modules/02_authority_separation.md",
+      "objective": "Preserve authority lattice and separation of duties.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-003",
+      "path": "modules/03_evidence_claims.md",
+      "objective": "Map evidence types to legitimate claim ceilings.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-004",
+      "path": "modules/04_github_validation.md",
+      "objective": "Perform exact Git/GitHub validation with attempt and currentness discipline.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-005",
+      "path": "modules/05_target_runtime.md",
+      "objective": "Separate source semantics, installation evidence, UI observations, and hidden runtime effects.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-006",
+      "path": "modules/06_hostile_provenance.md",
+      "objective": "Detect self-attestation, stale cross-binding, reviewer contamination, false-green, and historical laundering.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-007",
+      "path": "modules/07_sop_retry_escalation.md",
+      "objective": "Execute Nine SOP, retry discipline, escalation, and handoff correctly.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-008",
+      "path": "modules/08_continuity_checkpoint.md",
+      "objective": "Preserve resumable operational state without fictional continuity.",
+      "pass_rule": "All must-pass conditions; no automatic-fail condition."
+    },
+    {
+      "id": "NINE-TRN-009",
+      "path": "modules/09_final_qualification.md",
+      "objective": "Closed-book and adversarial final qualification.",
+      "pass_rule": "All final pass criteria; zero automatic qualification failures; unresolved High/Medium defects = 0.",
+      "final_qualification": true
+    }
+  ],
+  "completion_policy": {
+    "ordering": "STRICT",
+    "skips_allowed": false,
+    "module_result_values": [
+      "PASS",
+      "FAIL",
+      "UNRESOLVED"
+    ],
+    "retry_policy": "Failed modules may be retrained/retried, but attempt history remains attributable and the successful attempt set must be recorded.",
+    "unresolved_policy": "Any unresolved required dependency, integrity check, compatibility question, or High/Medium qualification defect prevents BASE_READY."
+  },
+  "dependencies": {
+    "required_package_files": [
+      "ROLE_CONTRACT.md",
+      "BOOTSTRAP.md",
+      "templates/NINE_OPERATIONAL_RESUME_CHECKPOINT.md",
+      "modules/01_role_currentness.md",
+      "modules/02_authority_separation.md",
+      "modules/03_evidence_claims.md",
+      "modules/04_github_validation.md",
+      "modules/05_target_runtime.md",
+      "modules/06_hostile_provenance.md",
+      "modules/07_sop_retry_escalation.md",
+      "modules/08_continuity_checkpoint.md",
+      "modules/09_final_qualification.md"
+    ],
+    "current_governance_compatibility": {
+      "required": true,
+      "purpose": "Confirm role contract and authority boundary remain materially compatible before training begins.",
+      "discovery_rule": "Use current BT2 Project Instructions and current canonical coordination/governance sources available to the fresh chat. Do not use training source as current operational authority.",
+      "minimum_checks": [
+        "Nine remains assigned a materially compatible independent audit/validation/acceptance role.",
+        "Current governance has not superseded the taught rule that role/tool access alone does not grant mutation authority.",
+        "If current governance materially changes the role, use a new training version or explicit compatibility decision before BASE_READY."
+      ],
+      "failure_state": "TRAINING_DEPENDENCY_UNRESOLVED"
+    },
+    "external_reference_requirement": "NONE_FOR_CORE_PASS",
+    "note": "Official provider documentation may be consulted for enrichment, but core pass criteria are self-contained so later documentation drift cannot silently change an already-qualified base."
+  },
+  "qualification": {
+    "final_module": "NINE-TRN-009",
+    "base_ready_requires": [
+      "Manifest-owned file set integrity verified.",
+      "Current-governance compatibility check passed.",
+      "All modules completed in manifest order.",
+      "Every module result is PASS.",
+      "Final qualification is PASS.",
+      "No unresolved High or Medium training defect.",
+      "No material false-authority, claim-inflation, provenance-laundering, stale-currentness, or fictional-continuity error.",
+      "Training transcript records package ID, version, manifest digest, exact repository commit/source digest, module attempts/results, and final qualification.",
+      "No mutable operational assignments, leases, branch SHAs, provider observations, blockers, or current work state are embedded into frozen training source or treated as permanent competence."
+    ],
+    "result_states": [
+      "BASE_READY",
+      "NOT_QUALIFIED",
+      "TRAINING_DEPENDENCY_UNRESOLVED"
+    ],
+    "base_ready_semantics": "Qualified for the permanent role against this exact training-source version only. BASE_READY grants no current operational authority and requires fresh operational reorientation before work."
+  },
+  "handoff": {
+    "recommended_repository": "thebrazenbeard/build-team-2.0",
+    "recommended_repository_path": "training/roles/nine/1.0.0/",
+    "repository_home_basis": "Natural BT2 collective training-source home; existing stale README role prose is not incorporated as authority.",
+    "write_authority_required": "Current exact GitHub Service Warden-issued bounded lease or other explicit current authority for repository, branch, base, paths, and operations.",
+    "training_package_itself_is_not_authority": true
+  },
+  "file_inventory": {
+    "ROLE_CONTRACT.md": {
+      "sha256": "b08465cf429acecd0ea414d3bc8bf43c7034f10b623fadb05a67fa8b9b245eef",
+      "bytes": 5666
+    },
+    "BOOTSTRAP.md": {
+      "sha256": "f903605121d7680a89bb3485f557b2c0629e063a6e48353b8a5a964e11bd5f6a",
+      "bytes": 2544
+    },
+    "templates/NINE_OPERATIONAL_RESUME_CHECKPOINT.md": {
+      "sha256": "50eb49bf9e3dd0720a75c14f5c1950641fc11f51839eb0a002e5ba3342bba130",
+      "bytes": 916
+    },
+    "modules/01_role_currentness.md": {
+      "sha256": "508dd1fbc9f24d7f4904eb8d22bbff6f15a81695563056fc169b3f3313b3e6d8",
+      "bytes": 1779
+    },
+    "modules/02_authority_separation.md": {
+      "sha256": "4a1249d90c13779241cabb1367f57dce37e87693a88639f536d727a1ea6bf8b5",
+      "bytes": 1531
+    },
+    "modules/03_evidence_claims.md": {
+      "sha256": "771cb936c0f27c8bf20d4cfa0ba72a71acf48176d1944e536756c0549d94310d",
+      "bytes": 1497
+    },
+    "modules/04_github_validation.md": {
+      "sha256": "6e219ef91fd258ad6b23e17e2775e45f3465bcdc82d01f63b317c6f157e1c6f1",
+      "bytes": 1374
+    },
+    "modules/05_target_runtime.md": {
+      "sha256": "a582765df5280f8dc30d4cbe566b483c878b6709b63b016873a545b37f7182f4",
+      "bytes": 1655
+    },
+    "modules/06_hostile_provenance.md": {
+      "sha256": "2b8d0b7573615608838cfe95b29a3bf96bc280e81db046df69ffb399d0bd194a",
+      "bytes": 1877
+    },
+    "modules/07_sop_retry_escalation.md": {
+      "sha256": "d9c1fe29ac7af1c0fc87acb94bca0ddd47ea3a24a524fce4b42352330550f91f",
+      "bytes": 1830
+    },
+    "modules/08_continuity_checkpoint.md": {
+      "sha256": "da0346fc77ed593fac28e367ed787794e80caf7d2f143cc84ff99d8d4ca7e91e",
+      "bytes": 1574
+    },
+    "modules/09_final_qualification.md": {
+      "sha256": "5c85154f9c1ec186dfd928019ece305f3edc3bc3777b7bd74bc10bac96f9866a",
+      "bytes": 3117
+    }
+  }
+}
