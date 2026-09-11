@@ -35,7 +35,7 @@
       "source_relation": "project_notices",
       "primary_key_column": "notice_id",
       "row_count": 7,
-      "source_rowset_sha256": "a57ad620a1849fafe2426e0867d2119f75c553bd9829793665bafe79e7bdc0e0",
+      "source_rowset_sha256": "09dd782f2218d5294d1fdb386cbdfb24b100a59eb03e62598c7c20a2c5129a78",
       "path": "governance.project_notices.json",
       "git_blob": "343bec10760637f024a24483adac78362a1da931"
     },
