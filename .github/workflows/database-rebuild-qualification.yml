@@ -74,11 +74,11 @@ jobs:
             psql -v ON_ERROR_STOP=1 -f "$file"
           done
 
-      - name: Qualify Project Lantern cohosted historical reconstruction
+      - name: Qualify Project Lantern cohosted historical reconstruction V2
         shell: bash
         run: |
           set -euo pipefail
-          python database/loaders/lantern_cohosted_history_v1.py --mode verify-rollback > /tmp/lantern_cohosted_history_verify.sql
+          python database/loaders/lantern_cohosted_history_v2.py --mode verify-rollback > /tmp/lantern_cohosted_history_verify.sql
           psql -v ON_ERROR_STOP=1 -f /tmp/lantern_cohosted_history_verify.sql
 
       - name: Catalog summary
