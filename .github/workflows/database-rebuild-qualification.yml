@@ -6,10 +6,12 @@ on:
       - 'work/two-canonical-platform-integrity-v1'
     paths:
       - 'database/**'
+      - 'archive/supabase-project-lantern/**'
       - '.github/workflows/database-rebuild-qualification.yml'
   pull_request:
     paths:
       - 'database/**'
+      - 'archive/supabase-project-lantern/**'
       - '.github/workflows/database-rebuild-qualification.yml'
   workflow_dispatch:
 
@@ -71,6 +73,13 @@ jobs:
             echo "Testing $file"
             psql -v ON_ERROR_STOP=1 -f "$file"
           done
+
+      - name: Qualify Project Lantern cohosted historical reconstruction
+        shell: bash
+        run: |
+          set -euo pipefail
+          python database/loaders/lantern_cohosted_history_v1.py --mode verify-rollback > /tmp/lantern_cohosted_history_verify.sql
+          psql -v ON_ERROR_STOP=1 -f /tmp/lantern_cohosted_history_verify.sql
 
       - name: Catalog summary
         run: |
