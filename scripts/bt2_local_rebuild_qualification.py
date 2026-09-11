@@ -139,12 +139,18 @@ def _run(cmd: list[str], *, input_text: str | None = None, check: bool = True) -
     return result
 
 
-def _docker_exec_psql(container: str, sql: str) -> subprocess.CompletedProcess[str]:
-    return _run([
-        'docker', 'exec', '-i', container,
-        'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', 'bt2_ci',
-    ], input_text=sql)
+def _container_sql_path(rel: str) -> str:
+    if not isinstance(rel, str) or not rel or rel.startswith('/') or '..' in Path(rel).parts:
+        fail(f'MANIFEST_PATH_INVALID:{rel}')
+    return '/workspace/' + rel.replace('\\', '/')
 
+
+def _docker_exec_psql_file(container: str, rel: str) -> subprocess.CompletedProcess[str]:
+    return _run([
+        'docker', 'exec', container,
+        'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', 'bt2_ci',
+        '-f', _container_sql_path(rel),
+    ])
 
 
 def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: str) -> tuple[str, str]:
@@ -161,6 +167,7 @@ def verify_source_binding(repo_root: Path, expected_commit: str, expected_tree: 
     if status:
         fail('SOURCE_WORKTREE_DIRTY')
     return commit, tree
+
 
 def build_receipt(
     *,
@@ -215,15 +222,14 @@ def run_qualification(
     if not docker_version:
         fail('DOCKER_VERSION_UNAVAILABLE')
 
-    started = False
     try:
         _run([
             'docker', 'run', '--detach', '--name', container,
             '-e', 'POSTGRES_PASSWORD=bt2-local-only',
             '-e', 'POSTGRES_DB=bt2_ci',
+            '--mount', f'type=bind,src={repo_root},dst=/workspace,readonly',
             postgres_image,
         ])
-        started = True
 
         ready = False
         for _ in range(60):
@@ -249,8 +255,7 @@ def run_qualification(
             fail(f'POSTGRES_MAJOR_MISMATCH:{observed_major}:{expected_major}')
 
         for stage_kind, rel in manifest_execution_paths(manifest):
-            sql = (repo_root / rel).read_text()
-            _docker_exec_psql(container, sql)
+            _docker_exec_psql_file(container, rel)
             stage_results.append({'stage': f'{stage_kind}:{rel}', 'exit_code': 0})
 
         for extension in manifest['target']['required_extensions']:
@@ -273,7 +278,6 @@ def run_qualification(
             stage_results=stage_results,
         )
     finally:
-        # Even if startup partially failed, cleanup is safe/idempotent and never touches WoWSQL.
         _run(['docker', 'rm', '-f', container], check=False)
 
 
