@@ -27,6 +27,29 @@ Installation wrapper:
 
 The wrapper binds the exact Project Instructions V2 replacement block and explicitly requires replacement, not coexistence, of the four Supabase-bound runtime files.
 
+## V1 -> V2 semantic-preservation review
+
+The frozen successor was compared against the actual installed V1 source files, not against memory or summaries.
+
+PASS findings:
+- consultation triggers remain materially the same: durable/current project state, continuation/recovery, visible Lantern material, provenance/currentness reconciliation, and Project-required Lantern use;
+- ordinary chat, creative work, current-turn-complete requests, and unrelated domains remain outside normal consultation;
+- session/runtime continuity remains explicitly non-persistent;
+- exact-provider binding is preserved while intentionally changing the provider from Supabase to WoWSQL `bt2-479e4ad9`;
+- governed read semantics remain B0 -> payload -> B1 with exact membership/count/profile/policy cross-binding and one complete retry before `UNKNOWN`;
+- fail-closed behavior is preserved and strengthened by explicitly prohibiting fallback to Supabase, Git source, Project prose, historical material, model memory, another provider, or another project as current Lantern state;
+- read-only default and separate-current-authority requirements are preserved; the successor adds protected-effect categories but grants no new authority;
+- source/package readiness, Project installation, runtime consumption, and provider retirement remain separate status axes;
+- old static `SHA256SUMS` / `SOURCE_BINDING.json` package verification is replaced by one frozen commit/tree plus four exact Git blob identities and an installation packet. This is a provenance mechanism change, not a weakening of the provenance requirement;
+- the four-file replacement set is complete: handshake, read queries, runtime contract, and acceptance;
+- remaining references to Supabase inside successor material are negative/no-fallback, parity/final-freeze, migration, or historical references rather than currentness routes.
+
+No wording was found that amplifies producer authority, material-admission authority, database write authority, Project mutation authority, runtime identity continuity, qualification, training installation/activation, or provider-retirement authority.
+
+Disposition for One's requested falsification review: `PASS_FOR_PREINSTALL_SOURCE_SUBJECT`.
+
+This PASS is deliberately limited to semantic/source readiness. It does not establish Project installation, fresh-runtime behavioral qualification, dependency-zero, final-frontier equality, or Supabase retirement readiness.
+
 ## Backend/source review
 
 Reviewed current combined database/runtime subject:
