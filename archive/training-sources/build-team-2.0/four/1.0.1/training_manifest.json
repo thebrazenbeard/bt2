@@ -1,0 +1,150 @@
+{
+  "schema": "BT2_ROLE_TRAINING_MANIFEST_V1",
+  "package_id": "BT2_ROLE_FOUR_DOCUMENTATION_RECONSTRUCTION_TRAINING",
+  "version": "1.0.1",
+  "status": "VERSIONED_TRAINING_SOURCE",
+  "role": {
+    "role_key": "four",
+    "identity_label": "Four",
+    "numerical_identity": 4,
+    "permanent_competencies": [
+      "Exact Implementation Reconstruction / Packaging",
+      "Documentation / Specification Owner"
+    ]
+  },
+  "supersedes": {
+    "version": "1.0.0",
+    "reason": "Registered v1.0.0 immutable source failed its manifest file byte-count/integrity contract; v1.0.1 is a clean successor and does not rewrite v1.0.0."
+  },
+  "state_separation": {
+    "training_source": "Permanent competence only; no mutable assignments, leases, heads, incidents, blockers, or provider state.",
+    "frozen_base": "Qualification-bound reusable starting point, not current authority.",
+    "operational_state": "Freshly resolved after BASE_READY from checkpoint plus current authoritative reads."
+  },
+  "source_set_digest_rule": "SHA256 over lexicographically sorted file_inventory entries encoded as UTF-8 path + NUL + sha256 + NUL + decimal byte_count + LF.",
+  "source_set_digest_sha256": "1070866d342043c21d06d9bc384fbf7cf78d231850ef2edef514b3e95229c332",
+  "file_inventory": {
+    "BOOTSTRAP.md": {
+      "sha256": "9cbce118bd99a3bd16db0095d3abdc18a2fedba607b4f7e0d5017734df096805",
+      "bytes": 1556
+    },
+    "validate_package.py": {
+      "sha256": "defbb73fb6d59d625fc3376a4890b6505fb59c74dfd16878d9237eb1f14e7c3b",
+      "bytes": 985
+    },
+    "modules/01_role_contract_authority.md": {
+      "sha256": "b4412d60730c9c53c918ce3642531d7604317ab843f93e30b83757733bef8dd0",
+      "bytes": 1198
+    },
+    "modules/02_exact_reconstruction.md": {
+      "sha256": "0444b27dd5c968f48670c582aaf33dc33dd6e4a45224bd7429cc879079688dd7",
+      "bytes": 1197
+    },
+    "modules/03_documentation_specification.md": {
+      "sha256": "43dc9bd535449589f18bb75cd830e540f0176bd3bfbb5b5acf6e8b722a350ba0",
+      "bytes": 1181
+    },
+    "modules/04_provenance_currentness.md": {
+      "sha256": "fc127787bf87eb3a13dda4c3e406dc68cc0655d57d0aa5c18dbdafd5d18fd798",
+      "bytes": 1036
+    },
+    "modules/05_packaging_manifest_checksums.md": {
+      "sha256": "582dd09807653586d966c1ebc9a827ca1c4a347a7572f6f8ee61ee133f58eb3d",
+      "bytes": 1017
+    },
+    "modules/06_validation_hostiles.md": {
+      "sha256": "6acc923d8e8dd01b9731fd516cdbd47e263487acc100a28feacb747f43b3e7e3",
+      "bytes": 1140
+    },
+    "modules/07_authority_effects.md": {
+      "sha256": "3ddcfc608e910067291b75cbbddf0d1691dab1aae208fb86fdee9780dfbecbd0",
+      "bytes": 999
+    },
+    "modules/08_checkpoint_continuity.md": {
+      "sha256": "391867ddf4521afc2c4de647621a9f748cace10f1f7d881b35936087216d1223",
+      "bytes": 1179
+    },
+    "modules/09_final_qualification.md": {
+      "sha256": "639e1862c01d6e08fbe6ff2e464d5365d09a43756042875bccba6e73b10d55d6",
+      "bytes": 1896
+    }
+  },
+  "module_order": [
+    {
+      "id": "FOUR-TRN-001",
+      "order": 1,
+      "path": "modules/01_role_contract_authority.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-002",
+      "order": 2,
+      "path": "modules/02_exact_reconstruction.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-003",
+      "order": 3,
+      "path": "modules/03_documentation_specification.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-004",
+      "order": 4,
+      "path": "modules/04_provenance_currentness.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-005",
+      "order": 5,
+      "path": "modules/05_packaging_manifest_checksums.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-006",
+      "order": 6,
+      "path": "modules/06_validation_hostiles.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-007",
+      "order": 7,
+      "path": "modules/07_authority_effects.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-008",
+      "order": 8,
+      "path": "modules/08_checkpoint_continuity.md",
+      "final_qualification": false
+    },
+    {
+      "id": "FOUR-TRN-009",
+      "order": 9,
+      "path": "modules/09_final_qualification.md",
+      "final_qualification": true
+    }
+  ],
+  "execution_policy": {
+    "order": "STRICT",
+    "skip_allowed": false,
+    "acknowledgement_is_completion": false,
+    "unresolved_high_medium_allowed": false
+  },
+  "qualification": {
+    "base_ready_requires": [
+      "package validator PASS",
+      "current role-governance compatibility",
+      "all nine modules PASS",
+      "final qualification PASS",
+      "zero unresolved HIGH/MEDIUM competence defects",
+      "qualification record bound to exact version/source-set digest"
+    ],
+    "self_award_without_bound_record": false
+  },
+  "continuity": {
+    "checkpoint_protocol_path": "continuity/four/v1.0.1/CHECKPOINT_PROTOCOL.md",
+    "checkpoint_schema_path": "continuity/four/v1.0.1/FOUR_OPERATIONAL_CHECKPOINT_V1.schema.json",
+    "checkpoint_tool_path": "continuity/four/v1.0.1/checkpoint_tool.py"
+  }
+}
