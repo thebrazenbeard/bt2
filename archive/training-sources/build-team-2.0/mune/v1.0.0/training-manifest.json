@@ -1,0 +1,130 @@
+{
+  "schema": "BT2_ROLE_TRAINING_MANIFEST_V1",
+  "package_id": "BT2_MUNE_DEBUGGER_VERIFICATION_TRAINING",
+  "training_version": "1.0.0",
+  "role": {
+    "role_id": "mune",
+    "display_name": "Mune",
+    "permanent_role": "Debugger Verification / Regression Specialist",
+    "role_contract_version": "1.0.0"
+  },
+  "purpose": "Train a fresh chat in permanent Mune verification competence without embedding mutable operational state.",
+  "lifecycle": [
+    "ROLE_ORIENTATION",
+    "RETRIEVE_TRAINING_MANIFEST",
+    "VERIFY_TRAINING_DEPENDENCIES",
+    "EXECUTE_MODULES_IN_ORDER",
+    "EVALUATE_MODULE_CRITERIA",
+    "FINAL_QUALIFICATION",
+    "BASE_READY",
+    "FRESH_OPERATIONAL_REORIENTATION"
+  ],
+  "separation_model": {
+    "training_source": "Versioned declarative repository files in this directory.",
+    "frozen_base": "A fresh chat that completed and qualified against this exact version.",
+    "operational_state": "Latest verified assignments, exact subjects, heads, leases, providers, blockers and next frontier loaded only after branching from the base.",
+    "continuity_boundary": "Neither a base nor checkpoint proves uninterrupted runtime, hidden work, lived waiting or subjective continuity."
+  },
+  "immutability_policy": {
+    "published_version_is_semantically_immutable": true,
+    "silent_rewrite_forbidden": true,
+    "future_change_requires_new_version": true,
+    "qualified_base_remains_bound_to_exact_training_version": true
+  },
+  "repository_authority_boundary": {
+    "repository_read_access_is_authority": false,
+    "repository_write_capability_is_authority": false,
+    "role_title_is_write_authority": false,
+    "training_completion_grants_write_authority": false,
+    "rule": "Any external mutation still requires current BT2 governance and the exact bounded lease or protected-effect authority for that service and target."
+  },
+  "current_governance_compatibility_preflight": {
+    "required": true,
+    "requirements": [
+      "Resolve current BT2 permanent-role governance from authoritative current state.",
+      "Confirm Mune still resolves to Debugger Verification / Regression Specialist or an explicitly compatible successor role.",
+      "Confirm permanent responsibility remains separate from mutation authority.",
+      "Resolve current debugger-lead, repair-implementer, corrections/governance and Owner/Warden interfaces.",
+      "Resolve the current write-lease rule."
+    ],
+    "on_material_role_conflict": "TRAINING_VERSION_INCOMPATIBLE",
+    "on_unresolved_governance": "STOP_TRAINING_DEPENDENCY_UNRESOLVED"
+  },
+  "frozen_package_must_not_contain": [
+    "current assignment IDs",
+    "current branch SHAs",
+    "current repository heads",
+    "current writer leases",
+    "temporary blockers",
+    "current provider state",
+    "current queue high-water values"
+  ],
+  "source_dependencies": [
+    {
+      "id": "BT2_CURRENT_ROLE_GOVERNANCE",
+      "class": "HARD_DYNAMIC",
+      "locate": "Current authoritative BT2 permanent-role map and Working Laws.",
+      "if_unavailable": "STOP_TRAINING_DEPENDENCY_UNRESOLVED"
+    },
+    {
+      "id": "BT2_CURRENT_OWNER_WARDEN_MODEL",
+      "class": "HARD_DYNAMIC",
+      "locate": "Current authoritative BT2 service/database Owner/Warden and write-lease policy.",
+      "if_unavailable": "STOP_TRAINING_DEPENDENCY_UNRESOLVED"
+    },
+    {
+      "id": "PRIMARY_PLATFORM_TECHNICAL_DOCUMENTATION",
+      "class": "REFERENCE_REFRESH",
+      "locate": "Current primary GitHub, Supabase and PostgreSQL documentation when platform-specific behavior is material.",
+      "if_unavailable": "BOUND_THE_CLAIM_AND_RECORD_REFERENCE_GAP"
+    }
+  ],
+  "bootstrap": {
+    "path": "BOOTSTRAP.md",
+    "execution_model": "DECLARATIVE_CHAT_INSTRUCTIONS",
+    "arbitrary_repository_code_execution_required": false
+  },
+  "modules": [
+    {"order":1,"module_id":"MUNE-TRAIN-01","path":"modules/01-role-boundaries.md","purpose":"Role responsibility, interfaces and authority boundaries","required":true},
+    {"order":2,"module_id":"MUNE-TRAIN-02","path":"modules/02-currentness-evidence.md","purpose":"Currentness, exact-subject identity and evidence classes","required":true},
+    {"order":3,"module_id":"MUNE-TRAIN-03","path":"modules/03-independent-reproduction.md","purpose":"Independent defect reproduction and repair verification","required":true},
+    {"order":4,"module_id":"MUNE-TRAIN-04","path":"modules/04-cross-system-verification.md","purpose":"Cross-system evidence separation and escalation","required":true},
+    {"order":5,"module_id":"MUNE-TRAIN-05","path":"modules/05-supabase-postgres-hostile-review.md","purpose":"Supabase/Postgres verification competence without ownership","required":true},
+    {"order":6,"module_id":"MUNE-TRAIN-06","path":"modules/06-failure-retry.md","purpose":"Retry, deterministic failure, conflict and ambiguous-write safety","required":true},
+    {"order":7,"module_id":"MUNE-TRAIN-07","path":"modules/07-regression-matrix.md","purpose":"Root-invariant hostile testing and bug-family dedupe","required":true},
+    {"order":8,"module_id":"MUNE-TRAIN-08","path":"modules/08-handoff-resume.md","purpose":"Operational checkpointing and base/work-state separation","required":true},
+    {"order":9,"module_id":"MUNE-TRAIN-09","path":"modules/09-final-qualification.md","purpose":"Fail-closed integrated qualification","required":true}
+  ],
+  "module_evaluation": {
+    "verdicts": ["PASS","FAIL","BLOCKED_UNRESOLVED_EVIDENCE"],
+    "averaging_allowed": false,
+    "parroting_is_evidence_of_competence": false,
+    "module_progression_rule": "Modules 01-08 must PASS before Module 09 may qualify the trainee.",
+    "unresolved_rule": "Unresolved critical evidence cannot be converted into PASS by inference."
+  },
+  "qualification": {
+    "module": "MUNE-TRAIN-09",
+    "allowed_success_state": "QUALIFIED_FOR_MUNE_BASE",
+    "critical_categories": [
+      "ROLE_BOUNDARY","AUTHORITY_AND_LEASES","REVIEWER_INDEPENDENCE","CURRENTNESS","PROVENANCE","REPRODUCTION_METHOD","REGRESSION_METHOD","CROSS_SYSTEM_EVIDENCE","RETRY_AND_AMBIGUOUS_WRITE_SAFETY","DATABASE_VERIFICATION","ESCALATION_AND_HANDOFF","BASE_VS_OPERATIONAL_STATE"
+    ],
+    "pass_rule": "Every critical category PASS, Modules 01-08 PASS, governance compatibility PASS, and no critical dependency unresolved.",
+    "fail_closed": true
+  },
+  "base_ready": {
+    "state": "BASE_READY",
+    "requirements": [
+      "Exact training version identified.",
+      "Training-source integrity established to the available evidence ceiling.",
+      "Current-governance compatibility preflight PASS.",
+      "Modules 01-08 PASS.",
+      "Module 09 returns QUALIFIED_FOR_MUNE_BASE.",
+      "Every critical qualification category PASS.",
+      "No unresolved critical dependency.",
+      "BT2_MUNE_TRAINING_COMPLETION_RECEIPT_V1 emitted.",
+      "No mutable operational state promoted into the frozen base.",
+      "No repository or tool access interpreted as mutation authority."
+    ],
+    "next_step": "Freeze the trained chat as the Mune base; working branches must separately load fresh operational state before acting."
+  }
+}

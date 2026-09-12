@@ -1,0 +1,19 @@
+{
+  "schema": "BT2_MUNE_TRAINING_CHECKPOINT_SETUP_RECEIPT_V1",
+  "training_version": "1.0.1",
+  "package_id": "BT2_MUNE_DEBUGGER_VERIFICATION_TRAINING",
+  "status": "IMPLEMENTED_VERIFIED_BY_REPOSITORY_TREE_IDENTITY",
+  "checkpoint_protocol": "CHECKPOINT_PROTOCOL.md",
+  "checkpoint_template": "operational-checkpoint-template.json",
+  "package_verifier": "scripts/verify_training_package.py",
+  "checkpoint_verifier": "scripts/verify_operational_checkpoint.py",
+  "module_semantics_changed_from_v1.0.0": false,
+  "verification_basis": [
+    "GitHub tree contains all 9 module paths and exact expected Git blob identities",
+    "GitHub tree contains checkpoint protocol/template/verifier paths and exact manifest-bound Git blob identities",
+    "Module 09 was restored byte-identical to v1.0.0 after verification caught a mismatch",
+    "Checkpoint template was normalized to its manifest-bound Git blob identity after verification caught a mismatch",
+    "Verifier scripts were syntax-compiled before publication"
+  ],
+  "authority_boundary": "Training/checkpoint setup only. No merge, deployment, production/provider mutation, or unrelated repository write is authorized by this receipt."
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bt2:three:training-checkpoint:v1",
+  "title": "BT2 Role Three Training Checkpoint V1",
+  "type": "object",
+  "required": [
+    "schema",
+    "package_id",
+    "training_version",
+    "manifest_sha256",
+    "role_identity",
+    "modules",
+    "critical_disqualifiers_triggered",
+    "overall_status"
+  ],
+  "properties": {
+    "schema": {"const": "BT2_ROLE_TRAINING_CHECKPOINT_V1"},
+    "package_id": {"type": "string", "minLength": 1},
+    "training_version": {"type": "string", "minLength": 1},
+    "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "role_identity": {"const": "Three"},
+    "created_at": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["order", "id", "status", "attempts", "evidence"],
+        "properties": {
+          "order": {"type": "integer", "minimum": 1},
+          "id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["NOT_STARTED", "PASS", "FAIL", "UNRESOLVED"]},
+          "attempts": {"type": "integer", "minimum": 0},
+          "evidence": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "critical_disqualifiers_triggered": {"type": "array", "items": {"type": "string"}},
+    "overall_status": {
+      "enum": [
+        "TRAINING_IN_PROGRESS",
+        "BASE_READY",
+        "NOT_QUALIFIED",
+        "TRAINING_UNRESOLVED",
+        "TRAINING_SOURCE_CONFLICT"
+      ]
+    },
+    "qualification_receipt": {"type": ["object", "null"]},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

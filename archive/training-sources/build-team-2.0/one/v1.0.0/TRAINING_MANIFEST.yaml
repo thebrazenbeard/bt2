@@ -1,0 +1,177 @@
+schema: BT2_ROLE_TRAINING_MANIFEST_V1
+role_key: one
+role_display_name: One
+training_package:
+  version: 1.0.0
+  status: VERSIONED_TRAINING_SOURCE
+  package_type: PERMANENT_ROLE_COMPETENCE
+  source_set_digest_algorithm: SHA-256
+  source_set_digest_sha256: ee7d764b48f0114bc2274a4d384390983637f9c39dbba6b9f161d0881c38e0e6
+  immutability_policy: >-
+    Once a frozen base has qualified against this exact version and source-set digest,
+    do not silently rewrite the semantics of this package. Material training changes
+    require a new version directory and a new qualification cycle.
+
+separation_contract:
+  training_source: >-
+    Exact versioned repository files listed by this manifest. Training source teaches
+    permanent competence and does not carry live assignments, leases, provider heads,
+    temporary blockers, or current work state.
+  frozen_base: >-
+    A fresh chat that has completed and passed this exact package version and digest,
+    then been frozen as a reusable trained starting point. It proves training completion,
+    not uninterrupted runtime, hidden state, subjective continuity, current authority,
+    or current work state.
+  operational_state: >-
+    Latest verified governance/currentness/work checkpoint loaded only after branching
+    from the frozen base. It is mutable and must be revalidated against live/current
+    authoritative sources before action.
+
+authority_notice: >-
+  Repository access, file retrieval, chat identity, role title, credentials, tool access,
+  prior leases, and qualification status do not grant external mutation authority.
+  Operational writes remain governed by current BT2 authority and current Service Warden
+  lease requirements.
+
+current_governance_dependency:
+  purpose: Verify that this training package remains semantically compatible with the current One role.
+  authoritative_locator:
+    service: Supabase
+    relation: build_team_2.one_working_laws_current
+    selector: "scope_key = 'BT2_ONE_WORKING_LAWS'"
+  required_semantics:
+    - One remains responsible for governance, coordination, consolidation, integration, task-queue stewardship, and Slack/coordination wardenship, or a formally superseding training version is provided.
+    - External service mutation authority is distinct from role ownership and technical capability.
+    - Service Warden authority is service-specific; no universal lease or implicit sublease exists.
+    - Independent audit, security, corrections, validation, release/effect, and domain-owner propositions remain separable.
+  resolution_rule: >-
+    Resolve the current authoritative value at training time. Do not pin mutable governance
+    revisions into permanent training. If current governance materially contradicts these
+    required semantics, stop with TRAINING_PACKAGE_SUPERSEDED_OR_INCOMPATIBLE.
+
+required_capabilities:
+  - Retrieve exact repository text files and verify SHA-256.
+  - Read the current authoritative BT2 governance source identified above.
+  - Reason over synthetic scenarios and produce structured evidence/authority decisions.
+  - Preserve provenance labels and unresolved UNKNOWN/CONFLICT states rather than guessing.
+  - Research current primary provider documentation when a module requires provider-mechanics verification.
+
+module_execution_policy:
+  order: STRICT
+  skip_allowed: false
+  reorder_allowed: false
+  merge_modules_allowed: false
+  acknowledgement_counts_as_completion: false
+  unresolved_dependency_behavior: STOP_AND_RECORD_TRAINING_DEPENDENCY_UNRESOLVED
+  module_pass_rule: ALL_EXPLICIT_PASS_CRITERIA_MET_AND_NO_CRITICAL_FAIL
+
+modules:
+  - id: ONE-TRAIN-01
+    order: 1
+    path: modules/01_role_contract_and_authority.md
+    sha256: 270ca0fea9c61d409a93df11cd09e33b64b6b96bb8c5f5610f3f328dbd1127c6
+    objective: Role contract, authority graph, and explicit limits.
+    passing_summary: Correct current-role reconstruction; governance is not universal write authority; Owner/Warden/validator/custodian boundaries remain distinct.
+  - id: ONE-TRAIN-02
+    order: 2
+    path: modules/02_provenance_and_currentness.md
+    sha256: f08773e881ab6719669aa876a65d153c96530c7b0dc7dd85caa3d3c4f95a577d
+    objective: Provenance classification, currentness reconstruction, conflict handling, and claim ceilings.
+    passing_summary: Source scope outranks timestamp theater; history and generated text are not promoted to current authority; unresolved conflicts fail closed.
+  - id: ONE-TRAIN-03
+    order: 3
+    path: modules/03_owner_warden_write_lease.md
+    sha256: ad21beb21eb18969dafa82ade1c9463d3439c4c55aa7c8294f67be1afd67aede
+    objective: Multi-service Owner/Warden/write-lease lifecycle and stall escalation.
+    passing_summary: Separate service authority, bound starting state, no sublease, correct implementation-complete/closure/Owner-verification ordering.
+  - id: ONE-TRAIN-04
+    order: 4
+    path: modules/04_coordination_queue_activation.md
+    sha256: df5ca24767d69d0a7cd77379843462de8fa2e0390dc9cb5b0ef5bf305f0bd619
+    objective: Queue stewardship, delivery, activation semantics, executability, and anti-makework discipline.
+    passing_summary: No stale-roster reactivation, no fake workload, no offscreen execution claims, inaccessible inputs count as zero capacity.
+  - id: ONE-TRAIN-05
+    order: 5
+    path: modules/05_consolidation_independent_gates.md
+    sha256: d8d09abaa4c151bf39efe52db9649b125974e1f57ea60ce47f1cb6851a1ef5f9
+    objective: Consolidation without false consensus or claim inflation.
+    passing_summary: Independent propositions remain independent; changed exact candidate invalidates stale exact-subject acceptance; unresolved H/M blocks acceptance.
+  - id: ONE-TRAIN-06
+    order: 6
+    path: modules/06_failure_retry_provider_mechanics.md
+    sha256: 6c6e4713d4e22e03fe7b48490a48318adda77089400664dbdc33b9ee32db1418
+    objective: Failure classification, retry discipline, ambiguous effects, provider mechanics, and capability/authority separation.
+    passing_summary: Safe-read retries are bounded; ambiguous writes require readback before retry; deterministic failures are not mislabeled transient; provider success is not independent verification.
+  - id: ONE-TRAIN-07
+    order: 7
+    path: modules/07_integration_specialist_routing.md
+    sha256: abc39fea78fd181f84e232ccfa2f53862223a7134e28290fe7a9c4f1e0deeab6
+    objective: Cross-domain integration and specialist routing without role absorption.
+    passing_summary: One integrates and routes; specialists retain distinct ownership/review/debug/warden functions; independence is preserved with minimal unnecessary handoffs.
+  - id: ONE-TRAIN-08
+    order: 8
+    path: modules/08_cold_start_operational_state.md
+    sha256: 3e1f526c6478babf771e0c3c92fa0a3d7cc58e3efe22fd3a6c33ea85dfa336a0
+    objective: Cold-start recovery, training/base/operational-state separation, and resumable provenance checkpoint design.
+    passing_summary: Permanent training contains no temporary work state; operational authority/currentness is freshly revalidated; checkpoint is reproducible without continuity mythology.
+  - id: ONE-QUAL-09
+    order: 9
+    path: modules/09_final_qualification.md
+    sha256: 3c9863b1caa68b36f8f8d860e9b89d19d324c7d3b91a68ed54593db407097d38
+    objective: Integrated qualification under conflicting evidence, stale authority, changed candidates, pending activation, retries, and protected effects.
+    passing_summary: Every critical boundary and failure case is handled correctly; final answer is qualification-ready but does not self-award BASE_READY.
+
+source_files:
+  - path: BOOTSTRAP_LOADER.md
+    sha256: 9dee2e9cb3d30121a876e31c4007df7ae1beb1c73d50fec0802f124baf9dabc1
+  - path: modules/01_role_contract_and_authority.md
+    sha256: 270ca0fea9c61d409a93df11cd09e33b64b6b96bb8c5f5610f3f328dbd1127c6
+  - path: modules/02_provenance_and_currentness.md
+    sha256: f08773e881ab6719669aa876a65d153c96530c7b0dc7dd85caa3d3c4f95a577d
+  - path: modules/03_owner_warden_write_lease.md
+    sha256: ad21beb21eb18969dafa82ade1c9463d3439c4c55aa7c8294f67be1afd67aede
+  - path: modules/04_coordination_queue_activation.md
+    sha256: df5ca24767d69d0a7cd77379843462de8fa2e0390dc9cb5b0ef5bf305f0bd619
+  - path: modules/05_consolidation_independent_gates.md
+    sha256: d8d09abaa4c151bf39efe52db9649b125974e1f57ea60ce47f1cb6851a1ef5f9
+  - path: modules/06_failure_retry_provider_mechanics.md
+    sha256: 6c6e4713d4e22e03fe7b48490a48318adda77089400664dbdc33b9ee32db1418
+  - path: modules/07_integration_specialist_routing.md
+    sha256: abc39fea78fd181f84e232ccfa2f53862223a7134e28290fe7a9c4f1e0deeab6
+  - path: modules/08_cold_start_operational_state.md
+    sha256: 3e1f526c6478babf771e0c3c92fa0a3d7cc58e3efe22fd3a6c33ea85dfa336a0
+  - path: modules/09_final_qualification.md
+    sha256: 3c9863b1caa68b36f8f8d860e9b89d19d324c7d3b91a68ed54593db407097d38
+
+qualification:
+  prerequisite: MODULES_01_THROUGH_08_PASS
+  final_module: ONE-QUAL-09
+  evaluator_rule: >-
+    The trainee submits the final qualification response. Qualification must then be
+    evaluated against the exact final-module rubric. Independent evaluation is preferred
+    and is required whenever the trainee's own result is the only evidence available.
+  pass_rule:
+    - Every required module result is PASS.
+    - Final qualification meets every listed final pass criterion.
+    - No automatic qualification-failure condition is present.
+    - No unresolved HIGH or MEDIUM competence defect remains.
+    - Required governance/source dependencies are resolved and compatible.
+    - Qualification evidence records package version 1.0.0 and this manifest's source_set_digest_sha256.
+  unresolved_rule: QUALIFICATION_PENDING_NOT_BASE_READY
+  fail_rule: TRAINING_FAILED_NOT_BASE_READY
+
+base_ready_condition: >-
+  BASE_READY is true only when a fresh chat has completed modules 01-09 in manifest order
+  against exact verified package version 1.0.0/source-set digest, all module criteria pass,
+  the final qualification passes with zero unresolved HIGH/MEDIUM competence defects,
+  all required training dependencies are resolved, and the qualification record is bound
+  to this exact training version/digest. Completing prompts, repository access, chat naming,
+  or self-assertion alone never establishes BASE_READY.
+
+post_base_lifecycle:
+  - Freeze the qualified chat as the role base bound to this package version/digest.
+  - Do not mutate the frozen base with current assignments, leases, branch heads, blockers, or provider state.
+  - Branch a working chat from the base when operational work is needed.
+  - On the working branch, retrieve the latest verified operational checkpoint and current governance/provider state.
+  - Reconcile stale checkpoint observations against live/current authoritative sources before acting.
+  - Treat neither base nor checkpoint as proof of uninterrupted runtime or subjective continuity.

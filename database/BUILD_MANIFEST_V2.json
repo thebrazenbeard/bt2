@@ -1,0 +1,80 @@
+{
+  "manifest_version": "BT2_DATABASE_BUILD_MANIFEST_V2",
+  "coordination_id": "BT2-CANONICAL-PLATFORM-20260910",
+  "supersedes_manifest": "database/BUILD_MANIFEST_V1.json",
+  "supersession_reason": "V1 did not bind canonical persistent seeds or qualification runners and therefore could not prove source-to-canonical-state reconstruction.",
+  "source_subject": {
+    "repository": "thebrazenbeard/bt2",
+    "branch": "work/two-canonical-platform-integrity-v1",
+    "head_before_manifest": "3c49be041e21ff42b03696a4123467232642b581"
+  },
+  "target": {
+    "backend": "PostgreSQL",
+    "qualified_major_version": 16,
+    "required_extensions": ["pgcrypto"]
+  },
+  "package_identity": {
+    "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
+    "migrations_tree": "e20cdbf0c70a10e67d5e3a493025ebe3ea8ee491",
+    "tests_tree": "84041d1f2430fda518e3a13e80a6bd04b9ca86c3",
+    "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
+    "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
+    "lantern_archive_tree": "929ee632b6df04e6ee7324b1f955539e80f26258",
+    "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
+    "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
+    "qualification_tools_tree": "b3f874682bc0747ff31311e972812e12045af7aa",
+    "digest_algorithm": "sha256",
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:e20cdbf0c70a10e67d5e3a493025ebe3ea8ee491|tests:84041d1f2430fda518e3a13e80a6bd04b9ca86c3|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:b3f874682bc0747ff31311e972812e12045af7aa|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "d04b06cb61abdb05be58090cc11c70a999bd987fe7d00b2dd905bbef88b84618"
+  },
+  "canonical_reconstruction": {
+    "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
+    "concurrency_runner": "tools/qualification/run_lantern_multisession_concurrency_v2.py",
+    "workflow": ".github/workflows/database-rebuild-qualification.yml",
+    "precondition": "empty PostgreSQL 16 database",
+    "sequence": [
+      "database/schema/*.sql",
+      "database/migrations/*.sql",
+      "database/tests/0001..0010 rollback regression suite",
+      "database/seeds/0001_canonical_workforce_topology_v1.sql",
+      "database/seeds/0002_training_preservation_predecessors_v1.sql",
+      "database/seeds/0003_project_lantern_governed_state_v1.sql",
+      "database/data/0001_verified_training_source_registry_v1.sql",
+      "database/data/0002_verified_training_source_registry_receipt_v2.sql",
+      "database/data/0003_four_verified_training_source_registration_v1.sql",
+      "database/data/0004_verified_training_source_registry_receipt_v3.sql",
+      "database/loaders/lantern_cohosted_history_v2.py --mode apply",
+      "SKIP database/data/0005_project_lantern_cohosted_history_receipt_v1.sql (retained failed historical candidate)",
+      "database/data/0006_project_lantern_cohosted_history_receipt_v2.sql",
+      "database/data/0007_remaining_numbered_training_source_registration_v1.sql",
+      "database/data/0008_verified_training_source_registry_receipt_v4.sql",
+      "database/tests/0011_canonical_state_reconstruction_oracle.sql"
+    ]
+  },
+  "canonical_state_subject": {
+    "topology_sha256": "45d262aae7285a69a66a3d5b35c04537899ba33f5eb7388b9731071e8907c0d8",
+    "training_package_count": 13,
+    "training_frontier_sha256": "8c30820432c95f5fd0e663cd6054c522b41b18c0979ce11c06e967037116eabc",
+    "training_qualification_count": 0,
+    "training_installation_event_count": 0,
+    "lantern_governed_state_sha256": "29da0892c199207bf566e8cf62c0ae8921d63950796fd58204577c464ca59dc5",
+    "lantern_current_producer_authority": 0,
+    "lantern_cohosted_history_row_count": 16,
+    "lantern_cohosted_history_sha256": "6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712"
+  },
+  "qualification": {
+    "blank_rebuild": "PENDING_DISPOSABLE_POSTGRESQL_16_EXECUTION",
+    "true_multisession_concurrency": "PENDING_DISPOSABLE_POSTGRESQL_16_EXECUTION",
+    "live_lantern_producer_boundary": "SOURCE_READY_NOT_LIVE_APPLIED",
+    "frozen_lantern_project_runtime": "AUTHORIZED_NOT_YET_ACCEPTED",
+    "one_acceptance": "PENDING",
+    "two_acceptance": "PENDING"
+  },
+  "authority": {
+    "one_may_merge_after_one_plus_two_acceptance": true,
+    "force_push": false,
+    "destructive_source_retirement": false,
+    "destructive_provider_retirement": false,
+    "supabase_project_lantern_delete": false
+  }
+}

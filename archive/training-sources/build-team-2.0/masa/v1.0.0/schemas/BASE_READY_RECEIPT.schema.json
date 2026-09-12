@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"BT2 Masa Base Ready Receipt",
+  "type":"object",
+  "required":["role","training_version","training_source_identity","qualification_status","base_status","operational_state_loaded","continuity_claim"],
+  "properties":{
+    "role":{"const":"MASA"},
+    "training_version":{"const":"1.0.0"},
+    "training_source_identity":{"type":"object","required":["repository","version_path","manifest_sha256"],"properties":{"repository":{"type":"string"},"version_path":{"type":"string"},"manifest_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}}},
+    "qualification_status":{"const":"QUALIFIED"},
+    "base_status":{"const":"BASE_READY"},
+    "operational_state_loaded":{"const":false},
+    "continuity_claim":{"const":"NO_UNINTERRUPTED_RUNTIME_OR_SUBJECTIVE_CONTINUITY_CLAIM"}
+  }
+}

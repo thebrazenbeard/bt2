@@ -1,0 +1,77 @@
+{
+  "schema": "BT2_SUPABASE_COHOSTED_HISTORICAL_ARCHIVE_MANIFEST_V2",
+  "supersedes": "BT2_SUPABASE_COHOSTED_HISTORICAL_ARCHIVE_MANIFEST_V1",
+  "correction_reason": "V1 governance.project_notices relation digest was inconsistent with both live Supabase canonical JSONB aggregation and row-for-row source equality; V2 records the source-verified digest without altering archived row bytes.",
+  "source_project": {
+    "provider": "Supabase",
+    "project_ref": "agvhmutlrolbaijzlbqk",
+    "observed_name": "Project Lantern"
+  },
+  "classification": "HISTORICAL_PROVENANCE_ONLY",
+  "authority_effect": "NONE",
+  "currentness_effect": "NONE",
+  "row_count": 16,
+  "canonical_combined_rows_sha256": "6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712",
+  "canonical_combined_rows_text_length": 23853,
+  "relations": [
+    {
+      "source_schema": "bug_ops",
+      "source_relation": "role_registry",
+      "primary_key_column": "role_key",
+      "row_count": 4,
+      "source_rowset_sha256": "f4c0ef4588f6c19d7a6291a6471de92b63b8f5fb4123a993d80ab67966da0055",
+      "path": "bug_ops.role_registry.json",
+      "git_blob": "5b491471d2a9432c4a8e7c640958a7e1d39f0e83"
+    },
+    {
+      "source_schema": "bug_ops",
+      "source_relation": "system_config",
+      "primary_key_column": "singleton",
+      "row_count": 1,
+      "source_rowset_sha256": "3987cace3a570249a24305c3feaf75e5309bf4f8c751e0a4c8fb116b3faf7203",
+      "path": "bug_ops.system_config.json",
+      "git_blob": "3e5837d9fd184d77d33d897dac6191046da2dbd5"
+    },
+    {
+      "source_schema": "governance",
+      "source_relation": "project_notices",
+      "primary_key_column": "notice_id",
+      "row_count": 7,
+      "source_rowset_sha256": "09dd782f2218d5294d1fdb386cbdfb24b100a59eb03e62598c7c20a2c5129a78",
+      "path": "governance.project_notices.json",
+      "git_blob": "343bec10760637f024a24483adac78362a1da931",
+      "verification": {
+        "live_supabase_rowset_sha256": "09dd782f2218d5294d1fdb386cbdfb24b100a59eb03e62598c7c20a2c5129a78",
+        "target_rowset_sha256": "09dd782f2218d5294d1fdb386cbdfb24b100a59eb03e62598c7c20a2c5129a78",
+        "individual_row_hashes_equal": true
+      }
+    },
+    {
+      "source_schema": "r9a0_coordination",
+      "source_relation": "events",
+      "primary_key_column": "event_id",
+      "row_count": 3,
+      "source_rowset_sha256": "5ea2b175f869cd38b58121fe0273305c2bf1595c534fad44108f0ae1fb4746c4",
+      "path": "r9a0_coordination.events.json",
+      "git_blob": "38ed1ff5c258677753b71454c328a1e105f6b036"
+    },
+    {
+      "source_schema": "r9a0_governance",
+      "source_relation": "migration_applications",
+      "primary_key_column": "application_id",
+      "row_count": 1,
+      "source_rowset_sha256": "b9e8cd36365aebfe4ae0a20d9c67e84c64e8fc63672e4a7fc71f97f59f963e8a",
+      "path": "r9a0_governance.migration_applications.json",
+      "git_blob": "bb365ab2cbf0adb8b52aba5f10f760a1f27d1ee6"
+    }
+  ],
+  "import_target": "bt2_legacy.source_rows",
+  "source_snapshot_target": "bt2.source_snapshots",
+  "prohibited_effects": [
+    "populate bt2.governance_notices",
+    "populate bt2.coordination_events",
+    "change bt2.agents or topology",
+    "grant authority",
+    "create qualification or installation state"
+  ]
+}

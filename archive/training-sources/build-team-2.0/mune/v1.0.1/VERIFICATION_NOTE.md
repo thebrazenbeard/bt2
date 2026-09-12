@@ -1,0 +1,1 @@
+Repository verification caught and corrected two setup mismatches before package completion: Module 09 was restored byte-identical to v1.0.0, and the checkpoint template was normalized to the manifest-bound Git blob identity. This note is historical verification evidence only.

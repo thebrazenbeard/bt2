@@ -1,0 +1,1 @@
+Modules 01–09 are byte-identical to v1.0.0. v1.0.1 adds only checkpoint and verification support plus declarative loader updates. A base qualified on v1.0.0 is not retroactively changed; v1.0.1 is a distinct training-source version.
