@@ -54,7 +54,7 @@ jobs:
 
       - name: True multi-session Lantern concurrency
         run: |
-          python tools/qualification/run_lantern_multisession_concurrency.py \
+          python tools/qualification/run_lantern_multisession_concurrency_v2.py \
             --database-url "$DATABASE_URL" \
             --evidence-out /tmp/bt2_lantern_concurrency_evidence.json
 
