@@ -122,13 +122,15 @@ def wait_for_session(url: str, proc: subprocess.Popen[str], app_name: str, timeo
     while time.monotonic() < deadline:
         row = scalar(
             url,
-            "SELECT concat_ws('|',pid,coalesce(wait_event_type,''),coalesce(wait_event,'')) "
+            "SELECT concat_ws('|',pid,state,coalesce(wait_event_type,''),coalesce(wait_event,'')) "
             "FROM pg_stat_activity "
-            f"WHERE application_name='{app_name}';",
+            f"WHERE application_name='{app_name}' "
+            "AND state='active' AND query LIKE '%append_material_v1%';",
         )
         if row:
-            pid_text, wait_type, wait_event = (row.split('|', 2) + ['', ''])[:3]
-            return int(pid_text), f"{wait_type}:{wait_event}".strip(':')
+            pid_text, state, wait_type, wait_event = (row.split('|', 3) + ['', '', ''])[:4]
+            if state == "active":
+                return int(pid_text), f"{wait_type}:{wait_event}".strip(':')
         if proc.poll() is not None:
             out, err = proc.communicate()
             raise RuntimeError(f"session exited before overlap observation: app={app_name} rc={proc.returncode} stdout={out!r} stderr={err!r}")
