@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "work/two-issue7-portable-qualification-v1",
-    "head_before_manifest": "76bf6eafcec179f164ca8f345ddc19474edb2ff1"
+    "head_before_manifest": "9183b8522aa096ca63a8f4c87188627d91acc7fd"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -24,10 +24,10 @@
     "lantern_archive_tree": "929ee632b6df04e6ee7324b1f955539e80f26258",
     "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
-    "qualification_tools_tree": "7cac36c9f9a3ed1cfeb90f39e0098386c150bf4b",
+    "qualification_tools_tree": "6997de9f51750789b46668f20350faad947795d1",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:c053c6a4809f1ac41c8db8be3b4ed42c1d861245|tests:1367b007805a0a9aa5109f664d8de1a75c0e1010|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:7cac36c9f9a3ed1cfeb90f39e0098386c150bf4b|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "fc51318cc19b244c403bc57e894b1b4c6b685e090595ae79cc367190d247a653"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:c053c6a4809f1ac41c8db8be3b4ed42c1d861245|tests:1367b007805a0a9aa5109f664d8de1a75c0e1010|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:6997de9f51750789b46668f20350faad947795d1|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "c3faa115d12ca26de08cb086a2ee4e129affa13e1755bcf8348b1c4b4b349f24"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
