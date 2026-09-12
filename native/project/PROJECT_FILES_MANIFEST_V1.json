@@ -1,0 +1,30 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V1",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_backend": "WoWSQL:bt2-479e4ad9",
+  "retired_backends": ["Supabase:agvhmutlrolbaijzlbqk"],
+  "project_instructions_source": "native/project/PROJECT_INSTRUCTIONS_V1.md",
+  "native_project_files": [
+    "native/project/BT2_NATIVE_RUNTIME_V1.md",
+    "native/project/BT2_CODING_OPERATIONS_V1.md",
+    "native/project/BT2_RECOVERY_AND_STATE_V1.md",
+    "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md",
+    "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V1.md",
+    "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md",
+    "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
+    "docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md"
+  ],
+  "optional_acceptance_files": [
+    "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md"
+  ],
+  "installation_rule": "Replace stale Supabase-bound Lantern Project files. Do not retain them as active runtime inputs.",
+  "fresh_chat_acceptance": [
+    "Recovers bt2/main as canonical source",
+    "Uses WoWSQL bt2-479e4ad9 for Lantern currentness",
+    "Performs Lantern B0 -> payload -> B1 without Supabase fallback",
+    "Distinguishes source/build/install/runtime/behavioral qualification",
+    "Can recover current work from durable Git/WoWSQL/Bus state"
+  ]
+}
