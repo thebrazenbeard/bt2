@@ -114,7 +114,7 @@ BEGIN
     SELECT 1 FROM bt2.migration_receipts
     WHERE migration_key='BT2-PROJECT-LANTERN-COHOSTED-HISTORY-V2'
       AND result_state='VERIFIED'
-      AND evidence->>'combined_rows_sha256'='6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712'
+      AND evidence->>'archive_sha256'='6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712'
   ) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_HISTORY_V2_RECEIPT_MISSING';
   END IF;
@@ -138,7 +138,7 @@ BEGIN
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2' AND p.proname='append_material_v1'
-    AND pg_get_function_identity_arguments(p.oid)='uuid, text, text, text, text, text';
+    AND oidvectortypes(p.proargtypes)='uuid, text, text, text, text, text';
 
   IF NOT coalesce(v_secdef,false)
      OR v_owner <> 'postgres'
