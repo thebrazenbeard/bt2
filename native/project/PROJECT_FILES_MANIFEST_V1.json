@@ -9,22 +9,22 @@
   "payload_source_commit": "a68f628ea2b6a58b6c927c4e61d4ade99bc69e23",
   "payload_source_tree": "84ad038bcd5637da7663443c3674348afb5a6f96",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256) + newline)",
-  "payload_digest": "2551b54893e78000e50f0c7262f82521380094a4bfe08c6c220cc7017e8ccd19",
+  "payload_digest": "be43ba21155426ca319b6343e55079d2668406113186c058633048b1860c39dd",
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V1.md",
     "git_blob": "ff0bc55010c62d26d1b5ca6a4ad834df3be8cfbb",
-    "sha256": "5c61c89450a5f54c6d24225bc627b461485da6480bf44011c27d3f218aa19f0f"
+    "sha256": "bb12e7adff2c0643158dcfc981b7cf4b9f690b90a82be35900b3f3862b2e1705"
   },
   "required_project_files": [
-    {"path":"native/project/BT2_NATIVE_RUNTIME_V1.md","git_blob":"a614e25e92994fc4892b2dcf4e1042971b5acece","sha256":"69883d30ac08764352e060538add0e265e2740077dce0b740cd26be6c090eb16"},
-    {"path":"native/project/BT2_CODING_OPERATIONS_V1.md","git_blob":"364a8ec604f5f8b42d2f0312e02eec6a17caf103","sha256":"f005e4883c833d8b6f24bd1b54de373bd7906e41bc93aa19c553573bf12ff07e"},
-    {"path":"native/project/BT2_RECOVERY_AND_STATE_V1.md","git_blob":"e4cfeec391ff679cc8d35ce1bec7323c1dc9a1db","sha256":"48f1756aed7bd1b627435cccd3af805276e18b622783d7408060fdfc3f533546"},
-    {"path":"docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md","git_blob":"9df2f7779ae49984510754ea674e7d332abf2fcd","sha256":"af790d879f5e3e93d04de10dbffc1886354213bf69d83764ed617016371f1455"},
-    {"path":"docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V1.md","git_blob":"909ddddf68016d10634334dcb029a4b5f4c87e5a","sha256":"86d0f15871850d50be91be74641f417b8185faad7d367623d375bda86afcb1d2"},
-    {"path":"docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md","git_blob":"5a0c8f893bf54ac93c46325f2f79bdf0289c5b3f","sha256":"a36a28da433510315835735e47b459118d9fd5b55e7e1a65e4935929ad00e0c5"},
-    {"path":"docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md","git_blob":"514a9431f6fecaead6358c9f1f787f5456c537db","sha256":"69d08d27df982c41ea9f85a1c7179e322255f7ed010f0ea1c081c02080251b01"},
-    {"path":"docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md","git_blob":"17593d4e3601590d8af9a9dd72692c55cb128fc9","sha256":"636b9b21fa84a81489c9d39fd773cde8b64c6730c9411db918f5d09a9873c218"},
-    {"path":"docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md","git_blob":"a3ea01eedc70f5c13d09115b690cf9a60bf85b87","sha256":"fa9fad2b1a1c2d71f7d5c2bfa9fbf87cc907042ade9885c5fc8fba386328ca1d"}
+    {"path":"native/project/BT2_NATIVE_RUNTIME_V1.md","git_blob":"a614e25e92994fc4892b2dcf4e1042971b5acece","sha256":"8f67444f8684f556c81caa1e95d9c9d4a0f98031de65d6504f83937ef2d6faf7"},
+    {"path":"native/project/BT2_CODING_OPERATIONS_V1.md","git_blob":"364a8ec604f5f8b42d2f0312e02eec6a17caf103","sha256":"5708bdb8c9af3ab22beb6a2525983f93d560e2ad21b042bf1066cfce55bd1d1d"},
+    {"path":"native/project/BT2_RECOVERY_AND_STATE_V1.md","git_blob":"e4cfeec391ff679cc8d35ce1bec7323c1dc9a1db","sha256":"6b48befe2970fc0485481f3083bd96179cad9b3a57ac21c251cc2172d8ea86ff"},
+    {"path":"docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md","git_blob":"9df2f7779ae49984510754ea674e7d332abf2fcd","sha256":"d43ac857e75c28eee306864c7e80fcafad85976b259bf96d7b65de1f5c191ea4"},
+    {"path":"docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V1.md","git_blob":"909ddddf68016d10634334dcb029a4b5f4c87e5a","sha256":"1aaeaf252949ddfd89a9c1f5223242e6cd147623acb916aca21b8471d10edb81"},
+    {"path":"docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md","git_blob":"5a0c8f893bf54ac93c46325f2f79bdf0289c5b3f","sha256":"8eb6d279b0296652390b401c8c82971aeffda6a164be968bb6fe9e894a09647c"},
+    {"path":"docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md","git_blob":"514a9431f6fecaead6358c9f1f787f5456c537db","sha256":"c642308d69d6fb7ef5b9df72e67f45e97002a36f0567cdaabb6211f9783d78ef"},
+    {"path":"docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md","git_blob":"17593d4e3601590d8af9a9dd72692c55cb128fc9","sha256":"0dca117746d948d79f6b931c47a5fc78e8b40aa67cb9376f86296656497137e9"},
+    {"path":"docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md","git_blob":"a3ea01eedc70f5c13d09115b690cf9a60bf85b87","sha256":"a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"}
   ],
   "installation_rule": "Install from payload_source_commit and verify exact file digests by authoritative Project readback. Replace stale Supabase-bound Lantern Project files; do not retain them as active currentness contracts.",
   "state_ceiling": "SOURCE_READY until authoritative Project mutation and readback establish stronger states.",
