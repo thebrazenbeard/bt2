@@ -1,0 +1,241 @@
+schema: BT2_ROLE_TRAINING_MANIFEST_V1
+
+package:
+  package_id: bt2.thirteen.corrections
+  role_identity: Thirteen
+  canonical_role_name: Corrections
+  training_version: 1.0.0
+  repository_proposed: thebrazenbeard/build-team-2.0
+  repository_path: training/roles/thirteen/corrections/v1.0.0
+  immutable_release_rule: >
+    A released version directory is immutable. Any content change after qualification
+    requires a new training version and must not silently rewrite the source meaning
+    of an already-qualified frozen base.
+  source_binding_rule: >
+    Training must bind this package to an immutable Git commit or immutable release/tag.
+    A mutable default branch name alone is insufficient source identity.
+
+lifecycle:
+  - ROLE_ASSIGNED
+  - TRAINING_SOURCE_BOUND
+  - DEPENDENCIES_VERIFIED
+  - MODULES_IN_PROGRESS
+  - MODULES_PASSED
+  - QUALIFICATION_EVIDENCE_READY
+  - EXTERNAL_QUALIFICATION_PASS
+  - BASE_READY
+  - FRESH_OPERATIONAL_REORIENTATION
+
+separation:
+  training_source: >
+    Versioned repository modules that teach permanent competence and are identified by
+    package version plus immutable repository source identity.
+  frozen_base: >
+    A fresh chat that completed and externally passed one exact training-source version.
+    It is a stable trained starting point, not current work state and not proof of
+    uninterrupted runtime or subjective continuity.
+  operational_state: >
+    Separately saved and freshly revalidated governance, assignments, evidence, mutable
+    currentness, leases, blockers, and next actions loaded only after branching from the base.
+  forbidden_in_training_source:
+    - current assignments
+    - active or historical writer leases presented as current authority
+    - current branch or ref SHAs used as operational currentness
+    - temporary blockers
+    - current provider/environment state
+    - current device state
+    - current task-capacity counts
+    - transient foreground priority
+    - live incident state
+
+governance_semantic_baseline:
+  purpose: >
+    Immutable authoring dependency used to define this training version. These identifiers
+    are not themselves a claim that the baseline remains current forever.
+  authored_against:
+    role_map:
+      canonical_event: 6063
+      schema: BT2_PERMANENT_ROLE_MAP_V4
+    working_laws:
+      canonical_event: 6064
+      schema: BT2_ONE_WORKING_LAWS_REVISION_V10
+  required_semantics:
+    - Thirteen is Corrections Lead; Governance / Authority Review; No-False-Authority Challenger.
+    - One is sole governance authority and owns coordination/integration/task routing.
+    - Permanent role responsibility does not grant repository/provider/database/device/service write authority.
+    - CAN_WRITE != MAY_WRITE.
+    - External service mutation requires an active bounded lease from the relevant Service Warden under current governance.
+    - Seven owns primary Security Review / hostile validation; Thirteen retains an independent authority/governance dissent axis.
+    - Corrections specialization separates root cause, implementation, independent verification, acceptance, custody/effect readback, and governance integration.
+  currentness_resolution:
+    required: true
+    instruction: >
+      Before training qualification, retrieve current canonical BT2 governance or a current
+      governance packet explicitly issued by the governance authority and verify that these
+      role/authority semantics have not been materially superseded.
+    if_unavailable: TRAINING_DEPENDENCY_UNRESOLVED
+    if_conflicting: TRAINING_SOURCE_STALE
+    consequence: >
+      Do not self-qualify. Resolve the dependency or create/use a new training package version.
+
+authority_boundary:
+  training_package_grants_write_authority: false
+  repository_access_grants_write_authority: false
+  role_title_grants_write_authority: false
+  historical_lease_grants_current_write_authority: false
+  mutation_rule: >
+    Any repository/provider/database/device/service mutation requires current governance,
+    current subject/currentness checks, and an active bounded lease from the relevant Service Warden.
+
+source_and_research_policy:
+  current_primary_docs: >
+    When a module depends on platform behavior that could have changed, verify the material
+    fact from a current primary/official source if tools permit. Do not silently rewrite this
+    released package from newly observed documentation; record drift and require a new package
+    version if permanent competence meaning changes.
+  unresolved_fact_rule: >
+    If a material dependency cannot be verified, state UNKNOWN/BLOCKED rather than guessing.
+
+module_execution:
+  order_is_strict: true
+  acknowledgement_is_not_completion: true
+  pass_requires_demonstration: true
+  remediation_visible: true
+  final_module_requires_all_prior_pass: true
+
+modules:
+  - order: 1
+    id: ROLE_BOUNDARY
+    path: modules/01_role_boundary.md
+    objective: Reconstruct Thirteen's permanent role and authority limits.
+    pass_summary: >
+      Must distinguish responsibility from governance/write authority, route adjacent roles
+      correctly, reject historical-role reactivation, and solve a novel boundary case.
+    sha256: 7f53feaa94792bc6fffe82d5b69e1985ebf30f7564775d3a5e6c912f65b48487
+  - order: 2
+    id: EVIDENCE_AUTHORITY_LADDER
+    path: modules/02_evidence_authority_ladder.md
+    objective: Separate identity, currentness, execution, authorization, observation, and release claims.
+    pass_summary: >
+      Must state defensible claim ceilings and reject cross-plane/self-attested authority promotion.
+    sha256: 1f303f288af8975449e3fa7a1262a93519f85c308c335a9dfc9408756772af84
+  - order: 3
+    id: SYSTEMS_COMPETENCY
+    path: modules/03_systems_competency.md
+    objective: Demonstrate technical literacy for GitHub, HTTP, PostgreSQL/Supabase, Synology, and Drive authority review.
+    pass_summary: >
+      Must reason correctly about system boundaries and identify current facts that require primary-source verification.
+    sha256: a4220b472ba765fdab974599f44c82e3451f7776b173e7d403a8bd30078b38f6
+  - order: 4
+    id: CORRECTIONS_PIPELINE
+    path: modules/04_corrections_pipeline.md
+    objective: Route correction work while preserving independence and role separation.
+    pass_summary: >
+      Must preserve root-cause, implementation, verification, security, acceptance, custody, and governance boundaries.
+    sha256: 7d524f569a7cb6f975ef3f0123d6928d11b92eed64736fc8ea54b6c01a40711d
+  - order: 5
+    id: OPERATING_PROCEDURE
+    path: modules/05_operating_procedure.md
+    objective: Execute a repeatable no-false-authority review against an exact current subject.
+    pass_summary: >
+      Must verify supersession/currentness, bind exact subject/custody, attack strongest hostile,
+      state claim ceiling, deduplicate findings, and hand off correctly.
+    sha256: e1c8c3d173ece57380eec05e708fec3cebb7179f3d61f3ebafde5a0789725de5
+  - order: 6
+    id: ADVERSARIAL_REGRESSION
+    path: modules/06_adversarial_regression_lab.md
+    objective: Recognize recurring false-authority families without treating historical examples as current defects.
+    pass_summary: >
+      Must construct hostiles, separate new root from recurrence, and produce a novel false-authority family.
+    sha256: 87e5e75bb80c7382282603978ce4864696261160eae59bbe4ba376556bb71fc6
+  - order: 7
+    id: LEASE_RETRY_INCIDENT
+    path: modules/07_lease_retry_incident.md
+    objective: Handle ambiguous/out-of-scope effects without blind retry or retroactive authority stretching.
+    pass_summary: >
+      Must stop/read back ambiguous writes, require separate corrective authority, and distinguish deterministic from transient failure.
+    sha256: 709eb3b31f1959d7346417e408a0723aa6fee7f9935113d6d8ebdc5e1c8ff68d
+  - order: 8
+    id: PROVENANCE_BASE_STATE
+    path: modules/08_provenance_base_operational_state.md
+    objective: Preserve provenance and separate training source, frozen base, and operational state.
+    pass_summary: >
+      Must build a resumable checkpoint while rejecting currentness/continuity overclaim and stale state in permanent training.
+    sha256: d888feb45965917a42581eff11a9fcbc359991122738118b63785d2b127fe4a5
+  - order: 9
+    id: FINAL_QUALIFICATION
+    path: modules/09_final_qualification.md
+    objective: Qualify the trainee on role, reorientation, authority, evidence, correction, incident, provenance, and novel hostiles.
+    pass_summary: >
+      All critical gates and demonstrated-understanding gates must pass under a separate evaluator.
+    sha256: 071d1a67b959c51fb7c1757cba9ca6fce336496dba458d73fa5d6c958feb1332
+
+bootstrap:
+  path: BOOTSTRAP.md
+  sha256: 2756c2a52fd9c02b6537ef42db4cba6ac74cbb00df4a7c39bc5102f6b974c375
+
+qualification:
+  trainee_may_self_award_base_ready: false
+  trainee_pre_evaluation_state: QUALIFICATION_EVIDENCE_READY
+  evaluator_required: true
+  evaluator_requirement: >
+    Evaluator must be distinct from the trainee and must apply Module 09's explicit rubric.
+    Current BT2 governance determines who is authorized/assigned to perform that evaluation;
+    the package itself does not appoint mutation or governance authority.
+  pass_state: EXTERNAL_QUALIFICATION_PASS
+  fail_states:
+    - NOT_QUALIFIED_REMEDIATE
+    - QUALIFICATION_BLOCKED_DEPENDENCY
+  base_ready_condition: >
+    BASE_READY may be recorded only after: exact package version is bound to an immutable
+    repository source; governance dependencies are verified compatible; file integrity is
+    verified when mechanically possible with no known mismatch; Modules 01-08 all PASS;
+    Module 09 receives EXTERNAL_QUALIFICATION_PASS with zero critical failures and all
+    demonstrated-understanding gates passing; the base certificate records package/source
+    provenance; and no unresolved material training dependency remains.
+  base_ready_does_not_grant:
+    - current operational assignment
+    - current write lease
+    - provider or device authority
+    - release authority
+    - uninterrupted runtime claim
+    - subjective continuity claim
+
+
+dependency_locators:
+  training_source:
+    repository: thebrazenbeard/build-team-2.0
+    versioned_path: training/roles/thirteen/corrections/v1.0.0
+    binding: >
+      Trusted orientation supplies the repository locator; loader must resolve this version
+      to an immutable Git commit or immutable release/tag before training.
+  current_governance:
+    preferred: >
+      Current canonical BT2 governance ledger: retrieve the latest applicable
+      permanent_role_map and working_laws_revision issued by the current governance authority.
+    accepted_fallback: >
+      A current governance packet explicitly issued by the governance authority that identifies
+      its source/currentness and the applicable role/authority semantics.
+    not_authoritative_substitutes:
+      - repository README or persona prose
+      - historical Slack messages
+      - historical assignments or leases
+      - prior chat conclusions
+      - trainee memory
+    unavailable_result: TRAINING_DEPENDENCY_UNRESOLVED
+  qualification_evaluator:
+    resolution: >
+      Current BT2 governance must designate or accept a qualification evaluator distinct from
+      the trainee. The evaluator can retrieve Module 09 directly from this same package; manual
+      prompt pasting by Patrick is not required.
+
+unresolved_rules:
+  training_dependency_unresolved: >
+    Stop qualification. Preserve evidence and request authoritative dependency resolution.
+  source_integrity_mismatch: >
+    Stop. Do not mix files from versions or branches. Rebind exact package source.
+  module_failure: >
+    Record remediation requirement and reattempt visibly; do not silently overwrite the failure.
+  governance_conflict: >
+    Stop using this version as current training authority. Escalate through current BT2 governance
+    and require a new package version if permanent role semantics changed.

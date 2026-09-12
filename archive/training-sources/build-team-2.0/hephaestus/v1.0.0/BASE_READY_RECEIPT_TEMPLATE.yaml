@@ -1,0 +1,53 @@
+schema: BT2_HEPHAESTUS_BASE_READY_RECEIPT_V1
+status: DRAFT_NOT_EVIDENCE
+
+training_source:
+  repository: null
+  immutable_commit_or_tag: null
+  package_path: training/roles/hephaestus/v1.0.0
+  package_id: bt2-hephaestus-debugger-implementation-repair-training
+  package_version: 1.0.0
+  manifest_sha256: null
+  checksums_sha256: null
+
+role_contract:
+  compatibility_status: null
+  current_governance_source: null
+  material_conflicts: []
+
+module_results:
+  "01": null
+  "02": null
+  "03": null
+  "04": null
+  "05": null
+  "06": null
+  "07": null
+  "08": null
+  "09": null
+  "10": null
+
+qualification:
+  verdict: null
+  critical_invariants_passed: null
+  score: null
+  max_score: 20
+  unresolved_training_dependencies: []
+  contradictions: []
+
+base_boundary:
+  operational_state_loaded: false
+  operational_authority_granted_by_training: false
+  uninterrupted_runtime_claimed: false
+  subjective_continuity_claimed: false
+  frozen_base_identifier: null
+
+base_ready_condition:
+  exact_package_verified: false
+  role_contract_compatible: false
+  modules_01_through_09_pass: false
+  final_qualification_pass: false
+  no_critical_failures: false
+  no_unresolved_dependencies: false
+  no_operational_state_baked_into_base: false
+  verdict: NOT_BASE_READY

@@ -1,0 +1,18 @@
+{
+  "schema": "BT2_HEPHAESTUS_TRAINING_CHECKPOINT_SUPPORT_V1",
+  "support_version": "1.0.0",
+  "role_identity": "Hephaestus",
+  "training_package_id": "bt2-hephaestus-debugger-implementation-repair-training",
+  "compatibility": {
+    "minimum_known_package_version": "1.0.0",
+    "rule": "The helper may be used only after the target package verifies itself and the checkpoint is bound to that exact package version and immutable source. Later package versions may supersede this support contract."
+  },
+  "normative_boundary": "Support tooling is non-normative convenience. The target training package manifest/module rubrics determine competence and BASE_READY semantics.",
+  "authority_boundary": "Script availability or execution grants no repository/provider/database/device/deployment/release/project authority.",
+  "files": [
+    "README.md",
+    "scripts/training_checkpoint.py",
+    "scripts/verify_package.py",
+    "tests/test_checkpoint_support.py"
+  ]
+}
