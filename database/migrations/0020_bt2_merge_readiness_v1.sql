@@ -131,7 +131,7 @@ BEGIN
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2'
     AND p.proname='append_material_v1'
-    AND pg_get_function_identity_arguments(p.oid)='uuid, text, text, text, text, text';
+    AND oidvectortypes(p.proargtypes)='uuid, text, text, text, text, text';
 
   v_producer_boundary := coalesce(v_secdef,false)
     AND v_owner='postgres'

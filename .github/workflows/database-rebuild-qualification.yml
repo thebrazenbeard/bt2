@@ -3,7 +3,7 @@ name: Database rebuild qualification
 on:
   push:
     branches:
-      - 'work/two-canonical-platform-integrity-v1'
+      - 'main'
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
@@ -43,19 +43,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify PostgreSQL client
-        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
+      - name: Verify PostgreSQL client and bind service image
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
+          image_id="$(docker inspect '${{ job.services.postgres.id }}' --format '{{.Image}}')"
+          digest="$(docker image inspect "$image_id" --format '{{index .RepoDigests 0}}')"
+          test -n "$digest"
+          test "$digest" != '<no value>'
+          echo "POSTGRES_IMAGE_DIGEST=$digest" >> "$GITHUB_ENV"
+          echo "Resolved PostgreSQL service image: $digest"
 
       - name: Canonical PostgreSQL 16 blank rebuild
         run: |
           python tools/qualification/run_postgres16_blank_rebuild.py \
             --database-url "$DATABASE_URL" \
+            --postgres-image-digest "$POSTGRES_IMAGE_DIGEST" \
             --evidence-out /tmp/bt2_blank_rebuild_evidence.json
 
       - name: True multi-session Lantern concurrency
         run: |
           python tools/qualification/run_lantern_multisession_concurrency_v2.py \
             --database-url "$DATABASE_URL" \
+            --postgres-image-digest "$POSTGRES_IMAGE_DIGEST" \
             --evidence-out /tmp/bt2_lantern_concurrency_evidence.json
 
       - name: Evidence summary

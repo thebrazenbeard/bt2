@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import time
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 SCOPE = "BT2_LD2_CONCURRENCY_V2"
@@ -80,19 +81,50 @@ def append_sql(material_id: str, subject_key: str, source_digest: str) -> str:
     )
 
 
-def spawn_gated(url: str, statement: str, sleep_seconds: int = 3) -> tuple[subprocess.Popen[str], int]:
-    # PID is emitted before the sleep; both child processes remain active while Python verifies pg_stat_activity.
-    command = f"SELECT pg_backend_pid(); SELECT pg_sleep({sleep_seconds}); {statement}"
-    proc = subprocess.Popen(base(url) + ["-c", command], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1)
-    assert proc.stdout is not None
-    first = proc.stdout.readline().strip()
-    try:
-        pid = int(first)
-    except ValueError as exc:
-        err = proc.stderr.read() if proc.stderr else ""
-        proc.kill()
-        raise RuntimeError(f"failed to obtain backend PID: stdout={first!r} stderr={err!r}") from exc
-    return proc, pid
+def spawn_named(url: str, command: str, prefix: str) -> tuple[subprocess.Popen[str], str]:
+    app_name = f"{prefix}-{uuid.uuid4().hex[:12]}"
+    env = os.environ.copy()
+    env["PGAPPNAME"] = app_name
+    proc = subprocess.Popen(
+        base(url) + ["-c", command],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    )
+    return proc, app_name
+
+
+def wait_for_pg_sleep(url: str, proc: subprocess.Popen[str], app_name: str, timeout: float = 8.0) -> int:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        row = scalar(
+            url,
+            "SELECT concat_ws('|',pid,coalesce(wait_event,'')) FROM pg_stat_activity "
+            f"WHERE application_name='{app_name}';",
+        )
+        if row:
+            pid_text, _, wait_event = row.partition('|')
+            if wait_event == "PgSleep":
+                return int(pid_text)
+        if proc.poll() is not None:
+            out, err = proc.communicate()
+            raise RuntimeError(f"session exited before server-observed gate: app={app_name} rc={proc.returncode} stdout={out!r} stderr={err!r}")
+        time.sleep(0.05)
+    proc.kill()
+    out, err = proc.communicate()
+    raise RuntimeError(f"server-observed gate timeout: app={app_name} stdout={out!r} stderr={err!r}")
+
+
+def spawn_gated(url: str, statement: str, gate_epoch: str) -> tuple[subprocess.Popen[str], int]:
+    command = (
+        "SELECT pg_sleep(GREATEST(0, "
+        f"{gate_epoch}::double precision - EXTRACT(EPOCH FROM clock_timestamp()))); "
+        f"{statement}"
+    )
+    proc, app_name = spawn_named(url, command, "bt2-ld2-race")
+    return proc, wait_for_pg_sleep(url, proc, app_name)
 
 
 def finish(proc: subprocess.Popen[str]) -> tuple[int, str, str]:
@@ -108,8 +140,9 @@ def assert_two_sessions(url: str, pids: list[int]) -> None:
 
 
 def same_subject_race(url: str) -> dict:
-    a, pid_a = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000001", "same-subject", "same-a"))
-    b, pid_b = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000002", "same-subject", "same-b"))
+    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '3 seconds')::text;")
+    a, pid_a = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000001", "same-subject", "same-a"), gate_epoch)
+    b, pid_b = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000002", "same-subject", "same-b"), gate_epoch)
     assert_two_sessions(url, [pid_a, pid_b])
     ra = finish(a); rb = finish(b)
     successes = sum(1 for r in (ra, rb) if r[0] == 0)
@@ -121,8 +154,9 @@ def same_subject_race(url: str) -> dict:
 
 
 def different_subject_race(url: str) -> dict:
-    a, pid_a = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000001", "different-a", "diff-a"))
-    b, pid_b = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000002", "different-b", "diff-b"))
+    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '3 seconds')::text;")
+    a, pid_a = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000001", "different-a", "diff-a"), gate_epoch)
+    b, pid_b = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000002", "different-b", "diff-b"), gate_epoch)
     assert_two_sessions(url, [pid_a, pid_b])
     ra = finish(a); rb = finish(b)
     count = scalar(url, f"SELECT count(*) FROM bt2.materials WHERE project_scope='{SCOPE}' AND canonical_payload->>'subject_key' IN ('different-a','different-b');")
@@ -133,18 +167,10 @@ def different_subject_race(url: str) -> dict:
 
 
 def mutation_holder(url: str, mutation: str, sleep_seconds: int = 4) -> tuple[subprocess.Popen[str], int]:
-    # Emit PID only *after* the mutation has executed inside the uncommitted transaction.
-    command = f"BEGIN; {mutation} SELECT pg_backend_pid(); SELECT pg_sleep({sleep_seconds}); COMMIT;"
-    proc = subprocess.Popen(base(url) + ["-c", command], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1)
-    assert proc.stdout is not None
-    first = proc.stdout.readline().strip()
-    try:
-        pid = int(first)
-    except ValueError as exc:
-        err = proc.stderr.read() if proc.stderr else ""
-        proc.kill()
-        raise RuntimeError(f"mutation holder failed before gate: stdout={first!r} stderr={err!r}") from exc
-    return proc, pid
+    # The server-side sleep begins only after the mutation has executed in the open transaction.
+    command = f"BEGIN; {mutation} SELECT pg_sleep({sleep_seconds}); COMMIT;"
+    proc, app_name = spawn_named(url, command, "bt2-ld2-mutation")
+    return proc, wait_for_pg_sleep(url, proc, app_name)
 
 
 def profile_lineage_race(url: str) -> dict:
