@@ -117,6 +117,27 @@ def wait_for_pg_sleep(url: str, proc: subprocess.Popen[str], app_name: str, time
     raise RuntimeError(f"server-observed gate timeout: app={app_name} stdout={out!r} stderr={err!r}")
 
 
+def wait_for_session(url: str, proc: subprocess.Popen[str], app_name: str, timeout: float = 4.0) -> tuple[int, str]:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        row = scalar(
+            url,
+            "SELECT concat_ws('|',pid,coalesce(wait_event_type,''),coalesce(wait_event,'')) "
+            "FROM pg_stat_activity "
+            f"WHERE application_name='{app_name}';",
+        )
+        if row:
+            pid_text, wait_type, wait_event = (row.split('|', 2) + ['', ''])[:3]
+            return int(pid_text), f"{wait_type}:{wait_event}".strip(':')
+        if proc.poll() is not None:
+            out, err = proc.communicate()
+            raise RuntimeError(f"session exited before overlap observation: app={app_name} rc={proc.returncode} stdout={out!r} stderr={err!r}")
+        time.sleep(0.05)
+    proc.kill()
+    out, err = proc.communicate()
+    raise RuntimeError(f"session overlap observation timeout: app={app_name} stdout={out!r} stderr={err!r}")
+
+
 def spawn_gated(url: str, statement: str, gate_epoch: str) -> tuple[subprocess.Popen[str], int]:
     command = (
         "SELECT pg_sleep(GREATEST(0, "
@@ -140,7 +161,7 @@ def assert_two_sessions(url: str, pids: list[int]) -> None:
 
 
 def same_subject_race(url: str) -> dict:
-    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '3 seconds')::text;")
+    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '5 seconds')::text;")
     a, pid_a = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000001", "same-subject", "same-a"), gate_epoch)
     b, pid_b = spawn_gated(url, append_sql("10000000-0000-4000-8000-000000000002", "same-subject", "same-b"), gate_epoch)
     assert_two_sessions(url, [pid_a, pid_b])
@@ -154,7 +175,7 @@ def same_subject_race(url: str) -> dict:
 
 
 def different_subject_race(url: str) -> dict:
-    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '3 seconds')::text;")
+    gate_epoch = scalar(url, "SELECT EXTRACT(EPOCH FROM clock_timestamp()+interval '5 seconds')::text;")
     a, pid_a = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000001", "different-a", "diff-a"), gate_epoch)
     b, pid_b = spawn_gated(url, append_sql("20000000-0000-4000-8000-000000000002", "different-b", "diff-b"), gate_epoch)
     assert_two_sessions(url, [pid_a, pid_b])
@@ -166,7 +187,7 @@ def different_subject_race(url: str) -> dict:
     return {"status": "PASS", "backend_pids": [pid_a, pid_b], "successes": 2}
 
 
-def mutation_holder(url: str, mutation: str, sleep_seconds: int = 4) -> tuple[subprocess.Popen[str], int]:
+def mutation_holder(url: str, mutation: str, sleep_seconds: int = 6) -> tuple[subprocess.Popen[str], int]:
     # The server-side sleep begins only after the mutation has executed in the open transaction.
     command = f"BEGIN; {mutation} SELECT pg_sleep({sleep_seconds}); COMMIT;"
     proc, app_name = spawn_named(url, command, "bt2-ld2-mutation")
@@ -176,8 +197,14 @@ def mutation_holder(url: str, mutation: str, sleep_seconds: int = 4) -> tuple[su
 def profile_lineage_race(url: str) -> dict:
     mutation = f"INSERT INTO bt2.material_profiles(project_scope,profile_digest,predecessor_digest,policy_digest,accepted) VALUES('{SCOPE}','{PROFILE_B}','{PROFILE_A}','{POLICY}',true);"
     holder, holder_pid = mutation_holder(url, mutation)
-    admission = subprocess.Popen(base(url) + ["-c", append_sql("30000000-0000-4000-8000-000000000001", "profile-race", "profile-race")], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # Holder has already mutated; admission should block behind its SHARE table lock until commit, then fail closed.
+    admission, admission_app = spawn_named(
+        url,
+        append_sql("30000000-0000-4000-8000-000000000001", "profile-race", "profile-race"),
+        "bt2-ld2-admission",
+    )
+    admission_pid, admission_wait = wait_for_session(url, admission, admission_app)
+    assert_two_sessions(url, [holder_pid, admission_pid])
+    # Holder has already mutated; admission is now independently observed while the holder remains open.
     holder_result = finish(holder)
     admission_result = finish(admission)
     count = scalar(url, f"SELECT count(*) FROM bt2.materials WHERE project_scope='{SCOPE}' AND canonical_payload->>'subject_key'='profile-race';")
@@ -186,19 +213,39 @@ def profile_lineage_race(url: str) -> dict:
     if "accepted profile lineage changed during admission" not in admission_result[2]:
         raise RuntimeError(f"profile-lineage admission failed for unexpected reason: {admission_result[2]}")
     sql(url, f"DELETE FROM bt2.material_profiles WHERE project_scope='{SCOPE}' AND profile_digest='{PROFILE_B}';")
-    return {"status": "PASS", "mutation_backend_pid": holder_pid, "admission_rejected": True}
+    return {
+        "status": "PASS",
+        "mutation_backend_pid": holder_pid,
+        "admission_backend_pid": admission_pid,
+        "admission_wait_event": admission_wait,
+        "overlap_verified": True,
+        "admission_rejected": True,
+    }
 
 
 def permit_invalidation_race(url: str) -> dict:
     mutation = f"UPDATE bt2.material_producer_permits SET invalidated_at=clock_timestamp() WHERE permit_id='{PERMIT}'::uuid;"
     holder, holder_pid = mutation_holder(url, mutation)
-    admission = subprocess.Popen(base(url) + ["-c", append_sql("40000000-0000-4000-8000-000000000001", "permit-race", "permit-race")], cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    admission, admission_app = spawn_named(
+        url,
+        append_sql("40000000-0000-4000-8000-000000000001", "permit-race", "permit-race"),
+        "bt2-ld2-admission",
+    )
+    admission_pid, admission_wait = wait_for_session(url, admission, admission_app)
+    assert_two_sessions(url, [holder_pid, admission_pid])
     holder_result = finish(holder)
     admission_result = finish(admission)
     count = scalar(url, f"SELECT count(*) FROM bt2.materials WHERE project_scope='{SCOPE}' AND canonical_payload->>'subject_key'='permit-race';")
     if holder_result[0] != 0 or admission_result[0] == 0 or count != "0":
         raise RuntimeError(f"permit-invalidation race failed: holder_rc={holder_result[0]} admission_rc={admission_result[0]} count={count} admission_stderr={admission_result[2]}")
-    return {"status": "PASS", "mutation_backend_pid": holder_pid, "admission_rejected": True}
+    return {
+        "status": "PASS",
+        "mutation_backend_pid": holder_pid,
+        "admission_backend_pid": admission_pid,
+        "admission_wait_event": admission_wait,
+        "overlap_verified": True,
+        "admission_rejected": True,
+    }
 
 
 def main() -> int:
