@@ -7,11 +7,13 @@ on:
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
+      - 'tools/qualification/**'
       - '.github/workflows/database-rebuild-qualification.yml'
   pull_request:
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
+      - 'tools/qualification/**'
       - '.github/workflows/database-rebuild-qualification.yml'
   workflow_dispatch:
 
@@ -37,51 +39,27 @@ jobs:
           --health-retries=10
     env:
       PGPASSWORD: postgres
-      PGHOST: localhost
-      PGPORT: 5432
-      PGUSER: postgres
-      PGDATABASE: bt2_ci
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bt2_ci
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify PostgreSQL
-        run: psql -v ON_ERROR_STOP=1 -c 'select version();'
+      - name: Verify PostgreSQL client
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
 
-      - name: Apply captured baseline
-        shell: bash
+      - name: Canonical PostgreSQL 16 blank rebuild
         run: |
-          set -euo pipefail
-          for file in database/schema/*.sql; do
-            echo "Applying $file"
-            psql -v ON_ERROR_STOP=1 -f "$file"
-          done
+          python tools/qualification/run_postgres16_blank_rebuild.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_blank_rebuild_evidence.json
 
-      - name: Apply canonical migrations
-        shell: bash
+      - name: True multi-session Lantern concurrency
         run: |
-          set -euo pipefail
-          for file in database/migrations/*.sql; do
-            echo "Applying $file"
-            psql -v ON_ERROR_STOP=1 -f "$file"
-          done
+          python tools/qualification/run_lantern_multisession_concurrency.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_lantern_concurrency_evidence.json
 
-      - name: Run rebuild smoke qualification
-        shell: bash
+      - name: Evidence summary
+        if: always()
         run: |
-          set -euo pipefail
-          for file in database/tests/*.sql; do
-            echo "Testing $file"
-            psql -v ON_ERROR_STOP=1 -f "$file"
-          done
-
-      - name: Qualify Project Lantern cohosted historical reconstruction V2
-        shell: bash
-        run: |
-          set -euo pipefail
-          python database/loaders/lantern_cohosted_history_v2.py --mode verify-rollback > /tmp/lantern_cohosted_history_verify.sql
-          psql -v ON_ERROR_STOP=1 -f /tmp/lantern_cohosted_history_verify.sql
-
-      - name: Catalog summary
-        run: |
-          psql -v ON_ERROR_STOP=1 -c "select n.nspname,count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname in ('bt2','bt2_legacy') and c.relkind in ('r','v') group by n.nspname order by n.nspname;"
-          psql -v ON_ERROR_STOP=1 -c "select count(*) as bt2_functions from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='bt2';"
+          test ! -f /tmp/bt2_blank_rebuild_evidence.json || cat /tmp/bt2_blank_rebuild_evidence.json
+          test ! -f /tmp/bt2_lantern_concurrency_evidence.json || cat /tmp/bt2_lantern_concurrency_evidence.json
