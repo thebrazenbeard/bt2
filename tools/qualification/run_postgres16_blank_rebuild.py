@@ -71,14 +71,20 @@ def assert_empty(url: str) -> None:
         raise SystemExit(f"qualification database is not blank: {relation_count} BT2 relations already exist")
 
 
+def manifest_path() -> Path:
+    v2 = DB / "BUILD_MANIFEST_V2.json"
+    return v2 if v2.is_file() else DB / "BUILD_MANIFEST_V1.json"
+
+
 def check_manifest(expected_digest: str | None) -> str:
-    manifest_path = DB / "BUILD_MANIFEST_V1.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    path = manifest_path()
+    manifest = json.loads(path.read_text(encoding="utf-8"))
     digest = manifest["package_identity"]["package_digest_sha256"]
     if expected_digest and digest != expected_digest:
         raise SystemExit(f"package digest mismatch: manifest={digest} expected={expected_digest}")
     if int(manifest["target"]["qualified_major_version"]) != 16:
         raise SystemExit("manifest is not qualified for PostgreSQL 16")
+    print(f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}", flush=True)
     return digest
 
 
