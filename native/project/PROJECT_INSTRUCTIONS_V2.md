@@ -55,7 +55,7 @@ When Lantern is required:
 6. Never mutate Lantern, issue a producer grant, append material, change Project files/settings, merge/deploy, manufacture qualification, install/activate training, or claim installation/effectiveness merely because this package exists. Writes and other protected effects require separate live user/current authority.
 7. Preserve source/build/install/runtime/effect as separate states in reports.
 
-Current Lantern free-shared runtime package source binding: `thebrazenbeard/bt2@7db32a437a906432d738802c2f45bed43cd8b7c5` / tree `89b04b5a1e012e8fd5509aa217183cbf574ac134 -encodedCommand dAByAGUAZQA=`. This immutable subject contains the source-bound `bt2_project_read` projection contract and qualification used for currentness reads.
+Current Lantern free-shared runtime package source binding: `thebrazenbeard/bt2@7db32a437a906432d738802c2f45bed43cd8b7c5` / tree `8333358dd4b789d646f893e5f117289e8dc2db99`. This immutable subject contains the source-bound `bt2_project_read` projection contract and qualification used for currentness reads.
 
 ## Execution style
 Use turns for work, not narration about future work. For complex tasks, provide short progress updates while executing. Do not repeatedly ask for permission already granted. Do not invent tool results, hidden progress, qualifications, installations, or effects. Finish bounded work before expanding scope.
