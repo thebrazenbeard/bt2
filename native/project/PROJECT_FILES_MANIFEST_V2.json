@@ -4,14 +4,14 @@
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
   "runtime_backend": "WoWSQL:bt2-479e4ad9",
-  "payload_source_commit": "9d9c1bacf5ff6d09e7bb2ee1dbf07e48e3ec9b7f",
-  "payload_source_tree": "13dd8e05d8206808dd698d180de3a13a1a24b4b0",
+  "payload_source_commit": "b7fe24a3913d42262d57e9aadada98c1685794aa",
+  "payload_source_tree": "794f2a9bddf3db3c8214ac5835989166634698da",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
-  "payload_digest": "5143939ee2f401433eac9d76e18e1a00e7ca8cd2f265bad65784f1750d08a164",
+  "payload_digest": "820509b061ca62deb61d8ace88a495063c9e8dc4f201132cccf5851f419c1f0a",
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V2.md",
-    "git_blob": "53183b1493f371345684d459b682865e50f308d3",
-    "sha256": "823cf522c61383a0825679f8d0cbc2aa9dabe103956371b35ea90a7fe6a5e746"
+    "git_blob": "a53e975b9e04842604155de2bba35221f39da09f",
+    "sha256": "eec3db4e453a4ecf41fbf01b1944e0c0d3d95b138db031a520fbc9f3f4249cfb"
   },
   "required_project_files": [
     {
@@ -60,7 +60,7 @@
       "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
     }
   ],
-  "installation_rule": "Install the four distinct Lantern `_V2.md` files alongside existing `_V1.md` files; do not delete, overwrite, or re-upload same-named Project files. Existing unchanged BT2 Project files remain valid.",
+  "installation_rule": "Add the four distinct Lantern `_V2.md` files alongside existing `_V1.md` files. Do not delete, overwrite, or re-upload same-named Project files. Under Project Instructions V2, corresponding `_V1.md` Lantern files are inactive historical material.",
   "runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
   "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
 }
