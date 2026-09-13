@@ -1,4 +1,4 @@
-# LANTERN_WOWSQL_RUNTIME_CONTRACT_V1
+﻿# LANTERN_WOWSQL_RUNTIME_CONTRACT_V1
 
 Status: CANONICAL RUNTIME CONTRACT / FREE-SHARED READ COMPATIBILITY
 
@@ -52,7 +52,7 @@ There is no Supabase fallback for currentness.
 
 ## Writes and authority
 
-This runtime integration is read-only by default. `FROZEN_ZERO_PRODUCER` is a hosted-mode ceiling: any future governed write must republish or supersede the projection before Project currentness is re-established.
+This runtime integration is read-only by default. Hosted producer enablement is NOT QUALIFIED on free-shared WoWSQL while the strict producer-boundary verifier fails. `FROZEN_ZERO_PRODUCER` is a hosted-mode ceiling: any future governed write requires a separately qualified producer boundary and projection republication or supersession before Project currentness is re-established.
 
 Successful reads do not imply producer authority, database write authority, runtime identity continuity, qualification, training activation, merge/deploy authority, or any other protected effect.
 

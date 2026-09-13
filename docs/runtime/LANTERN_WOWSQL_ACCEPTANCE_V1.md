@@ -1,4 +1,4 @@
-# LANTERN_WOWSQL_ACCEPTANCE_V1
+﻿# LANTERN_WOWSQL_ACCEPTANCE_V1
 
 Status: RUNTIME ACCEPTANCE SPEC / FREE-SHARED READ COMPATIBILITY
 
@@ -45,7 +45,7 @@ Without WoWSQL access, the same currentness request must return a clear `UNKNOWN
 ## Result vocabulary
 
 - `WOWSQL_PROJECT_FILES_INSTALLED`: Project instructions/files are deliberately installed and read back.
-- `WOWSQL_FREE_SHARED_READ_PROJECTION_VERIFIED`: both hosted boundary qualifiers pass.
+- `WOWSQL_FREE_SHARED_READ_PROJECTION_VERIFIED`: read projection qualification passes while hosted producer mode remains frozen.`r`n- `WOWSQL_HOSTED_PRODUCER_NOT_QUALIFIED`: hosted producer enablement does not satisfy the strict producer-boundary verifier and remains disabled.
 - `WOWSQL_RUNTIME_CONSUMPTION_VERIFIED`: fresh-chat projected B0/payload/B1 acceptance passes.
 - `WOWSQL_FAILURE_PATH_VERIFIED`: WoWSQL-unavailable behavior fails closed.
 - `NOT_ESTABLISHED`: required evidence is missing.
