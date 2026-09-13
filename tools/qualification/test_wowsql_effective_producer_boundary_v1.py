@@ -43,7 +43,7 @@ def exact_function() -> None:
         "ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) OWNER TO postgres; "
         "ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SECURITY DEFINER; "
         "ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) "
-        "SET search_path TO pg_catalog, bt2;"
+        "SET search_path TO pg_catalog, bt2, pg_temp;"
     )
 
 
@@ -76,6 +76,13 @@ def main() -> int:
 
         reset_fixture(); exact_function()
         psql(
+            "ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) "
+            "SET search_path TO pg_catalog, bt2;"
+        )
+        verify(False, "implicit pg_temp shadowing path")
+
+        reset_fixture(); exact_function()
+        psql(
             "CREATE ROLE bt2_test_group NOLOGIN; CREATE ROLE bt2_test_child LOGIN NOINHERIT; "
             "GRANT bt2_test_group TO bt2_test_child; "
             "GRANT USAGE ON SCHEMA bt2 TO bt2_test_group;"
@@ -89,7 +96,7 @@ def main() -> int:
             "ALTER FUNCTION bt2.append_material_v1(integer,text,text,text,text,text) OWNER TO postgres; "
             "ALTER FUNCTION bt2.append_material_v1(integer,text,text,text,text,text) SECURITY DEFINER; "
             "ALTER FUNCTION bt2.append_material_v1(integer,text,text,text,text,text) "
-            "SET search_path TO pg_catalog, bt2;"
+            "SET search_path TO pg_catalog, bt2, pg_temp;"
         )
         verify(False, "wrong six-argument signature")
 

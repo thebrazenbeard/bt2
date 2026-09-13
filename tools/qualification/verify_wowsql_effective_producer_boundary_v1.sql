@@ -36,7 +36,7 @@ BEGIN
 
   IF v_owner IS DISTINCT FROM 'postgres'
      OR NOT v_secdef
-     OR v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2']::text[] THEN
+     OR v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[] THEN
     RAISE EXCEPTION 'BT2_WOWSQL_PRODUCER_BOUNDARY_FORM_MISMATCH';
   END IF;
 

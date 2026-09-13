@@ -135,7 +135,7 @@ BEGIN
 
   v_producer_boundary := coalesce(v_secdef,false)
     AND v_owner='postgres'
-    AND coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2']::text[],false)
+    AND coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
     AND NOT coalesce(v_public_exec,true)
     AND coalesce(v_postgres_exec,false);
 

@@ -5,7 +5,7 @@ BEGIN;
 
 ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) OWNER TO postgres;
 ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SECURITY DEFINER;
-ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SET search_path TO pg_catalog, bt2;
+ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SET search_path TO pg_catalog, bt2, pg_temp;
 REVOKE ALL ON FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) TO postgres;
 
@@ -28,7 +28,7 @@ BEGIN
   IF NOT v_secdef OR v_owner<>'postgres' THEN
     RAISE EXCEPTION 'LANTERN_PRODUCER_BOUNDARY_OWNER_OR_SECURITY_DEFINER_MISMATCH';
   END IF;
-  IF v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2']::text[] THEN
+  IF v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[] THEN
     RAISE EXCEPTION USING MESSAGE =
       'LANTERN_PRODUCER_BOUNDARY_SEARCH_PATH_MISMATCH:' || coalesce(array_to_string(v_config,','),'NULL');
   END IF;
