@@ -142,7 +142,7 @@ BEGIN
 
   IF NOT coalesce(v_secdef,false)
      OR v_owner <> 'postgres'
-     OR NOT coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2']::text[],false)
+     OR NOT coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
      OR coalesce(v_public_exec,true)
      OR NOT coalesce(v_postgres_exec,false) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_PRODUCER_BOUNDARY_MISMATCH';
