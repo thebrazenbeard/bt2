@@ -4,14 +4,14 @@
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
   "runtime_backend": "WoWSQL:bt2-479e4ad9",
-  "payload_source_commit": "ffc64c8686a6d2fcc9aa6b068f12f049ce715452",
-  "payload_source_tree": "204c00fc5e19fa3140414d2d3bb0244cefd5caa4",
+  "payload_source_commit": "9d9c1bacf5ff6d09e7bb2ee1dbf07e48e3ec9b7f",
+  "payload_source_tree": "13dd8e05d8206808dd698d180de3a13a1a24b4b0",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
-  "payload_digest": "5e61dda2734bf7f1e73362d32ba0b68c1a3a35bd61f4a6266b134d480d8f627e",
+  "payload_digest": "5143939ee2f401433eac9d76e18e1a00e7ca8cd2f265bad65784f1750d08a164",
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V2.md",
-    "git_blob": "08c5e79b0b0bb6d2f8fae447201bed8e4914dad6",
-    "sha256": "d17f2034d2393b082c9ae182dead3600576205bd8dfc539f0f41426dcfd18f43"
+    "git_blob": "53183b1493f371345684d459b682865e50f308d3",
+    "sha256": "823cf522c61383a0825679f8d0cbc2aa9dabe103956371b35ea90a7fe6a5e746"
   },
   "required_project_files": [
     {
@@ -30,24 +30,24 @@
       "sha256": "6b48befe2970fc0485481f3083bd96179cad9b3a57ac21c251cc2172d8ea86ff"
     },
     {
-      "path": "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md",
-      "git_blob": "3afa5b597ac502a68b6727e5acc1521e3f50c98f",
-      "sha256": "219660c21c47428562b241f9df9322913ec2daad800bbca2b360cfe772ba0a3e"
+      "path": "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V2.md",
+      "git_blob": "20404d29fc865b082d77218b43b27b327f94c333",
+      "sha256": "fa1ba8e675f6a71e594d72d73c4ad5d6706e66ff355795e20ea74a47079ed7fb"
     },
     {
-      "path": "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V1.md",
-      "git_blob": "988deac84141545ded87b29980a6ab002562154b",
-      "sha256": "a6343c997aaae0acb5aa8bd06d04b30950ea9c3bb3562bd1d9353b708d113c89"
+      "path": "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V2.md",
+      "git_blob": "4a1b386f46c3306ac13464cda6ebad160fbbeb7b",
+      "sha256": "e47b88190598c1495027e73a149040e138cfd46206430d45ab169a8b3c1f02b9"
     },
     {
-      "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md",
-      "git_blob": "b6f8976c4947cf2db156fc3506e42a2de9239b28",
-      "sha256": "8f7e8794b466b610dd77fba65e3e5dfad01a6f683b06f9e4c3c1b802ed8c8a26"
+      "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V2.md",
+      "git_blob": "d19980fd40766a1bd629dc2e27cfeaeebd11f9b7",
+      "sha256": "0da0088370629e47195128ab819cb7f10346eb0b8181987c21a6555b72e24c91"
     },
     {
-      "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md",
-      "git_blob": "fdf9302e923641b7de03630a40afae674967bd4f",
-      "sha256": "a991e9606bc6f19a97336061b6b27567fa340ea9bebbfcda5e095c983e0b2209"
+      "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V2.md",
+      "git_blob": "75fc12af4bffc15b550ab05d6cc01e2383d690e3",
+      "sha256": "a9d7a066fddee0e49bdfb5e8c752d4ce10f848de4e56d2089006cb631732b273"
     },
     {
       "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
@@ -60,7 +60,7 @@
       "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
     }
   ],
-  "installation_rule": "Install exact V2 identities; replace older active Lantern runtime copies; verify by Project readback.",
+  "installation_rule": "Install the four distinct Lantern `_V2.md` files alongside existing `_V1.md` files; do not delete, overwrite, or re-upload same-named Project files. Existing unchanged BT2 Project files remain valid.",
   "runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
   "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
 }
