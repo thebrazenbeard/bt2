@@ -1,12 +1,12 @@
-# LANTERN_WOWSQL_RUNTIME_CONTRACT_V1
+﻿# LANTERN_WOWSQL_RUNTIME_CONTRACT_V1
 
-Status: CANONICAL-CANDIDATE SUCCESSOR RUNTIME CONTRACT / NOT YET INSTALLED IN CHATGPT PROJECT
+Status: CANONICAL RUNTIME CONTRACT / FREE-SHARED READ COMPATIBILITY
 
 ## Purpose
 
 Lantern supplies a governed, provenance-bearing material universe to an authorized ChatGPT Project runtime. It is a currentness/evidence source, not a substitute for the live user request and not a blanket instruction channel.
 
-This successor contract changes the Lantern currentness provider from the retired-target Supabase subject to exact WoWSQL project `bt2-479e4ad9`. It does not change Lantern's evidence semantics or authority ceiling.
+The currentness provider is exact WoWSQL project `bt2-479e4ad9`. On its free-shared PostgreSQL tier, the Project login is deliberately isolated from internal schema `bt2`, so Project reads use the source-bound `bt2_project_read` compatibility projection.
 
 ## Evidence order
 
@@ -21,58 +21,45 @@ Do not silently promote a lower class into a higher one.
 
 ## Consultation triggers
 
-Consult Lantern when the answer materially depends on:
-- durable project state or continuation/recovery;
-- what Lantern currently recognizes as visible material;
-- provenance/currentness of project material;
-- reconciling potentially stale project evidence;
-- a task whose installed Project instructions explicitly require Lantern.
-
-Normally skip Lantern for:
-- ordinary conversation with no project-state dependency;
-- creative generation;
-- information completely supplied in the current turn;
-- unrelated projects/domains.
+Consult Lantern when the answer materially depends on durable project state, recovery/currentness, provenance of accepted material, or when installed Project instructions explicitly require it. Skip Lantern when the live turn already supplies everything needed or the task is unrelated.
 
 ## Exact runtime target
 
-Currentness reads require read access to exact WoWSQL project `bt2-479e4ad9`.
-
-Do not substitute another WoWSQL project, the former Supabase project, Git source, Project prose, historical material, or model memory as current Lantern state.
+Currentness reads require exact WoWSQL project `bt2-479e4ad9`. Do not substitute another project, the former Supabase provider, Git source, Project prose, historical material, or model memory as current Lantern state.
 
 ## Governed read
 
 Follow `LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md` and `LANTERN_WOWSQL_READ_QUERIES_V1.md`.
 
 A valid current cut requires:
-1. exactly one B0 row from `bt2.material_cut_v1('PROJECT_LANTERN')`;
-2. payload rows from `bt2.runtime_visible_materials_v1` whose count, exact member tuples, profile digest, and policy digest cross-bind exactly to B0;
-3. B1 exactly equal to B0;
-4. one complete retry on B0/B1 instability, then `UNKNOWN` if instability remains.
+1. exactly one projection preflight row bound to `BT2_LANTERN_FREE_SHARED_READ_V1` and `FROZEN_ZERO_PRODUCER`;
+2. exactly one B0 row from `bt2_project_read.lantern_cut_v1`;
+3. payload rows from `bt2_project_read.lantern_materials_v1` whose count, exact member tuples, profile digest, and policy digest cross-bind exactly to B0;
+4. B1 exactly equal to B0;
+5. one complete retry on instability, then `UNKNOWN` if instability remains.
 
 ## Fail-closed states
 
 Return a clear limitation rather than inventing currentness when:
-- exact WoWSQL target `bt2-479e4ad9` is unavailable;
-- `bt2.material_cut_v1('PROJECT_LANTERN')` is absent, non-singular, or invalid;
-- payload rows do not exactly cross-bind to B0 membership/profile/policy;
-- B0 and B1 do not match after one complete retry;
-- the requested claim needs authority that current evidence does not establish.
+- exact WoWSQL target is unavailable;
+- projection binding is absent or differs from the installed source-bound state;
+- producer mode is not `FROZEN_ZERO_PRODUCER`;
+- B0/payload/B1 cross-binding fails;
+- instability persists after one retry;
+- the requested claim needs authority current evidence does not establish.
 
-There is no fallback to the former Supabase provider for currentness after this contract is installed.
+There is no Supabase fallback for currentness.
 
 ## Writes and authority
 
-This runtime integration is read-only by default. A Lantern read never authorizes a Lantern write.
+This runtime integration is read-only by default. Hosted producer enablement is NOT QUALIFIED on free-shared WoWSQL while the strict producer-boundary verifier fails. `FROZEN_ZERO_PRODUCER` is a hosted-mode ceiling: any future governed write requires a separately qualified producer boundary and projection republication or supersession before Project currentness is re-established.
 
-Provider mutation, producer grants, material admission, database writes, Project Settings mutation, Project-file replacement, merge/deploy, qualification, training installation/activation, canonical-memory effects, or destructive provider retirement require separate current authority.
-
-Successful reads do not imply runtime identity continuity or any protected effect.
+Successful reads do not imply producer authority, database write authority, runtime identity continuity, qualification, training activation, merge/deploy authority, or any other protected effect.
 
 ## Reporting ceiling
 
-Report only what evidence establishes: source/package present, backend consulted, stable material cut obtained, specific material used, installed Project files observed, and/or fresh-runtime consumption verified.
+Report only what evidence establishes: source/package present, backend consulted, stable projected material cut obtained, specific material used, installed Project files observed, and/or fresh-runtime consumption verified.
 
-Do not collapse source readiness, installation, routing, behavioral qualification, or provider retirement into one status.
+Do not collapse source readiness, installation, routing, behavioral qualification, or provider lifecycle into one status.
 
 Use `LANTERN_WOWSQL_ACCEPTANCE_V1.md` for installation and runtime-consumption acceptance.
