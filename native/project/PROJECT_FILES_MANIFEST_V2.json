@@ -4,17 +4,14 @@
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
   "runtime_backend": "WoWSQL:bt2-479e4ad9",
-  "lantern_provider_mode": "WOWSQL_FREE_SHARED_FROZEN_ZERO_PRODUCER",
-  "superseded_currentness_backend": "Supabase:agvhmutlrolbaijzlbqk",
-  "superseded_backend_rule": "Not a valid Lantern currentness fallback. Physical provider lifecycle is a separate observed effect.",
-  "payload_source_commit": "d427bdfeb1bdeab3cd2a9fb1bb71c2634c1f267d",
-  "payload_source_tree": "c4a76b4520d36768eabbbde5c8f6502c6852c8ce",
-  "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256) + newline)",
-  "payload_digest": "e0261a6585f1b3e51ff06ef3448c04710c41a5a57bdfad3eaaa5a0f770da2829",
+  "payload_source_commit": "ffc64c8686a6d2fcc9aa6b068f12f049ce715452",
+  "payload_source_tree": "204c00fc5e19fa3140414d2d3bb0244cefd5caa4",
+  "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
+  "payload_digest": "5e61dda2734bf7f1e73362d32ba0b68c1a3a35bd61f4a6266b134d480d8f627e",
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V2.md",
-    "git_blob": "af6fe6beff270242ab99205a3466f4fd76fce55d",
-    "sha256": "489346649982f80eb4aa22fe4c500000db9ace47c596370c96bb968416b357d8"
+    "git_blob": "08c5e79b0b0bb6d2f8fae447201bed8e4914dad6",
+    "sha256": "d17f2034d2393b082c9ae182dead3600576205bd8dfc539f0f41426dcfd18f43"
   },
   "required_project_files": [
     {
@@ -44,13 +41,13 @@
     },
     {
       "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md",
-      "git_blob": "2594736ed997fab0438596db86abb6dd265c1d61",
-      "sha256": "3ead3a04756a54efe1adac2d9f74d81265be5f09c5e360a3e567ea115d80b54a"
+      "git_blob": "b6f8976c4947cf2db156fc3506e42a2de9239b28",
+      "sha256": "8f7e8794b466b610dd77fba65e3e5dfad01a6f683b06f9e4c3c1b802ed8c8a26"
     },
     {
       "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md",
-      "git_blob": "3da0bd167df5dc6742f458aac292b11620a0131c",
-      "sha256": "ce0c910661a48c758b2a9637eae936b2c9a5c3d20677ff1d26860caa2abedf5e"
+      "git_blob": "fdf9302e923641b7de03630a40afae674967bd4f",
+      "sha256": "a991e9606bc6f19a97336061b6b27567fa340ea9bebbfcda5e095c983e0b2209"
     },
     {
       "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
@@ -63,30 +60,7 @@
       "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
     }
   ],
-  "runtime_qualification_sources": [
-    {
-      "path": "database/provider/wowsql/0001_free_shared_lantern_read_projection_v1.sql",
-      "git_blob": "6dcec9c35f87270a89b6981cf023e4bda5898eaf",
-      "sha256": "155c349df2d5c23bb2669b5f659fc4ef01ff1d2bf033408d4b44189df7e6c6e9"
-    },
-    {
-      "path": "tools/qualification/verify_wowsql_free_shared_lantern_read_projection_v1.sql",
-      "git_blob": "7e42cd7afb7bf11d3362857cd42b3e0a8680ddec",
-      "sha256": "8a8d1c6b429315082da7c4abf39eaf8e11c41f692aa1c7b7b64e4da7b0def7e7"
-    },
-    {
-      "path": "tools/qualification/verify_wowsql_effective_producer_boundary_v1.sql",
-      "source_ref": "bt2/main@8b061d1ba72a3e336610b5d61a431b06e0947eed"
-    }
-  ],
-  "installation_rule": "Install from payload_source_commit and verify exact file digests by authoritative Project readback. Replace prior direct-bt2 Lantern read-contract copies with the manifest-bound V2 package.",
-  "state_ceiling": "SOURCE_READY until authoritative Project mutation and readback establish stronger states.",
-  "fresh_chat_acceptance": [
-    "Recovers bt2/main as canonical evolving source and identifies immutable installed package subject",
-    "Uses WoWSQL bt2-479e4ad9 for Lantern currentness",
-    "Performs projection preflight -> B0 -> payload -> B1 without Supabase fallback",
-    "Keeps internal bt2 schema inaccessible to the Project role",
-    "Distinguishes source/build/install/runtime/behavioral qualification",
-    "Can recover current work from durable Git/WoWSQL/Bus state"
-  ]
+  "installation_rule": "Install exact V2 identities; replace older active Lantern runtime copies; verify by Project readback.",
+  "runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
+  "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
 }
