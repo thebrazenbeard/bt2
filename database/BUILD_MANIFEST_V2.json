@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "work/two-pr15-effective-boundary-fix-v1",
-    "head_before_manifest": "3f2a2ce1cc0d2696ac30ad9b03fd18259ab8fa3b"
+    "head_before_manifest": "6fcab10b5dc69e2dd3ecd9b5dc64a96bc3e31af9"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -17,7 +17,7 @@
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "8d09d620a16770564531a96ebb55aae75531e3de",
+    "migrations_tree": "91d2baceb627ac57420ff9fb861b7af32d519381",
     "tests_tree": "ded1fa8b371b1f4a3fffe66af1fe8b93c6da2ff4",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
@@ -26,8 +26,8 @@
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
     "qualification_tools_tree": "dda66ea89522d9de6cd09dbdd5b33c1cadff5bcf",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:8d09d620a16770564531a96ebb55aae75531e3de|tests:ded1fa8b371b1f4a3fffe66af1fe8b93c6da2ff4|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:dda66ea89522d9de6cd09dbdd5b33c1cadff5bcf|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "e5441b16ebf0567cebe98c4b64715d09176fa5d79791748babd91a44935824e0"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:91d2baceb627ac57420ff9fb861b7af32d519381|tests:ded1fa8b371b1f4a3fffe66af1fe8b93c6da2ff4|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:dda66ea89522d9de6cd09dbdd5b33c1cadff5bcf|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "e60c2b4bac14eed9baaa875e77aec0b42a105d72b92f4e83a7e1205da5c110e0"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
