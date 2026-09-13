@@ -12,7 +12,7 @@ DECLARE
   v_actual jsonb;
 BEGIN
   IF current_database() <> 'db_bt2_479e4ad9' THEN
-    RAISE EXCEPTION 'WRONG_BT2_DATABASE:%',current_database();
+    RAISE EXCEPTION USING MESSAGE='WRONG_BT2_DATABASE:'||current_database();
   END IF;
   IF has_schema_privilege(current_user,'bt2','USAGE') THEN
     RAISE EXCEPTION 'PROJECT_ROLE_UNEXPECTEDLY_HAS_BT2_SCHEMA_USAGE';
