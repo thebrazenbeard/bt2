@@ -1,0 +1,92 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V2",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_backend": "WoWSQL:bt2-479e4ad9",
+  "lantern_provider_mode": "WOWSQL_FREE_SHARED_FROZEN_ZERO_PRODUCER",
+  "superseded_currentness_backend": "Supabase:agvhmutlrolbaijzlbqk",
+  "superseded_backend_rule": "Not a valid Lantern currentness fallback. Physical provider lifecycle is a separate observed effect.",
+  "payload_source_commit": "d427bdfeb1bdeab3cd2a9fb1bb71c2634c1f267d",
+  "payload_source_tree": "c4a76b4520d36768eabbbde5c8f6502c6852c8ce",
+  "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256) + newline)",
+  "payload_digest": "e0261a6585f1b3e51ff06ef3448c04710c41a5a57bdfad3eaaa5a0f770da2829",
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V2.md",
+    "git_blob": "af6fe6beff270242ab99205a3466f4fd76fce55d",
+    "sha256": "489346649982f80eb4aa22fe4c500000db9ace47c596370c96bb968416b357d8"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V1.md",
+      "git_blob": "a614e25e92994fc4892b2dcf4e1042971b5acece",
+      "sha256": "8f67444f8684f556c81caa1e95d9c9d4a0f98031de65d6504f83937ef2d6faf7"
+    },
+    {
+      "path": "native/project/BT2_CODING_OPERATIONS_V1.md",
+      "git_blob": "364a8ec604f5f8b42d2f0312e02eec6a17caf103",
+      "sha256": "5708bdb8c9af3ab22beb6a2525983f93d560e2ad21b042bf1066cfce55bd1d1d"
+    },
+    {
+      "path": "native/project/BT2_RECOVERY_AND_STATE_V1.md",
+      "git_blob": "e4cfeec391ff679cc8d35ce1bec7323c1dc9a1db",
+      "sha256": "6b48befe2970fc0485481f3083bd96179cad9b3a57ac21c251cc2172d8ea86ff"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V1.md",
+      "git_blob": "3afa5b597ac502a68b6727e5acc1521e3f50c98f",
+      "sha256": "219660c21c47428562b241f9df9322913ec2daad800bbca2b360cfe772ba0a3e"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V1.md",
+      "git_blob": "988deac84141545ded87b29980a6ab002562154b",
+      "sha256": "a6343c997aaae0acb5aa8bd06d04b30950ea9c3bb3562bd1d9353b708d113c89"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V1.md",
+      "git_blob": "2594736ed997fab0438596db86abb6dd265c1d61",
+      "sha256": "3ead3a04756a54efe1adac2d9f74d81265be5f09c5e360a3e567ea115d80b54a"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V1.md",
+      "git_blob": "3da0bd167df5dc6742f458aac292b11620a0131c",
+      "sha256": "ce0c910661a48c758b2a9637eae936b2c9a5c3d20677ff1d26860caa2abedf5e"
+    },
+    {
+      "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
+      "git_blob": "17593d4e3601590d8af9a9dd72692c55cb128fc9",
+      "sha256": "0dca117746d948d79f6b931c47a5fc78e8b40aa67cb9376f86296656497137e9"
+    },
+    {
+      "path": "docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md",
+      "git_blob": "a3ea01eedc70f5c13d09115b690cf9a60bf85b87",
+      "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
+    }
+  ],
+  "runtime_qualification_sources": [
+    {
+      "path": "database/provider/wowsql/0001_free_shared_lantern_read_projection_v1.sql",
+      "git_blob": "6dcec9c35f87270a89b6981cf023e4bda5898eaf",
+      "sha256": "155c349df2d5c23bb2669b5f659fc4ef01ff1d2bf033408d4b44189df7e6c6e9"
+    },
+    {
+      "path": "tools/qualification/verify_wowsql_free_shared_lantern_read_projection_v1.sql",
+      "git_blob": "7e42cd7afb7bf11d3362857cd42b3e0a8680ddec",
+      "sha256": "8a8d1c6b429315082da7c4abf39eaf8e11c41f692aa1c7b7b64e4da7b0def7e7"
+    },
+    {
+      "path": "tools/qualification/verify_wowsql_effective_producer_boundary_v1.sql",
+      "source_ref": "bt2/main@8b061d1ba72a3e336610b5d61a431b06e0947eed"
+    }
+  ],
+  "installation_rule": "Install from payload_source_commit and verify exact file digests by authoritative Project readback. Replace prior direct-bt2 Lantern read-contract copies with the manifest-bound V2 package.",
+  "state_ceiling": "SOURCE_READY until authoritative Project mutation and readback establish stronger states.",
+  "fresh_chat_acceptance": [
+    "Recovers bt2/main as canonical evolving source and identifies immutable installed package subject",
+    "Uses WoWSQL bt2-479e4ad9 for Lantern currentness",
+    "Performs projection preflight -> B0 -> payload -> B1 without Supabase fallback",
+    "Keeps internal bt2 schema inaccessible to the Project role",
+    "Distinguishes source/build/install/runtime/behavioral qualification",
+    "Can recover current work from durable Git/WoWSQL/Bus state"
+  ]
+}
