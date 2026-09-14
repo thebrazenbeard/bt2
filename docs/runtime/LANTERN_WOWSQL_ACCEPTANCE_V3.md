@@ -12,17 +12,19 @@ Verify all four Lantern Project files are installed from one reviewed BT2 source
 
 Verify Project Instructions name exact WoWSQL project `bt2-479e4ad9`, preserve read-only/fail-closed semantics, and contain no Supabase currentness fallback.
 
-## Free-shared provider acceptance
+## Free-shared read-provider acceptance
 
 PASS requires:
 1. Project role can read `bt2_project_read`;
 2. Project role does not have `USAGE` on internal schema `bt2`;
-3. `tools/qualification/verify_wowsql_effective_producer_boundary_v1.sql` passes;
-4. `tools/qualification/verify_wowsql_free_shared_lantern_read_projection_v1.sql` passes;
-5. projection preflight is exactly `BT2_LANTERN_FREE_SHARED_READ_V1` with `FROZEN_ZERO_PRODUCER`;
-6. projection source-state digest equals `29da0892c199207bf566e8cf62c0ae8921d63950796fd58204577c464ca59dc5`.
+3. `tools/qualification/verify_wowsql_free_shared_lantern_read_projection_v1.sql` passes;
+4. projection preflight is exactly `BT2_LANTERN_FREE_SHARED_READ_V1` with `FROZEN_ZERO_PRODUCER`;
+5. projection source-state digest equals `29da0892c199207bf566e8cf62c0ae8921d63950796fd58204577c464ca59dc5`;
+6. the hosted producer remains disabled while strict producer qualification is not established.
 
-This provider mode is intentionally read-frozen. A future governed write requires projection republication or supersession in the same authorized change.
+The strict producer-boundary verifier is a separate qualification subject. `tools/qualification/verify_wowsql_effective_producer_boundary_v1.sql` must pass before hosted producer enablement may be reported as qualified, but its failure does not invalidate the read-only `FROZEN_ZERO_PRODUCER` projection when the read-provider conditions above pass.
+
+This provider mode is intentionally read-frozen. A future governed write requires producer qualification plus projection republication or supersession in the same authorized change.
 
 ## Cold-start runtime acceptance
 
@@ -45,9 +47,10 @@ Without WoWSQL access, the same currentness request must return a clear `UNKNOWN
 ## Result vocabulary
 
 - `WOWSQL_PROJECT_FILES_INSTALLED`: Project instructions/files are deliberately installed and read back.
-- `WOWSQL_FREE_SHARED_READ_PROJECTION_VERIFIED`: read projection qualification passes while hosted producer mode remains frozen.`r`n- `WOWSQL_HOSTED_PRODUCER_NOT_QUALIFIED`: hosted producer enablement does not satisfy the strict producer-boundary verifier and remains disabled.
+- `WOWSQL_FREE_SHARED_READ_PROJECTION_VERIFIED`: read projection qualification passes while hosted producer mode remains frozen.
+- `WOWSQL_HOSTED_PRODUCER_NOT_QUALIFIED`: hosted producer enablement does not satisfy the strict producer-boundary verifier and remains disabled.
 - `WOWSQL_RUNTIME_CONSUMPTION_VERIFIED`: fresh-chat projected B0/payload/B1 acceptance passes.
 - `WOWSQL_FAILURE_PATH_VERIFIED`: WoWSQL-unavailable behavior fails closed.
 - `NOT_ESTABLISHED`: required evidence is missing.
 
-Do not collapse installation, runtime consumption, source state, behavioral qualification, or provider lifecycle into one status.
+Do not collapse installation, runtime consumption, source state, behavioral qualification, producer qualification, or provider lifecycle into one status.
