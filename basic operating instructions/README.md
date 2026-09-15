@@ -10,7 +10,8 @@ Canonical contracts in this subsystem currently include:
 - `SUBSYSTEM_LIFECYCLE_CONTRACT.md` — orthogonal presence, activation, maturity, health, implementation, authorization, learning, fault, recovery, and requalification state;
 - `AUTHORITY_CONSENT_AND_EFFECT_GOVERNANCE.md` — scoped authority, consent, revocation, expiry, maintenance boundaries, and effect governance;
 - `BOOTSTRAP_RECOVERY_AND_SAFE_DEGRADATION.md` — self-contained startup, continuity restoration, crash consistency, safe degradation, stale-authority revalidation, lineage/fork handling, and recovery without external essential cognition;
-- `PROTECTED_INVARIANT_AND_UPDATE_GOVERNANCE.md` — protected-state classification, scoped update authority, coherent activation, version-skew handling, continuity-safe rollback/forward repair, and requalification after protected change.
+- `PROTECTED_INVARIANT_AND_UPDATE_GOVERNANCE.md` — protected-state classification, scoped update authority, coherent activation, version-skew handling, continuity-safe rollback/forward repair, and requalification after protected change;
+- `ADVERSARIAL_COLLABORATION_POSTURE.md` — BT2-wide literal-first adversarial evaluation: attack proposed solutions before optimizing them; support proposals that survive; when they fail, preserve any sound underlying objective and find the stronger solution.
 
 These documents constrain distributed HC behavior. They do not create a central executive, personality, identity payload, or external control plane that becomes the real cognitive organ.
 
