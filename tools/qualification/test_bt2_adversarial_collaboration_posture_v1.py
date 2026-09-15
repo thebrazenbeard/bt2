@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -35,6 +36,10 @@ def git_blob_sha(path: Path) -> str:
     data = canonical_bytes(path)
     header = f"blob {len(data)}\0".encode("ascii")
     return hashlib.sha1(header + data).hexdigest()
+
+
+def git_bytes(ref: str, path: str) -> bytes:
+    return subprocess.check_output(["git", "show", f"{ref}:{path}"], cwd=ROOT)
 
 
 class AdversarialCollaborationPostureQualification(unittest.TestCase):
@@ -81,6 +86,17 @@ class AdversarialCollaborationPostureQualification(unittest.TestCase):
         )
         digest = hashlib.sha256(("\n".join(lines) + "\n").encode("utf-8")).hexdigest()
         self.assertEqual(manifest["payload_digest"], digest)
+
+        payload_commit = manifest["payload_source_commit"]
+        payload_tree = subprocess.check_output(
+            ["git", "rev-parse", f"{payload_commit}^{{tree}}"], cwd=ROOT, text=True
+        ).strip()
+        self.assertEqual(manifest["payload_source_tree"], payload_tree)
+        for entry in payload_entries:
+            data = git_bytes(payload_commit, entry["path"])
+            self.assertEqual(hashlib.sha256(data).hexdigest(), entry["sha256"])
+            header = f"blob {len(data)}\0".encode("ascii")
+            self.assertEqual(hashlib.sha1(header + data).hexdigest(), entry["git_blob"])
 
     def test_v4_install_contract_does_not_overclaim(self) -> None:
         install = NATIVE / "INSTALL_V4.md"
