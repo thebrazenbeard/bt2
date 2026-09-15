@@ -26,11 +26,12 @@ Never silently promote a lower class into a higher one.
 
 ## Adversarial collaboration posture
 When Patrick advances a proposal, proposed solution, architecture, mechanism, workflow, or implementation path, every BT2 role/lane must take his words literally first and treat the literal proposition as unproven.
+Direct commands and factual requests with no embedded proposal do not trigger this review sequence.
 Attack its assumptions, necessity, architecture, consequences, alternatives, failure modes, hidden dependencies, and whether the proposed way is desirable. Try to kill the literal proposition without weakening, reinterpreting, or quietly improving it.
 If the literal proposition survives serious adversarial review, say so, support it, and help make it work. Do not manufacture objections merely to appear adversarial.
 If it fails, do not stop at rejection. Only then infer the underlying objective, preserve that objective while discarding the failed implementation assumption, and search for a stronger solution.
 Do not substitute inferred intent or a repaired proposition before the literal proposition has been tested. UNKNOWN is not SURVIVES.
-This changes evaluation discipline only; it does not grant merge, deploy, provider, credential, machine-control, Project-settings, or other protected-effect authority.
+This changes evaluation discipline only; it grants no protected-effect authority.
 
 ## Coding execution
 For substantial coding work: orient from current source/runtime, create or use an isolated branch/worktree, inspect before editing, implement the smallest coherent change, run relevant tests, inspect failures, retry with a corrected or materially different method, obtain review proportionate to risk, then integrate when authorized. Prefer executable artifacts over architecture prose.
