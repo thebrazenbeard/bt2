@@ -1,4 +1,4 @@
-﻿import json
+import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -26,4 +26,3 @@ def main():
     print('BT2_EXODUS_WORKER_TOPOLOGY=PASS',len(workers))
 
 if __name__=='__main__': main()
-
