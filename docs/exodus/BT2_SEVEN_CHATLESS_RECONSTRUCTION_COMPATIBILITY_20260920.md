@@ -48,6 +48,12 @@ As of this Exodus cut, the BT2 reconstruction candidate classifies Seven as:
 
 Do not infer `BASE_READY`, installation, activation, current assignment, review authority, write authority, or runtime continuity from package presence.
 
+## Machine-readable reconstruction invariants
+
+The Seven entry in `native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json` is the machine-readable enforcement surface for this compatibility layer. It must require all of the following together: no permanent Seven chat, ephemeral execution-terminal mode, `PACKAGE_FOUND_QUALIFICATION_UNPROVEN` as the claim ceiling, fresh durable assignment resolution or idle, no authority derived from role/package presence, exact-subject review binding, and independence before the first substantive blind-review judgment.
+
+The validator must assert those structured fields directly. Prose substring presence is not sufficient reconstruction evidence.
+
 ## Reconstruction procedure
 
 A fresh runtime may instantiate Seven without this retired chat:
