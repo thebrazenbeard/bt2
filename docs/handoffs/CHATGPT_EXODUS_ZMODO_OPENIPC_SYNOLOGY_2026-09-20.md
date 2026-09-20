@@ -143,6 +143,18 @@ No authority is inferred for:
 
 `BT2_COORDINATOR::RESTORE_AND_RUN::ZMODO_OPENIPC_SYNOLOGY_V1 — Fresh-check the current disposition of the Exodus camera PR and BT2/Bus state. When Patrick has physical/LAN access, instantiate an embedded-camera worker in a temporary runtime and collect external label/FCC evidence, LAN service inventory, both-side PCB images, measured UART logic level, receive-only cold-boot log, and stock flash backup with hashes. Do not select/flash OpenIPC until exact SoC/sensor/flash/network hardware and a recovery path are established. Use docs/engineering/ZMODO_OPENIPC_SYNOLOGY_REPURPOSE_V1.md as the starting snapshot, not current truth.`
 
+## Durable Exodus publication
+
+- Draft PR: `thebrazenbeard/bt2#32`
+- branch: `exodus/zmodo-openipc-synology-v1-20260920`
+- first published branch head: `6645b0fd9016cd79985e722da446fded3fc02e2d`
+- engineering artifact blob at first publication: `2cc2428206738f97bec4c78551b93c96c0d4e4b4`
+- checkpoint blob before this refresh: `1ef6c89f00c38094201b675304d42d963671d1ed`
+- initial Bus handoff: `messages/20260920T0605-seven-exodus-zmodo-camera-handoff.md`
+- initial Bus handoff commit: `74250b133f750a2fd3a50bc167d17dc10ab4bc59`
+
+Fresh-check PR #32 and the Bus lane before any effect; the identifiers above are evacuation provenance, not a permanent currentness claim.
+
 ## Reconstruction test
 
 With this chat inaccessible, GitHub/Bus state is sufficient to determine:
