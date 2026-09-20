@@ -40,7 +40,7 @@ def main() -> int:
     _, package_digest, source_commit, source_tree = verify_manifest_source(
         ROOT, MANIFEST, args.expected_package_digest
     )
-    image_attestation = observe_postgres_container_image(args.postgres_container_id)
+    image_attestation = observe_postgres_container_image(args.postgres_container_id, args.database_url)
 
     version = races.scalar(args.database_url, "SHOW server_version_num;")
     server_version = races.scalar(args.database_url, "SHOW server_version;")
