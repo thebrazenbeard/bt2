@@ -15,7 +15,7 @@ import subprocess
 import sys
 sys.dont_write_bytecode = True
 
-from source_identity import verify_manifest_source
+from source_identity import observe_postgres_container_image, verify_manifest_source
 import run_lantern_multisession_concurrency as races
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,7 +27,7 @@ def main() -> int:
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     ap.add_argument("--expected-package-digest")
     ap.add_argument("--evidence-out")
-    ap.add_argument("--postgres-image-digest", default=os.environ.get("POSTGRES_IMAGE_DIGEST"))
+    ap.add_argument("--postgres-container-id", default=os.environ.get("POSTGRES_CONTAINER_ID"))
     args = ap.parse_args()
 
     if not args.database_url:
@@ -40,8 +40,7 @@ def main() -> int:
     _, package_digest, source_commit, source_tree = verify_manifest_source(
         ROOT, MANIFEST, args.expected_package_digest
     )
-    if not args.postgres_image_digest or not args.postgres_image_digest.startswith("postgres@sha256:"):
-        raise SystemExit("resolved POSTGRES_IMAGE_DIGEST (postgres@sha256:...) is required")
+    image_attestation = observe_postgres_container_image(args.postgres_container_id)
 
     version = races.scalar(args.database_url, "SHOW server_version_num;")
     server_version = races.scalar(args.database_url, "SHOW server_version;")
@@ -85,7 +84,8 @@ def main() -> int:
         "source_commit": source_commit,
         "source_tree": source_tree,
         "package_digest_sha256": package_digest,
-        "postgres_image_digest": args.postgres_image_digest,
+        "postgres_image_digest": image_attestation["repo_digest"],
+        "postgres_image_attestation": image_attestation,
         "postgres_server_version": server_version,
         "postgres_major": 16,
         "git_version": subprocess.run(["git", "--version"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip(),
