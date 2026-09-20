@@ -1,0 +1,41 @@
+{
+  "schema": "BT2_CANONICAL_MAIN_TARGETS_V1",
+  "status": "IN_PROGRESS",
+  "date": "2026-09-20",
+  "targets": [
+    {
+      "repo": "discovery",
+      "current_main": "96e6f8e9c776047f9068c897eab0406324187166",
+      "candidate": "PR #19 @ aa51c4bf2b6b34d0ae0d8063119ae685b84bf2e2",
+      "state": "MAIN_READY_CANDIDATE",
+      "effect": "MERGE_REQUIRES_PATRICK"
+    },
+    {
+      "repo": "god-brain",
+      "current_main": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+      "candidate": "PR #6 @ c8aff4109e53930a15eed54ab2f00b746ec8b09c",
+      "state": "MAIN_READY",
+      "effect": "MERGE_REQUIRES_PATRICK"
+    },
+    {
+      "repo": "chat-communication-bus",
+      "current_main": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+      "candidate": "bt2/bus-canonical-main-reconciliation-v1-20260920 @ 95225255b43b72cf822b93ba93bf90c052dff5b4",
+      "state": "QUALIFICATION_IN_PROGRESS",
+      "effect": "MAIN_REF_MOVE_REQUIRES_PATRICK"
+    },
+    {
+      "repo": "world-zero",
+      "current_main": "5ab39621d090079d24de40261906b64413c6f995",
+      "candidate": "CURRENT_MAIN",
+      "state": "HEALTHY_CANONICAL_MAIN_NO_REPAIR_TARGET_NEEDED"
+    },
+    {
+      "repo": "bt2",
+      "current_main": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+      "candidate": null,
+      "state": "BLOCKED_CANONICAL_IDENTITY_COLLISION_WITH_HC_BRAIN_AND_BUILD_TEAM_2_0",
+      "effect": "PATRICK_IDENTITY_DECISION_REQUIRED_BEFORE_CANONICALIZATION"
+    }
+  ]
+}
