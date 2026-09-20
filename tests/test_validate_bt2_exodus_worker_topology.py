@@ -119,6 +119,13 @@ class ExodusTopologyValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "worker reconstruction sources drift"):
             validator.validate_interfaces(mutated)
 
+    def test_compat_authority_rejects_undeclared_merge_authority(self):
+        compat = load_json("specs/BT2_COORDINATOR_INTERFACE_V1.json")
+        mutated = copy.deepcopy(compat)
+        mutated["authority"]["merge_authority"] = True
+        with self.assertRaisesRegex(ValueError, "compat authority field set drift"):
+            validator.validate_compat(mutated)
+
     def test_compat_adapter_cannot_grant_protected_effect_authority(self):
         compat = load_json("specs/BT2_COORDINATOR_INTERFACE_V1.json")
         mutated = copy.deepcopy(compat)
