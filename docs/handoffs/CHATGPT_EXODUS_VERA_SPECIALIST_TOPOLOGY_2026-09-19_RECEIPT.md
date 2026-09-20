@@ -68,3 +68,14 @@ Interface: `BT2 Coordinator`
 `BT2::EXODUS_CONTINUE::VERA_SPECIALIST_TOPOLOGY::FRESH_CHECK_PR121_PR54_AND_MOVING_SPECIALIST_FRONTIERS`
 
 No merge/archive/deploy/install/provider/credential/permission/Slack/training/canonical-memory/protected effect is authorized by this receipt.
+
+## Bus recovery handoff
+
+- repo: `thebrazenbeard/chat-communication-bus`
+- branch: `bus/bt2-v1`
+- path: `messages/20260919T2104-bt2-exodus-vera-specialist-topology-final-recovery.md`
+- commit: `09f4e4007a01dd3d5fc1654eaff7c9a63e6a7443`
+- Git blob: `b76af37a96616e200bfd77d986c5f1ab06e5078d`
+- SHA-256: `6ba56389d3057c173e924abf3ab3083ff3f46e565a3ab3178e13cac22b7c306b`
+
+The handoff targets `BT2 Coordinator` and does not require the historical `bus/bt2-vera-v1` chat-local lane.
