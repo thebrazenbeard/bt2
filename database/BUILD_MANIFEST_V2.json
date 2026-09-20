@@ -5,8 +5,8 @@
   "supersession_reason": "V1 did not bind canonical persistent seeds or qualification runners and therefore could not prove source-to-canonical-state reconstruction.",
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
-    "branch": "exodus/two-producer-boundary-current-main-v1",
-    "head_before_manifest": "10065dbc1c493a7ffd43be8bdf3f038f71307aee"
+    "branch": "exodus/training-provenance-binding-v1-20260920",
+    "head_before_manifest": "939ecbd93eacbc61711bf1258cddc7d6c81aa13c"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -17,8 +17,8 @@
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "91d2baceb627ac57420ff9fb861b7af32d519381",
-    "tests_tree": "3bfb4fb06ce6aa4b57f3a9f722f4398f6f418ad6",
+    "migrations_tree": "040b19ecf5e0904a27fcef07b357e357dd624af9",
+    "tests_tree": "fc0b40bae336ae0a0a9f6f3505ebcf62d9e5a804",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
     "lantern_archive_tree": "929ee632b6df04e6ee7324b1f955539e80f26258",
@@ -26,8 +26,8 @@
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
     "qualification_tools_tree": "99525d5f709bd0d300b2233d7abcabb0f5c33121",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:91d2baceb627ac57420ff9fb861b7af32d519381|tests:3bfb4fb06ce6aa4b57f3a9f722f4398f6f418ad6|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:99525d5f709bd0d300b2233d7abcabb0f5c33121|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "4fd1f6625f6088beacfecc7695ce65287a3a2a3631a2f573b9527eded28ce561"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:040b19ecf5e0904a27fcef07b357e357dd624af9|tests:fc0b40bae336ae0a0a9f6f3505ebcf62d9e5a804|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:99525d5f709bd0d300b2233d7abcabb0f5c33121|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "55a3c12639ef54f6535a605c702fa753adcfe04be71ba319307c46b95e49538c"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
@@ -37,7 +37,7 @@
     "sequence": [
       "database/schema/*.sql",
       "database/migrations/*.sql",
-      "database/tests/0001..0010 rollback regression suite",
+      "database/tests/0001..0010 + 0012 rollback regression suite (0011 reserved for final canonical-state oracle)",
       "database/seeds/0001_canonical_workforce_topology_v1.sql",
       "database/seeds/0002_training_preservation_predecessors_v1.sql",
       "database/seeds/0003_project_lantern_governed_state_v1.sql",
