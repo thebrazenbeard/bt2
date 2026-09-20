@@ -1,0 +1,43 @@
+{
+  "schema": "BT2_PROTECTED_EFFECT_QUEUE_V1",
+  "status": "NO_EFFECTS_EXECUTED",
+  "date": "2026-09-20",
+  "queue": [
+    {
+      "priority": 1,
+      "repo": "discovery",
+      "operation": "merge Draft PR #19 to main",
+      "exact_main": "96e6f8e9c776047f9068c897eab0406324187166",
+      "exact_candidate": "aa51c4bf2b6b34d0ae0d8063119ae685b84bf2e2",
+      "ready": "YES_SUBJECT_TO_FRESH_CURRENTNESS",
+      "authority": "PATRICK"
+    },
+    {
+      "priority": 2,
+      "repo": "god-brain",
+      "operation": "merge Draft PR #6 to main",
+      "exact_main": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+      "exact_candidate": "c8aff4109e53930a15eed54ab2f00b746ec8b09c",
+      "ready": "YES_SUBJECT_TO_FRESH_CURRENTNESS",
+      "authority": "PATRICK"
+    },
+    {
+      "priority": 3,
+      "repo": "chat-communication-bus",
+      "operation": "canonicalize reconciled repaired source candidate",
+      "exact_main": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+      "exact_candidate": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+      "ready": "NO_QUALIFICATION_AND_REVIEW_IN_PROGRESS",
+      "authority": "PATRICK"
+    },
+    {
+      "priority": 4,
+      "repo": "bt2",
+      "operation": "resolve canonical identity collision",
+      "exact_main": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+      "exact_candidate": null,
+      "ready": "NO_IDENTITY_DECISION_REQUIRED",
+      "authority": "PATRICK"
+    }
+  ]
+}
