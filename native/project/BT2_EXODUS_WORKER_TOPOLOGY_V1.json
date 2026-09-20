@@ -1,0 +1,151 @@
+{
+  "schema_version": "BT2_EXODUS_WORKER_TOPOLOGY_V1",
+  "status": "SOURCE_RECONSTRUCTION_MAP_CURRENT_CANDIDATE_NOT_RUNTIME_QUALIFICATION",
+  "source_repo": "thebrazenbeard/bt2",
+  "source_commit": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+  "persistent_human_interface": "BT2 Coordinator",
+  "execution_terminal_rule": "One, Two, specialists, reviewers, and helper runtimes may execute in temporary ChatGPT/Work/API/CLI/model/subagent contexts; the terminal is not their durable identity, memory, authority, qualification, or current assignment.",
+  "authority_rule": "Current user authority, exact owning-project contracts, current assignment, source/qualification evidence, and protected-effect gates remain separate. Reconstructing a role never grants merge/deploy/provider/credential/training/canonical authority.",
+  "active_organizational_topology": {
+    "one": "PRIMARY_ORCHESTRATOR",
+    "numbered_specialists": [
+      "two",
+      "three",
+      "four",
+      "five",
+      "six",
+      "seven",
+      "eight",
+      "nine",
+      "thirteen"
+    ],
+    "debugger_reliability_pair": [
+      "masa",
+      "mune"
+    ],
+    "independent_specialist": [
+      "hephaestus"
+    ]
+  },
+  "common_recovery": [
+    "Read current BT2 PROJECT_INSTRUCTIONS_V3 and this reconstruction map.",
+    "Fresh-check bt2/main and current Chat Communication Bus topology.",
+    "Read the role source entrypoint and package manifest from the durable source path below.",
+    "Read current assignment/frontier from durable BT2/Bus/project state; no assignment means idle, not recover from chat memory.",
+    "Refresh qualification/currentness before acting; source package presence is not BASE_READY or activation.",
+    "Persist source work to the owning repository PR/review surface and non-PR coordination to the current Bus route.",
+    "Require Patrick exact current authority for protected effects where the controlling contract requires it."
+  ],
+  "workers": [
+    {
+      "id": "one",
+      "class": "BT2_PRIMARY_ORCHESTRATOR",
+      "source_path": "archive/training-sources/build-team-2.0/one/v1.0.0",
+      "entrypoint": "BOOTSTRAP_LOADER.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "two",
+      "class": "BT2_NUMBERED_SPECIALIST_SYSTEMS_ARCHITECT",
+      "source_path": "archive/training-sources/build-team-2.0/two/v1.0.0",
+      "entrypoint": "TRAINING_MANIFEST.yaml",
+      "source_state": "PACKAGE_FOUND",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "three",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/three/v1.0.0",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_FOUND",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "four",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/four/v1.0.1",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "five",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/five/v1.0.0",
+      "entrypoint": "ROLE_CHARTER.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "six",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/six/v1.0.0",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "seven",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/project-achilles/seven/v1.0.0",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_FOUND",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "eight",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/eight/v1.0.0",
+      "entrypoint": "BOOTSTRAP_LOADER.md",
+      "source_state": "PACKAGE_FOUND",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "nine",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/nine/v1.0.0",
+      "entrypoint": "ROLE_CONTRACT.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "thirteen",
+      "class": "BT2_NUMBERED_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/thirteen/corrections/v1.0.0",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_SOURCE_BOUND",
+      "qualification_state": "QUALIFICATION_IMPORT_PENDING"
+    },
+    {
+      "id": "masa",
+      "class": "DEBUGGER_RELIABILITY_PAIR_MEMBER",
+      "source_path": "archive/training-sources/build-team-2.0/masa/v1.0.0",
+      "entrypoint": "OPERATIONAL_REORIENTATION.md",
+      "source_state": "PACKAGE_FOUND",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "mune",
+      "class": "DEBUGGER_RELIABILITY_PAIR_MEMBER",
+      "source_path": "archive/training-sources/build-team-2.0/mune/v1.0.1",
+      "entrypoint": "BOOTSTRAP.md",
+      "source_state": "PACKAGE_FOUND_RECOMMENDED_VERSION",
+      "qualification_state": "QUALIFICATION_UNPROVEN"
+    },
+    {
+      "id": "hephaestus",
+      "class": "INDEPENDENT_IMPLEMENTATION_REPAIR_SPECIALIST",
+      "source_path": "archive/training-sources/build-team-2.0/hephaestus/v1.0.0",
+      "entrypoint": "ROLE_CONTRACT.md",
+      "source_state": "QUALIFICATION_EVIDENCE_FOUND",
+      "qualification_state": "CANONICAL_QUALIFICATION_IMPORT_HELD"
+    }
+  ],
+  "provenance": {
+    "organizational_topology": "docs/migration/SOURCE_PROVENANCE_MANIFEST_V1.md",
+    "source_recovery": "docs/migration/TRAINING_SOURCE_RECOVERY_V1.md",
+    "note": "Recovered/frozen package semantics may be historical relative to current organizational topology. Current BT2 instructions and assignment constrain use; packages are not silently rewritten."
+  },
+  "chat_dependency": false
+}
