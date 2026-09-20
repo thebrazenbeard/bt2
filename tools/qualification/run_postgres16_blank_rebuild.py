@@ -100,6 +100,7 @@ def main() -> int:
     ap.add_argument("--expected-package-digest")
     ap.add_argument("--evidence-out")
     ap.add_argument("--postgres-image-digest", default=os.environ.get("POSTGRES_IMAGE_DIGEST"))
+    ap.add_argument("--postgres-binary-digest", default=os.environ.get("POSTGRES_BINARY_DIGEST"))
     args = ap.parse_args()
 
     if not args.database_url:
@@ -108,8 +109,16 @@ def main() -> int:
         raise SystemExit("psql is required on PATH")
 
     package_digest, source_commit, source_tree = check_manifest(args.expected_package_digest)
-    if not args.postgres_image_digest or not args.postgres_image_digest.startswith("postgres@sha256:"):
-        raise SystemExit("resolved POSTGRES_IMAGE_DIGEST (postgres@sha256:...) is required")
+    if args.postgres_image_digest:
+        if not args.postgres_image_digest.startswith("postgres@sha256:"):
+            raise SystemExit("POSTGRES_IMAGE_DIGEST must use postgres@sha256:...")
+        postgres_runtime_identity = args.postgres_image_digest
+    elif args.postgres_binary_digest:
+        if not args.postgres_binary_digest.startswith("sha256:"):
+            raise SystemExit("POSTGRES_BINARY_DIGEST must use sha256:...")
+        postgres_runtime_identity = "edb-windows-binary@" + args.postgres_binary_digest
+    else:
+        raise SystemExit("a source-bound PostgreSQL runtime digest is required")
 
     version_num = psql_scalar(args.database_url, "SHOW server_version_num;")
     server_version = psql_scalar(args.database_url, "SHOW server_version;")
@@ -178,7 +187,9 @@ def main() -> int:
         "source_commit": source_commit,
         "source_tree": source_tree,
         "package_digest_sha256": package_digest,
+        "postgres_runtime_identity": postgres_runtime_identity,
         "postgres_image_digest": args.postgres_image_digest,
+        "postgres_binary_digest": args.postgres_binary_digest,
         "postgres_server_version": server_version,
         "postgres_major": 16,
         "git_version": command_version(["git", "--version"]),
