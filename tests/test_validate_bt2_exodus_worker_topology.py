@@ -85,6 +85,40 @@ class ExodusTopologyValidationTests(unittest.TestCase):
         ):
             validator.validate_interfaces(mutated)
 
+    def test_worker_cannot_add_undeclared_authority_field(self):
+        workers = load_json(
+            "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"
+        )
+        mutated = copy.deepcopy(workers)
+        one = next(item for item in mutated["workers"] if item["id"] == "one")
+        one["merge_authority"] = True
+        with self.assertRaisesRegex(ValueError, "one worker field set drift"):
+            validator.validate_worker_topology(mutated, ROOT)
+
+    def test_authority_contract_rejects_unknown_authority_field(self):
+        interfaces = load_json(
+            "native/project/BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1.json"
+        )
+        mutated = copy.deepcopy(interfaces)
+        mutated["authority_contract"]["interface_role_grants_merge_authority"] = True
+        with self.assertRaisesRegex(ValueError, "authority field set drift"):
+            validator.validate_interfaces(mutated)
+
+    def test_worker_reconstruction_sources_are_exactly_bound(self):
+        interfaces = load_json(
+            "native/project/BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1.json"
+        )
+        mutated = copy.deepcopy(interfaces)
+        mutated["worker_runtime_contract"]["worker_reconstruction_sources"] = [
+            "arbitrary-1",
+            "arbitrary-2",
+            "arbitrary-3",
+            "arbitrary-4",
+            "arbitrary-5",
+        ]
+        with self.assertRaisesRegex(ValueError, "worker reconstruction sources drift"):
+            validator.validate_interfaces(mutated)
+
     def test_compat_adapter_cannot_grant_protected_effect_authority(self):
         compat = load_json("specs/BT2_COORDINATOR_INTERFACE_V1.json")
         mutated = copy.deepcopy(compat)
