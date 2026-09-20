@@ -9,6 +9,9 @@ A fresh BT2 session should recover state in this order:
 5. installed Project files;
 6. memory/inference only as non-authoritative context.
 
+## Worker reconstruction
+`native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json` is the current source map for reconstructing One, Two, numbered specialists, Masa/Mune, and Hephaestus without a permanent worker chat. Read the mapped source package and current assignment separately. Source-package recovery is not qualification, installation, activation, current assignment, or protected-effect authority.
+
 ## Minimum orientation record
 Before resuming durable work, establish when relevant:
 - canonical source head/ref;
