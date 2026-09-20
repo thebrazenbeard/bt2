@@ -108,7 +108,7 @@ def main() -> int:
         raise SystemExit("psql is required on PATH")
 
     package_digest, source_commit, source_tree = check_manifest(args.expected_package_digest)
-    image_attestation = observe_postgres_container_image(args.postgres_container_id)
+    image_attestation = observe_postgres_container_image(args.postgres_container_id, args.database_url)
 
     version_num = psql_scalar(args.database_url, "SHOW server_version_num;")
     server_version = psql_scalar(args.database_url, "SHOW server_version;")
