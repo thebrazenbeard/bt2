@@ -171,6 +171,41 @@ EXPECTED_AUTHORITY_KEYS = {
     "protected_effect_examples",
 }
 
+EXPECTED_COMPAT_TOP_KEYS = {
+    "schema_version",
+    "artifact_id",
+    "status",
+    "project",
+    "persistent_chat_name",
+    "interface_not_worker_identity",
+    "purpose",
+    "durable_sources",
+    "startup_obligations",
+    "worker_model",
+    "authority",
+    "persistence",
+    "normative_topology_contract",
+    "normative_worker_reconstruction_contract",
+}
+EXPECTED_COMPAT_DURABLE_SOURCE_KEYS = {
+    "primary_repo", "communication_hub", "exodus_topology_contract",
+}
+EXPECTED_COMPAT_WORKER_MODEL_KEYS = {
+    "permanent_worker_chats_required",
+    "workers_are_reconstructed_from_durable_state",
+    "ephemeral_execution_terminals_allowed",
+    "retired_chat_url_dependency_forbidden",
+}
+EXPECTED_COMPAT_AUTHORITY_KEYS = {
+    "interface_role_does_not_grant_merge_deploy_or_provider_authority",
+    "patrick_exact_authority_required_for_protected_effects",
+}
+EXPECTED_COMPAT_PERSISTENCE_KEYS = {
+    "project_outputs_canonical_in_owning_repositories",
+    "non_pr_coordination_via_bus",
+    "continuation_must_not_depend_on_chat_history",
+}
+
 
 def _require(condition: bool, message: str) -> None:
     if not condition:
@@ -336,6 +371,7 @@ def validate_interfaces(interfaces: dict) -> None:
 
 
 def validate_compat(compat: dict) -> None:
+    _require(set(compat) == EXPECTED_COMPAT_TOP_KEYS, "compat top-level field set drift")
     _require(compat.get("status") == "COMPATIBILITY_INTERFACE_ADAPTER", "compat status drift")
     _require(compat.get("project") == "Build Team Two", "compat project drift")
     _require(compat.get("persistent_chat_name") == "BT2 Coordinator", "compat interface drift")
@@ -350,7 +386,18 @@ def validate_compat(compat: dict) -> None:
         == "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json",
         "compat worker binding drift",
     )
+    durable_sources = compat.get("durable_sources", {})
+    _require(
+        type(durable_sources) is dict
+        and set(durable_sources) == EXPECTED_COMPAT_DURABLE_SOURCE_KEYS,
+        "compat durable-source field set drift",
+    )
     worker_model = compat.get("worker_model", {})
+    _require(
+        type(worker_model) is dict
+        and set(worker_model) == EXPECTED_COMPAT_WORKER_MODEL_KEYS,
+        "compat worker-model field set drift",
+    )
     for field in (
         "permanent_worker_chats_required",
         "retired_chat_url_dependency_forbidden",
@@ -367,6 +414,11 @@ def validate_compat(compat: dict) -> None:
     )
     authority = compat.get("authority", {})
     _require(
+        type(authority) is dict
+        and set(authority) == EXPECTED_COMPAT_AUTHORITY_KEYS,
+        "compat authority field set drift",
+    )
+    _require(
         authority.get("interface_role_does_not_grant_merge_deploy_or_provider_authority")
         is True,
         "compat authority ceiling drift",
@@ -376,6 +428,11 @@ def validate_compat(compat: dict) -> None:
         "compat protected-effect authority drift",
     )
     persistence = compat.get("persistence", {})
+    _require(
+        type(persistence) is dict
+        and set(persistence) == EXPECTED_COMPAT_PERSISTENCE_KEYS,
+        "compat persistence field set drift",
+    )
     _require(
         persistence.get("project_outputs_canonical_in_owning_repositories") is True,
         "compat project-output canonicality drift",
