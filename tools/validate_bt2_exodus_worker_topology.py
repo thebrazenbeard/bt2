@@ -43,11 +43,15 @@ def main():
     assert seven["source_path"] == "archive/training-sources/project-achilles/seven/v1.0.0"
     assert seven["compatibility_overlay"] == "docs/exodus/BT2_SEVEN_CHATLESS_RECONSTRUCTION_COMPATIBILITY_20260920.md"
     assert seven["execution_terminal_compatibility"] == "CHATLESS_EPHEMERAL_RUNTIME"
+    assert seven["permanent_chat_required"] is False
+    assert seven["runtime_instance_mode"] == "EPHEMERAL_EXECUTION_TERMINAL"
+    assert seven["qualification_claim_ceiling"] == "PACKAGE_FOUND_QUALIFICATION_UNPROVEN"
+    assert seven["current_assignment_resolution"] == "FRESH_DURABLE_STATE_OR_IDLE"
+    assert seven["authority_from_role_or_package"] is False
+    assert seven["independent_review_exact_subject_binding_required"] is True
+    assert seven["peer_review_independence_required_before_first_substantive_judgment"] is True
     seven_overlay = ROOT / seven["compatibility_overlay"]
     assert seven_overlay.is_file()
-    seven_overlay_text = seven_overlay.read_text(encoding="utf-8")
-    assert "permanent Seven conversation" in seven_overlay_text
-    assert "QUALIFICATION_UNPROVEN" in seven_overlay_text
     assert "archive/training-sources/project-achilles/seven/v1.0.0/" in coordinator
 
     names = [x["display_name"] for x in interfaces["persistent_chat_interfaces"]]
