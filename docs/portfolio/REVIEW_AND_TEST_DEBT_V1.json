@@ -1,0 +1,49 @@
+{
+  "schema": "BT2_REVIEW_AND_TEST_DEBT_V1",
+  "status": "IN_PROGRESS",
+  "date": "2026-09-20",
+  "debt": [
+    {
+      "repo": "chat-communication-bus",
+      "subject": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+      "debt": [
+        "full tests/radar still executing",
+        "new exact object needs independent candidate review",
+        "local-no-paid qualification/receipt not yet produced"
+      ],
+      "severity": "HIGH"
+    },
+    {
+      "repo": "chat-communication-bus",
+      "subject": "PR #80 f77576a7e5c0a454271c0389496f8dbc28578b43",
+      "debt": [
+        "named fresh Brigit gate still open if repo-specific gate retained"
+      ],
+      "severity": "MEDIUM"
+    },
+    {
+      "repo": "god-brain",
+      "subject": "PRs #10/#13/#15/#16/#17/#18/#19/#20/#21",
+      "debt": [
+        "multiple Bus exact-head review requests/research successors remain open; do not block PR #6 main-ready bundle unless dependency explicitly proven"
+      ],
+      "severity": "MEDIUM"
+    },
+    {
+      "repo": "on-theo",
+      "subject": "active 65-PR research estate",
+      "debt": [
+        "synthesis/currentness DAG not yet fully reconstructed by estate run"
+      ],
+      "severity": "HIGH"
+    },
+    {
+      "repo": "bt2",
+      "subject": "canonical repo identity",
+      "debt": [
+        "source repo content conflicts with installed Project binding and separate hc-brain"
+      ],
+      "severity": "CRITICAL"
+    }
+  ]
+}
