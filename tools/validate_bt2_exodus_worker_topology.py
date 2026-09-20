@@ -125,6 +125,52 @@ EXPECTED_PROTECTED_EFFECTS = {
     "DESTRUCTIVE_CLEANUP",
 }
 
+EXPECTED_WORKER_BASE_KEYS = {
+    "id", "class", "source_path", "entrypoint", "source_state", "qualification_state",
+}
+EXPECTED_SEVEN_EXTRA_KEYS = {
+    "compatibility_overlay",
+    "execution_terminal_compatibility",
+    "permanent_chat_required",
+    "runtime_instance_mode",
+    "qualification_claim_ceiling",
+    "current_assignment_resolution",
+    "authority_from_role_or_package",
+    "independent_review_exact_subject_binding_required",
+    "peer_review_independence_required_before_first_substantive_judgment",
+}
+EXPECTED_INTERFACE_ENTRY_KEYS = {
+    "interface_id", "display_name", "domain", "durable_state_owner",
+}
+EXPECTED_RUNTIME_KEYS = {
+    "permanent_worker_chat_required",
+    "execution_context_is_terminal_not_identity",
+    "worker_reconstruction_sources",
+    "chat_title_is_authority",
+    "conversation_id_is_authority",
+    "archived_chat_required_for_reconstruction",
+    "hidden_chat_state_required_for_reconstruction",
+}
+EXPECTED_RECONSTRUCTION_SOURCES = [
+    "current live user instruction and Project Instructions",
+    "thebrazenbeard/bt2 current canonical source",
+    "target repository exact current source/PR/review state",
+    "thebrazenbeard/chat-communication-bus current protocol, worker lane, and recovery checkpoint",
+    "authorized live provider readback when the task depends on provider currentness",
+]
+EXPECTED_COMMUNICATION_KEYS = {
+    "non_pr_coordination_hub",
+    "external_prs_mirrored_to_bus_when_material",
+    "recovery_checkpoint_namespace",
+    "source_prs_remain_canonical_in_source_repository",
+}
+EXPECTED_AUTHORITY_KEYS = {
+    "worker_identity_does_not_imply_write_authority",
+    "tool_access_does_not_imply_write_authority",
+    "protected_effects_require_live_exact_authority",
+    "protected_effect_examples",
+}
+
 
 def _require(condition: bool, message: str) -> None:
     if not condition:
@@ -162,6 +208,15 @@ def validate_worker_topology(workers: dict, root: Path = ROOT) -> None:
 
     for worker in entries:
         worker_id = worker["id"]
+        expected_keys = (
+            EXPECTED_WORKER_BASE_KEYS | EXPECTED_SEVEN_EXTRA_KEYS
+            if worker_id == "seven"
+            else EXPECTED_WORKER_BASE_KEYS
+        )
+        _require(
+            set(worker) == expected_keys,
+            f"{worker_id} worker field set drift",
+        )
         expected = EXPECTED_WORKER_BINDINGS[worker_id]
         actual = (
             worker.get("class"),
@@ -206,6 +261,10 @@ def validate_interfaces(interfaces: dict) -> None:
     )
     entries = interfaces.get("persistent_chat_interfaces")
     _require(type(entries) is list and len(entries) == 3, "expected exactly 3 interfaces")
+    _require(
+        all(type(entry) is dict and set(entry) == EXPECTED_INTERFACE_ENTRY_KEYS for entry in entries),
+        "persistent interface field set drift",
+    )
     pairs = [(entry.get("interface_id"), entry.get("display_name")) for entry in entries]
     _require(pairs == EXPECTED_INTERFACES, "persistent interface identity/order drift")
     _require(
@@ -215,6 +274,7 @@ def validate_interfaces(interfaces: dict) -> None:
 
     runtime = interfaces.get("worker_runtime_contract")
     _require(type(runtime) is dict, "worker runtime contract missing")
+    _require(set(runtime) == EXPECTED_RUNTIME_KEYS, "worker runtime field set drift")
     for field in (
         "permanent_worker_chat_required",
         "chat_title_is_authority",
@@ -228,14 +288,22 @@ def validate_interfaces(interfaces: dict) -> None:
         "execution context identity boundary drift",
     )
     sources = runtime.get("worker_reconstruction_sources")
-    _require(type(sources) is list and len(sources) >= 5, "worker reconstruction sources incomplete")
+    _require(
+        sources == EXPECTED_RECONSTRUCTION_SOURCES,
+        "worker reconstruction sources drift",
+    )
 
     communication = interfaces.get("communication_contract")
     _require(type(communication) is dict, "communication contract missing")
+    _require(set(communication) == EXPECTED_COMMUNICATION_KEYS, "communication field set drift")
     _require(
         communication.get("non_pr_coordination_hub")
         == "thebrazenbeard/chat-communication-bus",
         "coordination hub drift",
+    )
+    _require(
+        communication.get("external_prs_mirrored_to_bus_when_material") is True,
+        "external PR mirroring contract drift",
     )
     _require(
         communication.get("recovery_checkpoint_namespace") == "checkpoints/<identity>/",
@@ -248,6 +316,7 @@ def validate_interfaces(interfaces: dict) -> None:
 
     authority = interfaces.get("authority_contract")
     _require(type(authority) is dict, "authority contract missing")
+    _require(set(authority) == EXPECTED_AUTHORITY_KEYS, "authority field set drift")
     _require(
         authority.get("worker_identity_does_not_imply_write_authority") is True,
         "worker identity authority boundary drift",
