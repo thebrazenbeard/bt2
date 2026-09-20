@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "artifact_id": "BT2_COORDINATOR_INTERFACE_V1",
+  "status": "COMPATIBILITY_INTERFACE_ADAPTER",
+  "project": "Build Team Two",
+  "persistent_chat_name": "BT2 Coordinator",
+  "interface_not_worker_identity": true,
+  "purpose": [
+    "coordinate Build Team Two engineering portfolio",
+    "instantiate and assign durable workers from GitHub state",
+    "orchestrate project build review and verification work",
+    "collect durable outputs and surface blockers or decisions to Patrick"
+  ],
+  "durable_sources": {
+    "primary_repo": "thebrazenbeard/bt2",
+    "communication_hub": "thebrazenbeard/chat-communication-bus",
+    "exodus_topology_contract": "thebrazenbeard/chat-communication-bus:architecture/contracts/EXODUS_INTERFACE_TOPOLOGY_V1.json"
+  },
+  "startup_obligations": [
+    "fresh-check bt2 main and relevant project repositories",
+    "fresh-check current worker assignments and Bus routing",
+    "treat checkpoints as starting snapshots rather than current truth",
+    "persist assignments decisions reviews and handoffs outside chat"
+  ],
+  "worker_model": {
+    "permanent_worker_chats_required": false,
+    "workers_are_reconstructed_from_durable_state": true,
+    "ephemeral_execution_terminals_allowed": true,
+    "retired_chat_url_dependency_forbidden": true
+  },
+  "authority": {
+    "interface_role_does_not_grant_merge_deploy_or_provider_authority": true,
+    "patrick_exact_authority_required_for_protected_effects": true
+  },
+  "persistence": {
+    "project_outputs_canonical_in_owning_repositories": true,
+    "non_pr_coordination_via_bus": true,
+    "continuation_must_not_depend_on_chat_history": true
+  },
+  "normative_topology_contract": "native/project/BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1.json",
+  "normative_worker_reconstruction_contract": "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"
+}
