@@ -4,9 +4,65 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
+
+POSTGRES_REPODIGEST_RE = re.compile(r"^postgres@sha256:[0-9a-f]{64}$")
+
+
+def observe_postgres_container_image(container_id: str | None) -> dict[str, str]:
+    if not container_id or not container_id.strip():
+        raise SystemExit("POSTGRES_CONTAINER_ID or --postgres-container-id is required")
+    if shutil.which("docker") is None:
+        raise SystemExit("docker is required on PATH to verify PostgreSQL image identity")
+
+    def docker(*args: str) -> str:
+        cp = subprocess.run(
+            ["docker", *args],
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return cp.stdout.strip()
+
+    container_id = container_id.strip()
+    running = docker("inspect", container_id, "--format", "{{.State.Running}}")
+    if running != "true":
+        raise SystemExit(f"PostgreSQL container is not running: {container_id}")
+
+    image_id = docker("inspect", container_id, "--format", "{{.Image}}")
+    if not image_id:
+        raise SystemExit(f"PostgreSQL container image id unavailable: {container_id}")
+
+    configured_image = docker("inspect", container_id, "--format", "{{.Config.Image}}")
+    raw_repo_digests = docker("image", "inspect", image_id, "--format", "{{json .RepoDigests}}")
+    try:
+        repo_digests = json.loads(raw_repo_digests)
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"invalid Docker RepoDigests JSON for {image_id}: {exc}") from exc
+    if not isinstance(repo_digests, list):
+        raise SystemExit(f"Docker RepoDigests must be a list for {image_id}")
+
+    matching = sorted({
+        value for value in repo_digests
+        if isinstance(value, str) and POSTGRES_REPODIGEST_RE.fullmatch(value)
+    })
+    if len(matching) != 1:
+        raise SystemExit(
+            "expected exactly one verified postgres@sha256:<64 lowercase hex> RepoDigest; "
+            f"observed={repo_digests!r}"
+        )
+
+    return {
+        "verification_method": "DOCKER_CONTAINER_IMAGE_INSPECT",
+        "container_id": container_id,
+        "container_image_id": image_id,
+        "configured_image": configured_image,
+        "repo_digest": matching[0],
+    }
+
 
 COMPONENTS = [
     ("schema_tree", "database/schema", "schema"),
