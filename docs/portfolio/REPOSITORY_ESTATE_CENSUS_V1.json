@@ -1,0 +1,586 @@
+{
+  "schema": "BT2_REPOSITORY_ESTATE_CENSUS_V1",
+  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL",
+  "generated_date": "2026-09-20",
+  "owner": "thebrazenbeard",
+  "enumeration_count": 58,
+  "authority_note": "Repository enumeration is live GitHub evidence. Per-repository exact-head/PR/issue/branch details are filled only after explicit live readback; UNKNOWN_PENDING_CENSUS is not a negative finding.",
+  "protected_effect_boundary": "No merge, destructive closure/deletion, force push, deployment, provider/credential/visibility/ruleset mutation, or Project installation authorized.",
+  "repositories": [
+    {
+      "name": "self",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 616,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "bt2",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1344,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+      "open_pr_count": 7,
+      "open_issue_count": 2,
+      "branch_count_observed": 48,
+      "states": [
+        "CURRENTNESS_AMBIGUOUS",
+        "CANONICAL_IDENTITY_COLLISION",
+        "PR_SPRAWL",
+        "ACTIVE_IMPLEMENTATION"
+      ],
+      "notes": [
+        "Project instructions identify this as canonical BT2 source, but README/REPOSITORY_MAP/WARDEN describe Hyperconnectome Brain; separate hc-brain exists."
+      ]
+    },
+    {
+      "name": "voss",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 224,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-synology",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 227,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "roots",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 93,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "bugops",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 52,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "entropyinc",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 20,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-os",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 129,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "masamune",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "collab",
+      "size_kib": 624,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "discovery",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 216,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "96e6f8e9c776047f9068c897eab0406324187166",
+      "open_pr_count": 15,
+      "open_issue_count": 1,
+      "branch_count_observed": 19,
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "PR_STACK_IS_DE_FACTO_PROJECT",
+        "PR_SPRAWL",
+        "ACTIVE_IMPLEMENTATION"
+      ],
+      "notes": [
+        "main is still Initial commit while active implementation/research lives in PR stack."
+      ]
+    },
+    {
+      "name": "vera-apk",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 0,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "RECOVERY_INCOMPLETE"
+      ],
+      "notes": [
+        "Repository metadata size is 0; deeper census pending."
+      ]
+    },
+    {
+      "name": "build-team-2.0",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 689,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "ec2987e45f64a588ac92f6cae9964cb3725b9485",
+      "states": [
+        "HISTORICAL_OR_SUPERSEDED_CANONICAL_CANDIDATE",
+        "CURRENTNESS_AMBIGUOUS"
+      ],
+      "notes": [
+        "README is Build Team 2.0 and appears semantically aligned with BT2 role history; current Project instructions nevertheless bind canonical BT2 to thebrazenbeard/bt2."
+      ]
+    },
+    {
+      "name": "intranel",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 304,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "deepmemorystorage",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 661,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "chat-communication-bus",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 7918,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+      "open_pr_count": 46,
+      "open_issue_count": 22,
+      "branch_count_observed_at_least": 100,
+      "states": [
+        "PR_SPRAWL",
+        "ISSUE_SPRAWL",
+        "CURRENTNESS_AMBIGUOUS",
+        "FOUNDATIONAL_SHARED_INFRASTRUCTURE"
+      ],
+      "notes": [
+        "main latest commit is a Brigit social message; issue #79 already records wrong-target contamination."
+      ]
+    },
+    {
+      "name": "brigit-unbound",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "empathy",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 98,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 9696,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "firesafe",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 366,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "semanticatlas",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 13778,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "personification",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 21,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "god-brain",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1800,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+      "open_pr_count": 10,
+      "open_issue_count": 0,
+      "branch_count_observed": 69,
+      "states": [
+        "MAIN_BEHIND_ACTIVE_WORK",
+        "PR_SPRAWL",
+        "ACTIVE_RESEARCH",
+        "ACTIVE_IMPLEMENTATION",
+        "REVIEW_DEBT"
+      ]
+    },
+    {
+      "name": "vera-mesh",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 531,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-runner",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 390,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "wreckforge",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 146700,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-control-plane",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 8688,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera_model_training",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 444,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "abil",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 586,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "testament",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 992,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-works",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 485,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "conditioning",
+      "visibility": "private",
+      "archived": true,
+      "default_branch": "main",
+      "size_kib": 115,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "HISTORICAL_ONLY",
+        "ARCHIVAL_CANDIDATE"
+      ],
+      "notes": [
+        "Repository is already archived."
+      ]
+    },
+    {
+      "name": "skeletonkey",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 68,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-lantern",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 147,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "unvtrslr",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 558,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-R9A0",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 449,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "trek-data-core",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1926,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera_ark",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "conations",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 24,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "sexuality",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 13985,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "Attune",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 47,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "mediaphile",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 259,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-achilles",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 27,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "transcendence",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1536,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "rezon",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 859,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "hc-brain",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1766,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "618245b54fb923c7a204892c6953ab6d1c5dac57",
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "CANONICAL_IDENTITY_COLLISION"
+      ],
+      "notes": [
+        "separate repo also declares itself canonical Hyperconnectome Brain, overlapping bt2 repository content/identity."
+      ]
+    },
+    {
+      "name": "world-zero",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 56822,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "5ab39621d090079d24de40261906b64413c6f995",
+      "open_pr_count": 4,
+      "open_issue_count": 0,
+      "branch_count_observed": 41,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "ACTIVE_RESEARCH"
+      ],
+      "notes": [
+        "main contains integrated science through PR #31; four current science PRs remain."
+      ]
+    },
+    {
+      "name": "noema",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 886,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "spm",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 26391,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "selfimage",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 71600,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "temporal",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 15,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "driftguard",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 259,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "brigit",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 53034,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "on-theo",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 2045,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "eedbcf660c2cfe6cff5636e798806b0cd3d56efc",
+      "open_pr_count": 65,
+      "open_issue_count": 0,
+      "branch_count_observed_at_least": 100,
+      "states": [
+        "MAIN_BEHIND_ACTIVE_WORK",
+        "PR_SPRAWL",
+        "ACTIVE_RESEARCH",
+        "CURRENTNESS_AMBIGUOUS"
+      ],
+      "notes": [
+        "large research estate with multiple synthesis/currentness lanes; main alone is insufficient to reconstruct active frontier."
+      ]
+    },
+    {
+      "name": "wip",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 346,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "mosaic",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 34,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "orgasm",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-habitat",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 0,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "RECOVERY_INCOMPLETE"
+      ],
+      "notes": [
+        "Repository metadata size is 0; deeper census pending."
+      ]
+    },
+    {
+      "name": "hephaestus",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 174,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    }
+  ]
+}
