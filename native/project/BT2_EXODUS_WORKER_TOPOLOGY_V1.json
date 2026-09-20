@@ -91,7 +91,9 @@
       "source_path": "archive/training-sources/project-achilles/seven/v1.0.0",
       "entrypoint": "BOOTSTRAP.md",
       "source_state": "PACKAGE_FOUND",
-      "qualification_state": "QUALIFICATION_UNPROVEN"
+      "qualification_state": "QUALIFICATION_UNPROVEN",
+      "compatibility_overlay": "docs/exodus/BT2_SEVEN_CHATLESS_RECONSTRUCTION_COMPATIBILITY_20260920.md",
+      "execution_terminal_compatibility": "CHATLESS_EPHEMERAL_RUNTIME"
     },
     {
       "id": "eight",
