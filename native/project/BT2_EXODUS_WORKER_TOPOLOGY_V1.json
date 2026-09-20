@@ -93,7 +93,14 @@
       "source_state": "PACKAGE_FOUND",
       "qualification_state": "QUALIFICATION_UNPROVEN",
       "compatibility_overlay": "docs/exodus/BT2_SEVEN_CHATLESS_RECONSTRUCTION_COMPATIBILITY_20260920.md",
-      "execution_terminal_compatibility": "CHATLESS_EPHEMERAL_RUNTIME"
+      "execution_terminal_compatibility": "CHATLESS_EPHEMERAL_RUNTIME",
+      "permanent_chat_required": false,
+      "runtime_instance_mode": "EPHEMERAL_EXECUTION_TERMINAL",
+      "qualification_claim_ceiling": "PACKAGE_FOUND_QUALIFICATION_UNPROVEN",
+      "current_assignment_resolution": "FRESH_DURABLE_STATE_OR_IDLE",
+      "authority_from_role_or_package": false,
+      "independent_review_exact_subject_binding_required": true,
+      "peer_review_independence_required_before_first_substantive_judgment": true
     },
     {
       "id": "eight",
