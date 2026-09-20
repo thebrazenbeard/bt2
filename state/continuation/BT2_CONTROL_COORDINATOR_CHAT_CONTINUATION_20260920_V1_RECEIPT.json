@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "checkpoint_id": "BT2_CONTROL_COORDINATOR_CHAT_CONTINUATION_20260920_V1",
+  "restore_command": "BT2_CONTROL_COORDINATOR::RESTORE::BT2_CONTROL_COORDINATOR_CHAT_CONTINUATION_20260920_V1",
+  "repository": "thebrazenbeard/bt2",
+  "branch": "state/bt2-control-coordinator-chat-continuation-20260920-v1",
+  "checkpoint_path": "state/continuation/BT2_CONTROL_COORDINATOR_CHAT_CONTINUATION_20260920_V1.md",
+  "checkpoint_commit": "6aa3a52e8876b780c7142b5da529c851501da1f2",
+  "checkpoint_git_blob": "e9afc1b7625beb6396fdb5dbe263bf38187cf2d0",
+  "base_bt2_main": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+  "bus_repo": "thebrazenbeard/chat-communication-bus",
+  "bt2_bus_head_at_save": "afb4f23ff4e78c22bc58ac6ba3d64e3b1ebb2aba",
+  "vera_bus_head_at_save": "79be06b62d3d5bac3a4f503c6747cd0cba64d02c",
+  "god_brain_repo": "thebrazenbeard/god-brain",
+  "god_brain_main_at_save": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+  "parallel_peer": {
+    "role": "Vera Unbound parallel coordinator/reviewer",
+    "chat_url": "https://chatgpt.com/g/g-p-6a6babcee53481918c0458d0bb5660e5-vera-unbound/c/6aafff8e-49d4-83e9-be83-9d3b6e06a236",
+    "authority_note": "Execution-terminal pointer only; durable repository/Bus/WoWSQL evidence remains authoritative."
+  },
+  "infrastructure": {
+    "canonical_source_coordination": "GitHub",
+    "canonical_bt2_lantern_runtime": "WoWSQL bt2-479e4ad9",
+    "supabase_lantern_fallback_allowed": false
+  },
+  "status": "DURABLE_SAVEPOINT"
+}
