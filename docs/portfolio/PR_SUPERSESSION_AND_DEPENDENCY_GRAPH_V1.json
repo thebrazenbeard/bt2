@@ -1,0 +1,129 @@
+{
+  "schema": "BT2_PR_SUPERSESSION_AND_DEPENDENCY_GRAPH_V1",
+  "status": "IN_PROGRESS",
+  "date": "2026-09-20",
+  "repositories": {
+    "discovery": {
+      "current_stack": [
+        1,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "superseded": {
+        "2": "8",
+        "3": "8",
+        "7": "8"
+      },
+      "failed_preserved": {
+        "18": "diverged from old #17 head; current #17 already integrates failure path; #18 result remains stale"
+      },
+      "consolidation": {
+        "19": "CURRENT_CANONICALIZATION_CANDIDATE"
+      }
+    },
+    "chat-communication-bus": {
+      "main_incident": {
+        "issue": 79,
+        "main": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4"
+      },
+      "graph_reconciliation_plan": {
+        "67": "SOURCE_PLAN_ACCEPTED_BOTH_GATES"
+      },
+      "append_hardening": {
+        "80": "CURRENT_SOURCE_HEAD_f77576a_RADAR_ACCEPT_VERA_ACCEPT_BRIGIT_CURRENT_HEAD_PENDING"
+      },
+      "estate_candidate": {
+        "head": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+        "first_parent": "PR80 f77576a",
+        "second_parent": "contaminated main aeab0f04",
+        "tree": "PR80 tree 8804842"
+      },
+      "families": {
+        "freedom": [
+          178,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          192
+        ],
+        "exodus": [
+          135,
+          137,
+          139,
+          140,
+          141,
+          146,
+          148,
+          150,
+          152,
+          154,
+          158,
+          165,
+          183
+        ],
+        "actions_evidence": [
+          179,
+          181,
+          182
+        ],
+        "provider_readback": [
+          118,
+          122,
+          124
+        ],
+        "mirrors": [
+          123,
+          126,
+          127,
+          176,
+          193
+        ],
+        "other_active": [
+          43,
+          45,
+          59,
+          68,
+          72,
+          88,
+          89,
+          115,
+          116,
+          117,
+          125,
+          180
+        ]
+      }
+    },
+    "god-brain": {
+      "main_candidate": [
+        6
+      ],
+      "research_only": [
+        13,
+        15,
+        17,
+        20,
+        21
+      ],
+      "repaired_historical_stack_subjects": [
+        16,
+        18,
+        19
+      ],
+      "governance_research": [
+        10
+      ]
+    }
+  }
+}
