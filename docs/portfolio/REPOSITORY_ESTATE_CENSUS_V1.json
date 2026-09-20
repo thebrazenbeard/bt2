@@ -1,6 +1,6 @@
 {
   "schema": "BT2_REPOSITORY_ESTATE_CENSUS_V1",
-  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL",
+  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL_WITH_FIRST_CANONICALIZATION_CANDIDATES",
   "generated_date": "2026-09-20",
   "owner": "thebrazenbeard",
   "enumeration_count": 58,
@@ -100,18 +100,31 @@
       "size_kib": 216,
       "census_state": "PARTIALLY_QUALIFIED",
       "head": "96e6f8e9c776047f9068c897eab0406324187166",
-      "open_pr_count": 15,
+      "open_pr_count": 16,
       "open_issue_count": 1,
       "branch_count_observed": 19,
       "states": [
         "MAIN_TRIVIAL_OR_EMPTY",
         "PR_STACK_IS_DE_FACTO_PROJECT",
         "PR_SPRAWL",
-        "ACTIVE_IMPLEMENTATION"
+        "ACTIVE_IMPLEMENTATION",
+        "CANONICALIZATION_CANDIDATE_READY"
       ],
       "notes": [
-        "main is still Initial commit while active implementation/research lives in PR stack."
-      ]
+        "main remains initial commit; Draft PR #19 consolidates the current #1/#8-#17 lineage, preserves #2/#3/#7 as superseded history, and preserves divergent #18 as failed/stale evidence."
+      ],
+      "reconciliation": {
+        "draft_pr": 19,
+        "exact_head": "aa51c4bf2b6b34d0ae0d8063119ae685b84bf2e2",
+        "base_main": "96e6f8e9c776047f9068c897eab0406324187166",
+        "local_validation": "57/57 PASS + validator PASS + compileall PASS + diff-check PASS",
+        "hosted_runs": [
+          35536561513,
+          35536561545
+        ],
+        "hosted_conclusion": "SUCCESS",
+        "protected_effect": "MERGE_NOT_AUTHORIZED"
+      }
     },
     {
       "name": "vera-apk",
@@ -175,11 +188,31 @@
         "PR_SPRAWL",
         "ISSUE_SPRAWL",
         "CURRENTNESS_AMBIGUOUS",
-        "FOUNDATIONAL_SHARED_INFRASTRUCTURE"
+        "FOUNDATIONAL_SHARED_INFRASTRUCTURE",
+        "MAIN_CONTAMINATED_WRONG_TARGET_APPEND",
+        "CANONICALIZATION_CANDIDATE_IN_QUALIFICATION"
       ],
       "notes": [
-        "main latest commit is a Brigit social message; issue #79 already records wrong-target contamination."
-      ]
+        "Issue #79 proves default-main contamination. Candidate preserves contaminated main as second-parent ancestry while using repaired PR #80 tree as result state."
+      ],
+      "reconciliation": {
+        "current_main": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+        "contamination_issue": 79,
+        "reviewed_graph_plan_pr": 67,
+        "repaired_source_pr": 80,
+        "repaired_source_head": "f77576a7e5c0a454271c0389496f8dbc28578b43",
+        "candidate_branch": "bt2/bus-canonical-main-reconciliation-v1-20260920",
+        "candidate_head": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+        "candidate_tree": "8804842b434fb142ec61cd86b7f916bfa2dcd6e5",
+        "candidate_parents": [
+          "f77576a7e5c0a454271c0389496f8dbc28578b43",
+          "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4"
+        ],
+        "wrong_target_path_in_candidate": false,
+        "focused_local_validation": "16/16 PASS + compileall PASS + diff-check PASS",
+        "full_radar_validation": "IN_PROGRESS",
+        "protected_effect": "MAIN_REF_MOVE_NOT_AUTHORIZED"
+      }
     },
     {
       "name": "brigit-unbound",
@@ -242,10 +275,26 @@
       "branch_count_observed": 69,
       "states": [
         "MAIN_BEHIND_ACTIVE_WORK",
-        "PR_SPRAWL",
         "ACTIVE_RESEARCH",
         "ACTIVE_IMPLEMENTATION",
-        "REVIEW_DEBT"
+        "REVIEW_DEBT",
+        "MAIN_READY_CANDIDATE_EXISTS",
+        "PROTECTED_EFFECT_BLOCKED"
+      ],
+      "reconciliation": {
+        "main_ready_pr": 6,
+        "exact_head": "c8aff4109e53930a15eed54ab2f00b746ec8b09c",
+        "base_main": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+        "relation": "11 ahead / 0 behind",
+        "changed_files": 7,
+        "hosted_architecture_run": 35513580427,
+        "hosted_conclusion": "SUCCESS",
+        "recorded_local_tests": "171/171 PASS",
+        "review": "ATOMIC_INTEGRATION_REVIEW_PASS",
+        "protected_effect": "MERGE_NOT_AUTHORIZED"
+      },
+      "notes": [
+        "PR #6 is the atomic main-integration bundle. Research PRs #13/#15/#17/#20/#21 remain research-only. PRs #16/#18/#19 are repaired historical-stack subjects and are not automatically main dependencies."
       ]
     },
     {
@@ -582,5 +631,6 @@
       "size_kib": 174,
       "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
     }
-  ]
+  ],
+  "last_updated": "2026-09-20"
 }
