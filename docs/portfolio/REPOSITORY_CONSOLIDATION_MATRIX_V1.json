@@ -105,8 +105,9 @@
       "repo": "empathy",
       "default_head": "4b2a6998f39aa4763c1c5a28fc3d815104e5637e",
       "open_prs": 3,
-      "state": "MULTI_LANE_RECONCILIATION_REQUIRED",
-      "frontier": "PRs #2-#4 require exact dependency/supersession audit"
+      "state": "EXISTING_CONSOLIDATION_FRONTIER",
+      "frontier": "Draft PR #5 @ 5a4e4e3296bff0fec8baa449d697ddc04600ee71 composes exact blobs from PRs #2/#3/#4 on main; compare = 2 ahead / 0 behind / 8 intended files after non-force repair",
+      "validation": "NO_GITHUB_WORKFLOW_RUNS_OBSERVED"
     },
     {
       "repo": "entropyinc",
@@ -140,8 +141,9 @@
       "repo": "hephaestus",
       "default_head": "78f6f22a0e5d14617855006a8383765589ac8c67",
       "open_prs": 2,
-      "state": "MULTI_LANE_RECONCILIATION_REQUIRED",
-      "frontier": "PR #9 runtime dechatification + PR #10 training refresh"
+      "state": "EXISTING_CONSOLIDATION_FRONTIER",
+      "frontier": "Draft PR #11 @ 53b3608ff6cf2de4c2d088eb86b77cee209aa83d composes PRs #9/#10 on main; compare = 1 ahead / 0 behind / 25 intended files",
+      "validation": "NO_GITHUB_WORKFLOW_RUNS_OBSERVED"
     },
     {
       "repo": "intranel",
@@ -210,8 +212,9 @@
       "repo": "project-lantern",
       "default_head": "6333d386c74ce37e644fa1e995be9f9dc3fe6394",
       "open_prs": 2,
-      "state": "MULTI_LANE_RECONCILIATION_REQUIRED",
-      "frontier": "PR #5 reusable distribution + PR #6 chatless acceptance context"
+      "state": "EXISTING_CONSOLIDATION_FRONTIER_WITH_INHERITED_CI_FAILURE",
+      "frontier": "Draft PR #7 @ 6b1a1f9a26086d5def0ff3f28b712ff8adcf19a6 composes PRs #5/#6 on main; compare = 1 ahead / 0 behind / 5 intended files",
+      "validation": "FAIL inherited from PR #5: exact source head e90124bda39d5f92fa2ce9d51b6648dc463ef36d already failed Lantern package CI (runs 35473944775/35473942784); consolidation run 35670574161 also failed"
     },
     {
       "repo": "project-runner",
@@ -399,8 +402,9 @@
       "repo": "wip",
       "default_head": "12a7c23dbe0482fd7bfe63659e54526778efef1e",
       "open_prs": 2,
-      "state": "MULTI_LANE_RECONCILIATION_REQUIRED",
-      "frontier": "PR #1 model-state adapter + PR #2 Discovery envelope export"
+      "state": "EXISTING_CONSOLIDATION_FRONTIER",
+      "frontier": "Draft PR #3 @ 272a9ab40bbf1bd38aed8caeef62a85b89cc10ee composes PRs #1/#2 on main; compare = 1 ahead / 0 behind / 22 intended files",
+      "validation": "GitHub Actions validate-wip run 35670613501 SUCCESS"
     },
     {
       "repo": "world-zero",
@@ -417,5 +421,6 @@
       "frontier": "main; small non-PR branch history retained"
     }
   ],
-  "last_graph_update": "2026-09-21"
+  "last_graph_update": "2026-09-21",
+  "last_execution_update": "2026-09-21"
 }
