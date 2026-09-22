@@ -1,0 +1,101 @@
+{
+  "schema": "BT2_CURRENT_PORTFOLIO_FRONTIER_V2",
+  "status": "INDIVIDUAL_REPOSITORY_CONSOLIDATION_IN_PROGRESS",
+  "date": "2026-09-21",
+  "completed_this_cut": [
+    "Enumerated 58 owned repositories from live GitHub.",
+    "Read exact default-branch heads and active PR state for the full estate.",
+    "Classified every repository under the individual-consolidation policy.",
+    "Verified Discovery PR #19 merged at 2026-09-21T23:55:07Z and read back main at 34b9d49ff4be7eedd6104cbfa5501549e468eccd.",
+    "Verified Chat Communication Bus main remains aeab0f04fc9b4bd7c2945c9a53011c53fac809b4 while Draft PR #194 head is aad280c68957f38204d49c61fb94cefcab458692.",
+    "Verified God Brain main remains c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5 and Draft PR #39 is the current governance integration frontier."
+  ],
+  "existing_frontiers_to_use_not_duplicate": [
+    {"repo":"chat-communication-bus","pr":194},
+    {"repo":"god-brain","pr":39},
+    {"repo":"on-theo","pr":138,"scope":"infrastructure only"},
+    {"repo":"orgasm","pr":5},
+    {"repo":"project-runner","pr":29},
+    {"repo":"rezon","pr":80},
+    {"repo":"spm","pr":6}
+  ],
+  "post_merge_readback": [
+    {"repo":"discovery","merged_pr":19,"main":"34b9d49ff4be7eedd6104cbfa5501549e468eccd","next":"verify predecessor disposition and surviving open PR relevance before any closure"}
+  ],
+  "highest_risk_graph_audits_next": [
+    "vera-control-plane",
+    "on-theo",
+    "chat-communication-bus",
+    "abil",
+    "driftguard",
+    "god-brain",
+    "vera",
+    "noema",
+    "project-runner",
+    "rezon"
+  ],
+  "later_graph_audits": [
+    "vera-mesh",
+    "vera_model_training",
+    "selfimage",
+    "testament",
+    "vera-works",
+    "hc-brain",
+    "empathy",
+    "firesafe",
+    "hephaestus",
+    "intranel",
+    "mediaphile",
+    "mosaic",
+    "project-lantern",
+    "roots",
+    "semanticatlas",
+    "sexuality",
+    "transcendence",
+    "unvtrslr",
+    "vera-synology",
+    "wip"
+  ],
+  "verification_only_or_history_classification": [
+    "Attune",
+    "brigit-unbound",
+    "bugops",
+    "build-team-2.0",
+    "conations",
+    "deepmemorystorage",
+    "entropyinc",
+    "masamune",
+    "project-achilles",
+    "self",
+    "skeletonkey",
+    "temporal",
+    "trek-data-core",
+    "vera-apk",
+    "vera-habitat",
+    "vera-os",
+    "vera_ark",
+    "voss",
+    "wreckforge"
+  ],
+  "single_active_frontier": [
+    {"repo":"brigit","pr":5},
+    {"repo":"personification","pr":1},
+    {"repo":"vera-R9A0","pr":21},
+    {"repo":"world-zero","pr":35}
+  ],
+  "archived_hold": [
+    {"repo":"conditioning","open_pr":2}
+  ],
+  "protected_effects": {
+    "merge": "NOT_AUTHORIZED_BY_THIS_RUN",
+    "close_pr_or_issue": "NOT_EXECUTED",
+    "delete_branch_or_repo": "NOT_EXECUTED",
+    "force_push": "NOT_EXECUTED",
+    "deploy": "NOT_EXECUTED",
+    "provider_or_credential_change": "NOT_EXECUTED"
+  },
+  "lantern": {
+    "status": "NOT_ESTABLISHED",
+    "reason": "WoWSQL connector returned an internal failure before projection preflight; no fallback used."
+  }
+}
