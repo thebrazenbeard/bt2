@@ -127,6 +127,14 @@ INSERT INTO bt2.training_preservation_provenance_bindings_v1(
   )
 );
 
+-- Migration 0023 separately binds optional manifest/source-set SHA-256 claims.
+-- This synthetic subject establishes neither claim, so its canonical values are NULL.
+INSERT INTO bt2.training_preservation_digest_bindings_v1(
+  preservation_migration_key,manifest_digest_sha256,source_set_digest_sha256
+) VALUES (
+  'CI-TRAINING-TWO-PRESERVATION',NULL,NULL
+);
+
 DO $test$
 DECLARE v_id1 uuid; v_id2 uuid; v_rejected boolean:=false;
 BEGIN
