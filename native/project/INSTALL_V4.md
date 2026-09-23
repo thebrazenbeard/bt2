@@ -11,7 +11,7 @@ V4 separates provider-specific truth from core BT2 availability:
 - the Chat Communication Bus carries non-PR coordination/handoffs;
 - WoWSQL is consulted only when a claim or acceptance criterion actually requires live runtime state;
 - WoWSQL failure makes those runtime facts `UNKNOWN` without blocking unrelated source/review/test/recovery work;
-- Lantern V3 remains fail-closed with no Supabase fallback.
+- Lantern V4 remains fail-closed with no Supabase fallback.
 
 ## Project Instructions
 Replace the active BT2 Project Instructions only when separately authorized, using exact `native/project/PROJECT_INSTRUCTIONS_V4.md` from the reviewed V4 source subject.
