@@ -5,27 +5,29 @@
   "supersession_reason": "V1 did not bind canonical persistent seeds or qualification runners and therefore could not prove source-to-canonical-state reconstruction.",
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
-    "branch": "work/two-pr15-effective-boundary-fix-v1",
-    "head_before_manifest": "b7ab268740da54e6de69c7d0ee3f9e33da37d1ea"
+    "branch": "repair/database-integrity-qualification-current-main-v1-20260923",
+    "head_before_manifest": "6ec62c7427a68802c63e3a8d5ca50fa60335aba8"
   },
   "target": {
     "backend": "PostgreSQL",
     "qualified_major_version": 16,
-    "required_extensions": ["pgcrypto"]
+    "required_extensions": [
+      "pgcrypto"
+    ]
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "19e8aeecdcd8a92a1e542266b040c39aa6fb96c7",
-    "tests_tree": "afd5335e1faf481793e8a27e33c8618b9e9e1133",
+    "migrations_tree": "040b19ecf5e0904a27fcef07b357e357dd624af9",
+    "tests_tree": "fc0b40bae336ae0a0a9f6f3505ebcf62d9e5a804",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
     "lantern_archive_tree": "929ee632b6df04e6ee7324b1f955539e80f26258",
     "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
-    "qualification_tools_tree": "dda66ea89522d9de6cd09dbdd5b33c1cadff5bcf",
+    "qualification_tools_tree": "b02802f59571e4862883227ec1e5e087779c1837",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:19e8aeecdcd8a92a1e542266b040c39aa6fb96c7|tests:afd5335e1faf481793e8a27e33c8618b9e9e1133|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:dda66ea89522d9de6cd09dbdd5b33c1cadff5bcf|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "802cba15eab3e40ae0aba86f7bf2a3f0535a3a34338a7c895aed744a34bf6230"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:040b19ecf5e0904a27fcef07b357e357dd624af9|tests:fc0b40bae336ae0a0a9f6f3505ebcf62d9e5a804|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:929ee632b6df04e6ee7324b1f955539e80f26258|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:b02802f59571e4862883227ec1e5e087779c1837|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "d991102ae25a2c3281a65ba3d41a10d861d3eb3c8ce56abffbb59feb7b596498"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
@@ -35,7 +37,7 @@
     "sequence": [
       "database/schema/*.sql",
       "database/migrations/*.sql",
-      "database/tests/0001..0010 rollback regression suite",
+      "database/tests/0001..0010 + 0012 rollback regression suite (0011 reserved for final canonical-state oracle)",
       "database/seeds/0001_canonical_workforce_topology_v1.sql",
       "database/seeds/0002_training_preservation_predecessors_v1.sql",
       "database/seeds/0003_project_lantern_governed_state_v1.sql",
