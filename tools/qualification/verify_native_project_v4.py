@@ -135,7 +135,8 @@ def main() -> int:
         "LANTERN_WOWSQL_READ_QUERIES_V4.md",
         "WoWSQL is not a general availability prerequisite",
         "Never use Supabase or another database as an implicit Lantern/current-runtime fallback.",
-        "Runtime-only facts remain",
+        "Mark WoWSQL-dependent facts `UNKNOWN` or `UNAVAILABLE`",
+        "This failure does not block unrelated source/review/coordination work.",
     )
     for token in instruction_requirements:
         require(token in instructions, f"Project Instructions V4 missing required token: {token}")
