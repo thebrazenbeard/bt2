@@ -6,7 +6,7 @@
   "payload_source_commit": "85c0d5f9263445d579c562ca42905f0d053b462f",
   "payload_source_tree": "8cedb1c251027319c2c8b3f9aac3066d3c9f8c50",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
-  "payload_digest": "c4d9f8b49d12bebe3a1e883afd2288388b89df66b452cdc7365733025c5d93b4",
+  "payload_digest": "7414578e03c12c3b8fd7c1b71fcb9d614240297410c77e3cc54ea3e9daafafeb",
   "runtime_backend": "WoWSQL:bt2-479e4ad9",
   "general_bt2_availability_dependency": false,
   "project_instructions": {
@@ -52,8 +52,8 @@
     },
     {
       "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V3.md",
-      "git_blob": "f5870c2c06c313967a998f09de9e3836c338fad4",
-      "sha256": "81536cb4b3f66605d34fad9333da125bd49610cbb538cf4740d48aa9023ad228"
+      "git_blob": "27f360237209cfcb60164cdfe220268a003d8021",
+      "sha256": "d1e281cd0e0f33297dfde03999d1461afa08b87d270bbb840d71f73df364efdf"
     },
     {
       "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
