@@ -17,6 +17,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+sys.dont_write_bytecode = True
+
+from source_identity import observe_postgres_container_image, verify_manifest_source
 
 ROOT = Path(__file__).resolve().parents[2]
 DB = ROOT / "database"
@@ -76,16 +79,19 @@ def manifest_path() -> Path:
     return v2 if v2.is_file() else DB / "BUILD_MANIFEST_V1.json"
 
 
-def check_manifest(expected_digest: str | None) -> str:
+def check_manifest(expected_digest: str | None) -> tuple[str, str, str]:
     path = manifest_path()
-    manifest = json.loads(path.read_text(encoding="utf-8"))
-    digest = manifest["package_identity"]["package_digest_sha256"]
-    if expected_digest and digest != expected_digest:
-        raise SystemExit(f"package digest mismatch: manifest={digest} expected={expected_digest}")
-    if int(manifest["target"]["qualified_major_version"]) != 16:
-        raise SystemExit("manifest is not qualified for PostgreSQL 16")
-    print(f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}", flush=True)
-    return digest
+    _, digest, head, tree = verify_manifest_source(ROOT, path, expected_digest)
+    print(
+        f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest} source_commit={head} source_tree={tree}",
+        flush=True,
+    )
+    return digest, head, tree
+
+
+def command_version(cmd: list[str]) -> str:
+    cp = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, check=True)
+    return (cp.stdout or cp.stderr).strip()
 
 
 def main() -> int:
@@ -93,6 +99,7 @@ def main() -> int:
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     ap.add_argument("--expected-package-digest")
     ap.add_argument("--evidence-out")
+    ap.add_argument("--postgres-container-id", default=os.environ.get("POSTGRES_CONTAINER_ID"))
     args = ap.parse_args()
 
     if not args.database_url:
@@ -100,25 +107,28 @@ def main() -> int:
     if shutil.which("psql") is None:
         raise SystemExit("psql is required on PATH")
 
-    package_digest = check_manifest(args.expected_package_digest)
+    package_digest, source_commit, source_tree = check_manifest(args.expected_package_digest)
+    image_attestation = observe_postgres_container_image(args.postgres_container_id, args.database_url)
 
     version_num = psql_scalar(args.database_url, "SHOW server_version_num;")
+    server_version = psql_scalar(args.database_url, "SHOW server_version;")
     if not version_num.startswith("16"):
         raise SystemExit(f"PostgreSQL 16 required; observed server_version_num={version_num}")
 
     assert_empty(args.database_url)
     run(psql_args(args.database_url) + ["-c", "CREATE EXTENSION IF NOT EXISTS pgcrypto;"])
 
-    for path in sorted((DB / "schema").glob("*.sql")):
+    schema_files = sorted((DB / "schema").glob("*.sql"))
+    migration_files = sorted((DB / "migrations").glob("*.sql"))
+    for path in schema_files:
         psql_file(args.database_url, path)
-    for path in sorted((DB / "migrations").glob("*.sql")):
+    for path in migration_files:
         psql_file(args.database_url, path)
 
     # Regression suite runs before durable seeds because several smoke tests create
     # intentionally synthetic subjects under rollback. 0011 is the final state oracle.
-    for path in sorted((DB / "tests").glob("*.sql")):
-        if path == FINAL_ORACLE:
-            continue
+    regression_tests = [path for path in sorted((DB / "tests").glob("*.sql")) if path != FINAL_ORACLE]
+    for path in regression_tests:
         psql_file(args.database_url, path)
 
     # Canonical durable state. Run seed files twice to prove replay convergence.
@@ -152,9 +162,29 @@ def main() -> int:
 
     psql_file(args.database_url, FINAL_ORACLE)
 
+    executed_order = (
+        [str(path.relative_to(ROOT)) for path in schema_files]
+        + [str(path.relative_to(ROOT)) for path in migration_files]
+        + [str(path.relative_to(ROOT)) for path in regression_tests]
+        + [str(path.relative_to(ROOT)) for _ in range(2) for path in seeds]
+        + [str(path.relative_to(ROOT)) for path in CANONICAL_DATA_BEFORE_HISTORY]
+        + [str(loader.relative_to(ROOT)) + " --mode apply"]
+        + ["SKIP " + str(SKIPPED_DATA.relative_to(ROOT))]
+        + [str(path.relative_to(ROOT)) for path in CANONICAL_DATA_AFTER_HISTORY]
+        + [str(FINAL_ORACLE.relative_to(ROOT))]
+    )
     evidence = {
+        "source_commit": source_commit,
+        "source_tree": source_tree,
         "package_digest_sha256": package_digest,
+        "postgres_image_digest": image_attestation["repo_digest"],
+        "postgres_image_attestation": image_attestation,
+        "postgres_server_version": server_version,
         "postgres_major": 16,
+        "git_version": command_version(["git", "--version"]),
+        "psql_version": command_version(["psql", "--version"]),
+        "python_version": sys.version.split()[0],
+        "executed_order": executed_order,
         "blank_rebuild": "PASS",
         "canonical_state_reconstruction": "PASS",
         "topology_sha256": "45d262aae7285a69a66a3d5b35c04537899ba33f5eb7388b9731071e8907c0d8",
