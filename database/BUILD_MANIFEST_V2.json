@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "repair/database-integrity-qualification-current-main-v1-20260923",
-    "head_before_manifest": "6ec62c7427a68802c63e3a8d5ca50fa60335aba8"
+    "head_before_manifest": "7310fdb07691a4e9c29cb0b0159436c0ece76262"
   },
   "target": {
     "backend": "PostgreSQL",
