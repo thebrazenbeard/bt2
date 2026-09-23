@@ -3,8 +3,8 @@
   "project": "Build Team Two",
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
-  "payload_source_commit": "29f3c2819a401c9fa860cd3ae0a855f0e33d5e64",
-  "payload_source_tree": "054efb4188b2086729fb5e97d19c3b60e1466683",
+  "payload_source_commit": "1eedd1e42fb764d1b032528f0c40ca51be98d7f8",
+  "payload_source_tree": "d1644d9ac6945ac8c4b5ae493197775617a60131",
   "content_binding": "exact Git blob IDs under one reviewed payload source commit/tree",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob)+newline)",
   "payload_digest": "2c078638ef79713d8a5c2b88252d08d31da7940d38928664d0f225731908599a",
@@ -66,8 +66,8 @@
   },
   "lantern_package": {
     "version": "V4",
-    "source_commit": "29f3c2819a401c9fa860cd3ae0a855f0e33d5e64",
-    "source_tree": "054efb4188b2086729fb5e97d19c3b60e1466683",
+    "source_commit": "1eedd1e42fb764d1b032528f0c40ca51be98d7f8",
+    "source_tree": "d1644d9ac6945ac8c4b5ae493197775617a60131",
     "same_subject_required": true
   },
   "installation_rule": "Install Project Instructions V4, the V2 core runtime/recovery/coding files, the provider-degradation contract, and exactly the four Lantern V4 files from this payload subject. Retain older V1/V2/V3 files as historical/inactive material rather than mixing them into the active package.",
@@ -79,12 +79,12 @@
   "payload_digest_members": "project_instructions + required_project_files",
   "qualification_support": [
     {
-      "path": "tools/qualification/verify_native_project_v4.py",
+      "path": "tools/native/verify_native_project_v4.py",
       "git_blob": "4135216543ede1b50f258e58eca48b03e83b8fb5"
     },
     {
       "path": ".github/workflows/native-project-v4-qualification.yml",
-      "git_blob": "7cc5cf4701d1936a1e50767632686594ae3127cf"
+      "git_blob": "fc143a008183e745cc82309d992bda8ffd4d8b75"
     }
   ]
 }
