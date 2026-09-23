@@ -75,5 +75,6 @@
   "lantern_runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
   "wowsql_unavailable_behavior": "RUNTIME_ONLY_AND_LANTERN_CURRENTNESS_UNKNOWN; INDEPENDENT_SOURCE_WORK_CONTINUES",
   "supabase_lantern_fallback": "FORBIDDEN",
-  "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
+  "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES",
+  "payload_digest_members": "project_instructions + required_project_files"
 }
