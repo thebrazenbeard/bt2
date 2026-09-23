@@ -9,12 +9,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "native/project/PROJECT_FILES_MANIFEST_V4.json"
+EXPECTED_POSTURE_SHA256 = "828a3995dd0e49999c7ebc51753cfa17508935b45b99c01c79f456845994826f"
 
 EXPECTED_PAYLOAD_PATHS = {
     "native/project/PROJECT_INSTRUCTIONS_V4.md",
     "native/project/BT2_NATIVE_RUNTIME_V2.md",
     "native/project/BT2_CODING_OPERATIONS_V2.md",
     "native/project/BT2_RECOVERY_AND_STATE_V2.md",
+    "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
     "docs/runtime/RUNTIME_PROVIDER_DEGRADATION_V1.md",
     "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V4.md",
     "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V4.md",
@@ -107,6 +109,7 @@ def main() -> int:
 
     support_entries = [manifest["source_validation"], manifest["installer"]]
     support_entries.extend(manifest.get("qualification_support", []))
+    support_entries.extend(manifest.get("behavior_contract_support", []))
     for entry in support_entries:
         observed_blob = git("rev-parse", f"{source_commit}:{entry['path']}")
         require(
@@ -137,6 +140,12 @@ def main() -> int:
         "Never use Supabase or another database as an implicit Lantern/current-runtime fallback.",
         "Mark WoWSQL-dependent facts `UNKNOWN` or `UNAVAILABLE`",
         "This failure does not block unrelated source/review/coordination work.",
+        "## Adversarial collaboration posture",
+        "Try to kill the literal proposition",
+        "Direct commands and factual requests with no embedded proposal do not trigger",
+        "Only then infer the underlying objective",
+        "`UNKNOWN` is not `SURVIVES`",
+        "grants no protected-effect authority",
     )
     for token in instruction_requirements:
         require(token in instructions, f"Project Instructions V4 missing required token: {token}")
@@ -153,6 +162,37 @@ def main() -> int:
     require(
         "Lantern V4 remains fail-closed with no Supabase fallback." in installer,
         "installer does not state active Lantern V4 fail-closed rule",
+    )
+
+    require(
+        "BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md" in installer,
+        "installer does not name adversarial collaboration Project file",
+    )
+    require(
+        "source/package conformance only" in installer
+        and "BEHAVIOR_VERIFIED" in installer,
+        "installer collapses source qualification into behavioral installation",
+    )
+
+    posture_path = ROOT / "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md"
+    posture_digest = hashlib.sha256(posture_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    require(
+        posture_digest == EXPECTED_POSTURE_SHA256,
+        f"adversarial posture digest mismatch: {posture_digest}",
+    )
+    adversarial = manifest.get("adversarial_collaboration", {})
+    require(
+        adversarial.get("source_artifact_sha256") == EXPECTED_POSTURE_SHA256,
+        "manifest does not bind exact adversarial posture source digest",
+    )
+    require(
+        adversarial.get("native_project_file")
+        == "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+        "manifest adversarial native Project file binding is wrong",
+    )
+    require(
+        adversarial.get("effect_authority") == "UNCHANGED",
+        "adversarial posture must not grant effect authority",
     )
 
     spec_requirements = (
