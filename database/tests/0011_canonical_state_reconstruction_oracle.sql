@@ -63,6 +63,24 @@ BEGIN
     RAISE EXCEPTION 'BT2_REBUILD_TRAINING_STATE_COLLAPSED';
   END IF;
 
+  IF (SELECT count(*) FROM bt2.training_preservation_digest_bindings_v1) <> 13 THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_COUNT_MISMATCH';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM bt2.training_packages tp
+    JOIN bt2.migration_receipts mr
+      ON mr.migration_receipt_id=tp.preservation_receipt_id
+    LEFT JOIN bt2.training_preservation_digest_bindings_v1 db
+      ON db.preservation_migration_key=mr.migration_key
+    WHERE db.preservation_migration_key IS NULL
+       OR tp.manifest_digest_sha256 IS DISTINCT FROM db.manifest_digest_sha256
+       OR tp.source_set_digest_sha256 IS DISTINCT FROM db.source_set_digest_sha256
+  ) THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_MISMATCH';
+  END IF;
+
   IF (SELECT count(*) FROM bt2.training_qualifications) <> 0
      OR (SELECT count(*) FROM bt2.training_installation_events) <> 0 THEN
     RAISE EXCEPTION 'BT2_REBUILD_FABRICATED_TRAINING_QUALIFICATION_OR_INSTALLATION';
