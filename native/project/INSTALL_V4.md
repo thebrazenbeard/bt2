@@ -23,7 +23,16 @@ V4 introduces:
 - `BT2_RECOVERY_AND_STATE_V2.md`
 - `RUNTIME_PROVIDER_DEGRADATION_V1.md`
 
-The existing V3 Lantern files remain the Lantern-specific contract and are not rewritten by V4.
+V4 introduces a coherent four-file Lantern V4 contract. V1/V2/V3 Lantern files remain historical/inactive when the corresponding V4 files are installed.
+
+## Lantern V4 files
+Add exactly the reviewed V4 set:
+- `LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V4.md`
+- `LANTERN_WOWSQL_READ_QUERIES_V4.md`
+- `LANTERN_WOWSQL_RUNTIME_CONTRACT_V4.md`
+- `LANTERN_WOWSQL_ACCEPTANCE_V4.md`
+
+All four must come from the one exact source subject recorded by `PROJECT_FILES_MANIFEST_V4.json`.
 
 ## Installation boundary
 Creating or merging this source package does not install it into ChatGPT Project settings/files. Project installation is a distinct protected effect and requires separate live authority plus readback.
