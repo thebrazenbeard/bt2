@@ -28,7 +28,7 @@ claim_domains:
     wowsql_required_when_wowsql_owns_fact: true
     unavailable_result: UNKNOWN
   LANTERN_CURRENTNESS:
-    authority: WOWSQL_GOVERNED_LANTERN_V3
+    authority: WOWSQL_GOVERNED_LANTERN_V4
     wowsql_required: true
     unavailable_result: UNKNOWN
     fallback_forbidden:
