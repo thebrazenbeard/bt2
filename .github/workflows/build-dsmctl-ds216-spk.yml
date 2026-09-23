@@ -1,0 +1,167 @@
+name: Build dsmctl DS216 SPK
+
+on:
+  push:
+    branches:
+      - build/dsmctl-ds216-spk-v0.1.3-20260923
+    paths:
+      - '.github/workflows/build-dsmctl-ds216-spk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout build lane
+        uses: actions/checkout@v4
+
+      - name: Checkout exact dsmctl v0.1.3
+        uses: actions/checkout@v4
+        with:
+          repository: laurenschristian/dsmctl
+          ref: v0.1.3
+          path: upstream
+          fetch-depth: 1
+
+      - name: Set up Go 1.27.1
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache-dependency-path: upstream/go.sum
+
+      - name: Build ARMv7 static binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/payload/bin work/spk/scripts work/spk/conf
+          cd upstream
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 \
+            go build -trimpath -ldflags="-s -w -X main.version=0.1.3" \
+            -o ../work/payload/bin/dsmctl .
+          cd ..
+          chmod 0755 work/payload/bin/dsmctl
+          file work/payload/bin/dsmctl
+          readelf -h work/payload/bin/dsmctl | tee work/ELF_HEADER.txt
+          go version -m work/payload/bin/dsmctl | tee work/GO_BUILD_INFO.txt
+          file work/payload/bin/dsmctl | grep -Eq 'ELF 32-bit.*ARM'
+          readelf -h work/payload/bin/dsmctl | grep -Eq 'Class:[[:space:]]+ELF32'
+          readelf -h work/payload/bin/dsmctl | grep -Eq 'Machine:[[:space:]]+ARM'
+
+      - name: Assemble DSM 7 package payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp upstream/README.md upstream/LICENSE work/payload/
+          tar -C work/payload -czf work/spk/package.tgz .
+
+          cat > work/spk/INFO <<'EOF'
+          package="dsmctl"
+          version="0.1.3-0001"
+          os_min_ver="7.0-40000"
+          displayname="dsmctl"
+          description="CLI and MCP server for Synology DSM WebAPI, packaged for DS216 / armada38x."
+          arch="armada38x"
+          maintainer="Lawrence Christian (upstream); SPK wrapper for Patrick"
+          support_url="https://github.com/laurenschristian/dsmctl"
+          thirdparty="yes"
+          startable="no"
+          ctl_stop="no"
+          silent_install="yes"
+          silent_upgrade="yes"
+          silent_uninstall="yes"
+          EOF
+
+          cat > work/spk/conf/privilege <<'EOF'
+          {
+            "defaults": {
+              "run-as": "package"
+            }
+          }
+          EOF
+
+          for script in preinst postinst preuninst postuninst preupgrade postupgrade; do
+            cat > "work/spk/scripts/$script" <<'EOF'
+          #!/bin/sh
+          exit 0
+          EOF
+            chmod 0755 "work/spk/scripts/$script"
+          done
+
+          cat > work/spk/scripts/start-stop-status <<'EOF'
+          #!/bin/sh
+          case "$1" in
+            start|stop|status)
+              exit 0
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
+          EOF
+          chmod 0755 work/spk/scripts/start-stop-status
+
+          cp upstream/LICENSE work/spk/LICENSE
+
+      - name: Generate DSM package icons
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          src = Image.open("upstream/assets/icon.png").convert("RGBA")
+          src.resize((64,64), Image.Resampling.LANCZOS).save("work/spk/PACKAGE_ICON.PNG")
+          src.resize((256,256), Image.Resampling.LANCZOS).save("work/spk/PACKAGE_ICON_256.PNG")
+          PY
+
+      - name: Pack and validate SPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="dsmctl_0.1.3-0001_ds216_armada38x_dsm7.spk"
+          tar -C work/spk -cf "$out" .
+          sha256sum "$out" | tee "$out.sha256"
+
+          mkdir -p verify
+          tar -xf "$out" -C verify
+          test -f verify/INFO
+          test -f verify/package.tgz
+          test -f verify/conf/privilege
+          test -x verify/scripts/start-stop-status
+          grep -Fx 'arch="armada38x"' verify/INFO
+          grep -Fx 'os_min_ver="7.0-40000"' verify/INFO
+          tar -tzf verify/package.tgz | grep -Fx './bin/dsmctl'
+
+          mkdir -p verify-payload
+          tar -xzf verify/package.tgz -C verify-payload
+          file verify-payload/bin/dsmctl | grep -Eq 'ELF 32-bit.*ARM'
+          sha256sum verify-payload/bin/dsmctl | tee dsmctl_armv7_binary.sha256
+
+          {
+            echo "Upstream: https://github.com/laurenschristian/dsmctl"
+            echo "Upstream tag: v0.1.3"
+            echo "Upstream commit: 15ed0b101fc802850f08ae1558d945458a79eb54"
+            echo "Target: Synology DS216"
+            echo "Synology package arch: armada38x"
+            echo "Go target: linux/arm GOARM=7 CGO_ENABLED=0"
+            echo "DSM minimum: 7.0-40000"
+            echo
+            cat work/ELF_HEADER.txt
+            echo
+            cat work/GO_BUILD_INFO.txt
+          } > BUILD_PROVENANCE.txt
+
+      - name: Upload SPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsmctl-ds216-armada38x-spk-v0.1.3
+          path: |
+            dsmctl_0.1.3-0001_ds216_armada38x_dsm7.spk
+            dsmctl_0.1.3-0001_ds216_armada38x_dsm7.spk.sha256
+            dsmctl_armv7_binary.sha256
+            BUILD_PROVENANCE.txt
+          if-no-files-found: error
+          retention-days: 7
