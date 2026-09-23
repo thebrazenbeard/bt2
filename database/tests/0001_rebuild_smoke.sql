@@ -108,6 +108,25 @@ INSERT INTO bt2.migration_receipts(
   ),clock_timestamp(),clock_timestamp()
 );
 
+-- Migration 0022 requires every BYTE_PRESERVED_VERIFIED registration to be
+-- cross-bound to normalized preservation provenance. Keep this synthetic
+-- fixture inside the rollback-contained smoke transaction.
+INSERT INTO bt2.training_preservation_provenance_bindings_v1(
+  preservation_migration_key,agent_key,version,source_repository,source_ref,
+  source_commit,source_tree,source_package_path,target_manifest_path,
+  package_tree_git_sha1,manifest_blob_git_sha1,provenance_digest_sha256
+) VALUES (
+  'CI-TRAINING-TWO-PRESERVATION','two','ci-v1','ci/source','ci-ref',
+  repeat('c',40),repeat('d',40),'training/roles/two/ci-v1',
+  'archive/training-sources/ci/two/v1/TRAINING_MANIFEST.yaml',
+  repeat('b',40),repeat('e',40),
+  bt2.training_preservation_provenance_digest_v1(
+    'two','ci-v1','ci/source','ci-ref',repeat('c',40),repeat('d',40),
+    'training/roles/two/ci-v1','archive/training-sources/ci/two/v1/TRAINING_MANIFEST.yaml',
+    repeat('b',40),repeat('e',40)
+  )
+);
+
 DO $test$
 DECLARE v_id1 uuid; v_id2 uuid; v_rejected boolean:=false;
 BEGIN
