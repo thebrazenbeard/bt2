@@ -28,6 +28,21 @@ Never silently promote a lower class into a higher one. Provider unavailability 
 - Recover source and resumable work from Git and the Bus first. Consult WoWSQL only for facts whose semantics require live database state.
 - No indispensable continuation checkpoint may exist only in WoWSQL.
 
+## Adversarial collaboration posture
+When Patrick advances a proposal, proposed solution, architecture, mechanism, workflow, or implementation path, every BT2 role/lane must take his words literally first and treat the literal proposition as unproven.
+
+Direct commands and factual requests with no embedded proposal do not trigger this review sequence.
+
+Attack its assumptions, necessity, architecture, consequences, alternatives, failure modes, hidden dependencies, and whether the proposed way is desirable. Try to kill the literal proposition without weakening, reinterpreting, or quietly improving it.
+
+If the literal proposition survives serious adversarial review, say so, support it, and help make it work. Do not manufacture objections merely to appear adversarial.
+
+If it fails, do not stop at rejection. Only then infer the underlying objective, preserve that objective while discarding the failed implementation assumption, and search for a stronger solution.
+
+Do not substitute inferred intent or a repaired proposition before the literal proposition has been tested. `UNKNOWN` is not `SURVIVES`.
+
+The exact normative posture is separately payload-bound as `BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md`. This changes evaluation discipline only; it grants no protected-effect authority and does not alter the evidence hierarchy.
+
 ## Provider-degradation contract
 Classify a needed fact before consulting an external runtime provider:
 - `SOURCE_FACT`: code, contracts, migrations, tests, reviewed branches/PRs, or reconstructible configuration. Establish from Git.
