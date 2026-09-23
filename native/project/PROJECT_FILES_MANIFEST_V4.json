@@ -3,8 +3,8 @@
   "project": "Build Team Two",
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
-  "payload_source_commit": "a095772f114e47562a027c5adc03816065eee20d",
-  "payload_source_tree": "e52879bab6e9cde3b2fbb87b05647ac45b94744d",
+  "payload_source_commit": "6c8b75d8cb5e7d090dba5c505588484b6c4b4938",
+  "payload_source_tree": "814a873d6fca41e2e080aedb07b24f0b186319ca",
   "content_binding": "exact Git blob IDs under one reviewed payload source commit/tree",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob)+newline)",
   "payload_digest": "2c078638ef79713d8a5c2b88252d08d31da7940d38928664d0f225731908599a",
@@ -62,12 +62,12 @@
   },
   "installer": {
     "path": "native/project/INSTALL_V4.md",
-    "git_blob": "fd1b86aab3e4b4aa38ff31e5254afe4bb6ce2562"
+    "git_blob": "8d335b702fdc6559e67b810ab61833c221c3aa15"
   },
   "lantern_package": {
     "version": "V4",
-    "source_commit": "a095772f114e47562a027c5adc03816065eee20d",
-    "source_tree": "e52879bab6e9cde3b2fbb87b05647ac45b94744d",
+    "source_commit": "6c8b75d8cb5e7d090dba5c505588484b6c4b4938",
+    "source_tree": "814a873d6fca41e2e080aedb07b24f0b186319ca",
     "same_subject_required": true
   },
   "installation_rule": "Install Project Instructions V4, the V2 core runtime/recovery/coding files, the provider-degradation contract, and exactly the four Lantern V4 files from this payload subject. Retain older V1/V2/V3 files as historical/inactive material rather than mixing them into the active package.",
@@ -76,5 +76,15 @@
   "wowsql_unavailable_behavior": "RUNTIME_ONLY_AND_LANTERN_CURRENTNESS_UNKNOWN; INDEPENDENT_SOURCE_WORK_CONTINUES",
   "supabase_lantern_fallback": "FORBIDDEN",
   "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES",
-  "payload_digest_members": "project_instructions + required_project_files"
+  "payload_digest_members": "project_instructions + required_project_files",
+  "qualification_support": [
+    {
+      "path": "tools/qualification/verify_native_project_v4.py",
+      "git_blob": "534b11eb0b1d2812cbf37ffbb7899adec9674b86"
+    },
+    {
+      "path": ".github/workflows/native-project-v4-qualification.yml",
+      "git_blob": "7cc5cf4701d1936a1e50767632686594ae3127cf"
+    }
+  ]
 }
