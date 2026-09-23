@@ -63,6 +63,24 @@ BEGIN
     RAISE EXCEPTION 'BT2_REBUILD_TRAINING_STATE_COLLAPSED';
   END IF;
 
+  IF (SELECT count(*) FROM bt2.training_preservation_digest_bindings_v1) <> 13 THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_COUNT_MISMATCH';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM bt2.training_packages tp
+    JOIN bt2.migration_receipts mr
+      ON mr.migration_receipt_id=tp.preservation_receipt_id
+    LEFT JOIN bt2.training_preservation_digest_bindings_v1 db
+      ON db.preservation_migration_key=mr.migration_key
+    WHERE db.preservation_migration_key IS NULL
+       OR tp.manifest_digest_sha256 IS DISTINCT FROM db.manifest_digest_sha256
+       OR tp.source_set_digest_sha256 IS DISTINCT FROM db.source_set_digest_sha256
+  ) THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_MISMATCH';
+  END IF;
+
   IF (SELECT count(*) FROM bt2.training_qualifications) <> 0
      OR (SELECT count(*) FROM bt2.training_installation_events) <> 0 THEN
     RAISE EXCEPTION 'BT2_REBUILD_FABRICATED_TRAINING_QUALIFICATION_OR_INSTALLATION';
@@ -114,7 +132,7 @@ BEGIN
     SELECT 1 FROM bt2.migration_receipts
     WHERE migration_key='BT2-PROJECT-LANTERN-COHOSTED-HISTORY-V2'
       AND result_state='VERIFIED'
-      AND evidence->>'combined_rows_sha256'='6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712'
+      AND evidence->>'archive_sha256'='6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712'
   ) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_HISTORY_V2_RECEIPT_MISSING';
   END IF;
@@ -138,11 +156,11 @@ BEGIN
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2' AND p.proname='append_material_v1'
-    AND pg_get_function_identity_arguments(p.oid)='uuid, text, text, text, text, text';
+    AND oidvectortypes(p.proargtypes)='uuid, text, text, text, text, text';
 
   IF NOT coalesce(v_secdef,false)
      OR v_owner <> 'postgres'
-     OR NOT coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
+     OR v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[]
      OR coalesce(v_public_exec,true)
      OR NOT coalesce(v_postgres_exec,false) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_PRODUCER_BOUNDARY_MISMATCH';

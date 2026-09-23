@@ -4,7 +4,7 @@ Status: HOSTED-RUNTIME COMPATIBILITY CONTRACT
 
 ## Purpose
 
-`database/migrations/0018_lantern_producer_boundary_v1.sql` defines the strict reconstruction target for ordinary PostgreSQL 16: the Lantern producer function is owned by `postgres`, is `SECURITY DEFINER`, has fixed `search_path=pg_catalog, bt2, pg_temp`, grants execute to `postgres`, and removes PUBLIC function execute.
+Canonical reconstruction establishes the producer boundary in sequence: migration `0018_lantern_producer_boundary_v1.sql` sets owner/`SECURITY DEFINER`/ACL controls, and migration `0021_lantern_producer_temp_schema_hardening_v1.sql` tightens the function-local path to `search_path=pg_catalog, bt2, pg_temp`.
 
 Hosted WoWSQL currently rejects `REVOKE` through both its MCP/control API and dashboard SQL Editor as a dangerous operation. Its session-pooler login also maps to a restricted project role rather than the owning `postgres` role.
 
@@ -43,6 +43,6 @@ Live WoWSQL readback established:
 
 ## Reconstruction and future tightening
 
-Do not weaken migration 0018 or rollback qualification 0008. Blank PostgreSQL 16 rebuilds must continue to prove the stricter ACL with PUBLIC function execute removed.
+Do not rewrite applied migration 0018. Migration 0021 is the forward hardening step for existing installations, while rollback qualification 0008 and the canonical reconstruction oracle prove the final strict ACL plus explicit `pg_temp`-last search path.
 
 If WoWSQL exposes an owner-capable path for function configuration, first tighten the live function-local search path to `pg_catalog, bt2, pg_temp` and verify it by readback. If WoWSQL later permits the strict `REVOKE`, also apply the source-defined ACL and retire this hosted exception after readback. Until both applicable controls are verified, do not label the hosted producer boundary accepted merely because no non-owner login is currently reachable.

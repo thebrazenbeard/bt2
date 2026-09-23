@@ -3,7 +3,7 @@ name: Database rebuild qualification
 on:
   push:
     branches:
-      - 'work/two-canonical-platform-integrity-v1'
+      - 'main'
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
@@ -40,22 +40,34 @@ jobs:
     env:
       PGPASSWORD: postgres
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bt2_ci
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
-      - name: Verify PostgreSQL client
-        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
+      - name: Verify PostgreSQL client and bind service container
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
+          docker inspect '${{ job.services.postgres.id }}' --format '{{.Id}} {{.Image}} {{.Config.Image}} {{.State.Running}}'
+          echo "POSTGRES_CONTAINER_ID=${{ job.services.postgres.id }}" >> "$GITHUB_ENV"
+
+      - name: Qualification image-identity regressions
+        run: |
+          python -m unittest discover -s tests -p 'test_postgres_qualification_image_identity.py'
 
       - name: Canonical PostgreSQL 16 blank rebuild
         run: |
           python tools/qualification/run_postgres16_blank_rebuild.py \
             --database-url "$DATABASE_URL" \
+            --postgres-container-id "$POSTGRES_CONTAINER_ID" \
             --evidence-out /tmp/bt2_blank_rebuild_evidence.json
 
       - name: True multi-session Lantern concurrency
         run: |
           python tools/qualification/run_lantern_multisession_concurrency_v2.py \
             --database-url "$DATABASE_URL" \
+            --postgres-container-id "$POSTGRES_CONTAINER_ID" \
             --evidence-out /tmp/bt2_lantern_concurrency_evidence.json
 
       - name: Evidence summary
