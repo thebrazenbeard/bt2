@@ -1,0 +1,85 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V4",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "payload_source_commit": "85c0d5f9263445d579c562ca42905f0d053b462f",
+  "payload_source_tree": "8cedb1c251027319c2c8b3f9aac3066d3c9f8c50",
+  "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
+  "payload_digest": "c4d9f8b49d12bebe3a1e883afd2288388b89df66b452cdc7365733025c5d93b4",
+  "runtime_backend": "WoWSQL:bt2-479e4ad9",
+  "general_bt2_availability_dependency": false,
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
+    "git_blob": "06f12cf4dcd0fed281307e2c8b4448821593a4ca",
+    "sha256": "6b4446a87b2d1c92a1b2c187f4f1198ffd5b13b2b33db03f08aa302cfbfe0c97"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V2.md",
+      "git_blob": "f189ad28f04bf58bd9f2dd6d51f8e485c5bdc022",
+      "sha256": "cb7b1fc94ec68dcac98d09b663420962b777e2ac0067afde238746c335b048c5"
+    },
+    {
+      "path": "native/project/BT2_CODING_OPERATIONS_V2.md",
+      "git_blob": "1dd88def94cf3a33f9ac38d64e45e2722629ea79",
+      "sha256": "a00308cf016ea6f7c7ec3861aa29f49788e4fe9d9662ab9a44feee9bb258f700"
+    },
+    {
+      "path": "native/project/BT2_RECOVERY_AND_STATE_V2.md",
+      "git_blob": "31a315a65f1552593a0b2d5ab44fe7da91cb93d4",
+      "sha256": "3dd99d3a643e89b4b256529c0d74773aafd9334bf9509113d0737d94784ba3a1"
+    },
+    {
+      "path": "docs/runtime/RUNTIME_PROVIDER_DEGRADATION_V1.md",
+      "git_blob": "d9a3f8539cebd8919371f865a4d3d5eb060ceace",
+      "sha256": "61d7f984c0ef4ea5605b70fb69cf5f658d23d2ccd03d96bbb9c75ecefcf4d750"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V3.md",
+      "git_blob": "4dec3d96dd124f67d26459752c880949f4f93789",
+      "sha256": "1aec5476e4e4cbea495f600226ba3c2c69d31d35474148e2cc5375039277b921"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V3.md",
+      "git_blob": "98188148be3c42500a0986371f9ea48b17b19b73",
+      "sha256": "717c7a698d97b1a983e4d6cad3c6c139e8e54a8140f660b2e925ac35f924150c"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V3.md",
+      "git_blob": "9d8903de1ca5683d64f812df60c1e40dc6576028",
+      "sha256": "551d589ba4981f41275eefcdf0a4d108a952de9c071ba7476f9674272f67a58c"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V3.md",
+      "git_blob": "f5870c2c06c313967a998f09de9e3836c338fad4",
+      "sha256": "81536cb4b3f66605d34fad9333da125bd49610cbb538cf4740d48aa9023ad228"
+    },
+    {
+      "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
+      "git_blob": "17593d4e3601590d8af9a9dd72692c55cb128fc9",
+      "sha256": "0dca117746d948d79f6b931c47a5fc78e8b40aa67cb9376f86296656497137e9"
+    },
+    {
+      "path": "docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md",
+      "git_blob": "a3ea01eedc70f5c13d09115b690cf9a60bf85b87",
+      "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
+    }
+  ],
+  "source_validation": {
+    "path": "specs/BT2_RUNTIME_PROVIDER_RESILIENCE_V1.yaml",
+    "git_blob": "04fae743ab2ab8303ddd35bf444f93a64f3a9299",
+    "sha256": "438614cfe90d76f73a6baf949be4911689395afa8f0a8aa64509efecffbe872d"
+  },
+  "installer": {
+    "path": "native/project/INSTALL_V4.md",
+    "git_blob": "b98955d7ea91f79a7f01c1d40a450f04c23eaee9",
+    "sha256": "62cd0d698055097a7c5b1c067172c6e9ec834cade98a200f5c1670be9ba8235b"
+  },
+  "installation_rule": "Install Project Instructions V4 plus the V2 core runtime/recovery/coding files and provider-degradation contract; retain the exact V3 Lantern files and existing Hyperconnectome/Plasticity files. Do not delete prior versions merely because V4 supersedes them for active use.",
+  "runtime_mode": "CLAIM_DOMAIN_SCOPED_PROVIDER_DEPENDENCY",
+  "lantern_runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
+  "wowsql_unavailable_behavior": "RUNTIME_ONLY_AND_LANTERN_CURRENTNESS_UNKNOWN; INDEPENDENT_SOURCE_WORK_CONTINUES",
+  "supabase_lantern_fallback": "FORBIDDEN",
+  "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
+}
