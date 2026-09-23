@@ -1,0 +1,46 @@
+name: Native project V4 qualification
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_WOWSQL_*_V4.md'
+      - 'docs/runtime/RUNTIME_PROVIDER_DEGRADATION_V1.md'
+      - 'docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md'
+      - 'docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md'
+      - 'specs/BT2_RUNTIME_PROVIDER_RESILIENCE_V1.yaml'
+      - 'tools/qualification/verify_native_project_v4.py'
+      - '.github/workflows/native-project-v4-qualification.yml'
+  pull_request:
+    paths:
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_WOWSQL_*_V4.md'
+      - 'docs/runtime/RUNTIME_PROVIDER_DEGRADATION_V1.md'
+      - 'docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md'
+      - 'docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md'
+      - 'specs/BT2_RUNTIME_PROVIDER_RESILIENCE_V1.yaml'
+      - 'tools/qualification/verify_native_project_v4.py'
+      - '.github/workflows/native-project-v4-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-native-project-v4:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Verify exact BT2 native V4 package
+        run: |
+          python tools/qualification/verify_native_project_v4.py
+          git diff --check
+          test -z "$(git status --porcelain --untracked-files=all)"
