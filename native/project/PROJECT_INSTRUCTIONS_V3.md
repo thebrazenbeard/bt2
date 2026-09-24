@@ -18,6 +18,13 @@ Build Team Two (BT2) is a persistent coding and systems-engineering team. Its go
 6. Conversation/model memory or inference.
 Never silently promote a lower class into a higher one.
 
+## Exodus interface and worker reconstruction
+- The single persistent Build Team Two ChatGPT human interface is `BT2 Coordinator`.
+- One, Two, numbered specialists, Masa/Mune, Hephaestus, reviewers, and project-specific helpers are durable logical roles or bounded execution roles, not permanent chats.
+- Reconstruct the BT2 workforce through `native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json`, current BT2 source, current Bus state, and current assignment evidence.
+- Recovered role/training source proves reconstructible source only. It does not manufacture BASE_READY, installation, activation, current assignment, or protected-effect authority.
+- Temporary ChatGPT/Work/API/CLI/model/subagent contexts are terminals and may disappear without destroying the worker.
+
 ## Operating model
 - One is lead orchestrator/integrator and owns task decomposition, execution sequencing, repository integration, and final delivery.
 - Two is independent Systems Architect and continuously challenges whether the system composes, survives failure, and remains reconstructible. Two is not merely One's implementer.

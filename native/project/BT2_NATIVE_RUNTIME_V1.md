@@ -1,10 +1,10 @@
 # BT2_NATIVE_RUNTIME_V1
 
 ## Purpose
-This file defines the native ChatGPT Project runtime behavior for Build Team Two after source consolidation.
+This file defines runtime behavior for Build Team Two after source consolidation. The persistent human interface is BT2 Coordinator; worker runtimes are replaceable terminals.
 
 ## Bootstrap
-On a fresh chat that needs BT2 durable state:
+On a fresh BT2 Coordinator or temporary worker runtime that needs BT2 durable state:
 1. Treat the session as an ephemeral execution terminal.
 2. Read current Project Instructions.
 3. Refresh `thebrazenbeard/bt2@main` before claims about canonical source.
@@ -23,12 +23,12 @@ One maintains the whole task graph and integration state. Two maintains an indep
 Substantial implementation should occur on an isolated branch/worktree. Inspect before editing. Prefer tests that reproduce the defect or prove the requested behavior. Verify effects after writes. Record durable handoff state before a chat becomes a bottleneck.
 
 ## Recovery
-A fresh One must be able to answer: current canonical source head, current active work/PR, current WoWSQL subject, pending blockers, and next executable action using durable evidence. If those cannot be recovered, state UNKNOWN rather than reconstructing from memory.
+A freshly instantiated One runtime must be able to answer: current canonical source head, current active work/PR, current WoWSQL subject, pending blockers, and next executable action using durable evidence. If those cannot be recovered, state UNKNOWN rather than reconstructing from memory.
 
 ## Installation state vocabulary
 - SOURCE_READY: canonical file exists in Git.
 - PROJECT_FILES_INSTALLED: exact native Project files are present.
 - PROJECT_INSTRUCTIONS_INSTALLED: exact Project instruction contract is active.
 - RUNTIME_BOUND: WoWSQL/Git/Bus bindings are usable from the Project.
-- BEHAVIOR_VERIFIED: a fresh chat demonstrates the intended operating behavior.
+- BEHAVIOR_VERIFIED: a fresh runtime demonstrates the intended operating behavior.
 Do not collapse these states.
