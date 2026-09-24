@@ -14,6 +14,8 @@ import argparse
 import json
 import os
 from pathlib import Path
+
+from bt2_build_manifest import load_and_verify_manifest
 import shutil
 import subprocess
 import sys
@@ -71,22 +73,16 @@ def assert_empty(url: str) -> None:
         raise SystemExit(f"qualification database is not blank: {relation_count} BT2 relations already exist")
 
 
-def manifest_path() -> Path:
-    v2 = DB / "BUILD_MANIFEST_V2.json"
-    return v2 if v2.is_file() else DB / "BUILD_MANIFEST_V1.json"
-
-
 def check_manifest(expected_digest: str | None) -> str:
-    path = manifest_path()
-    manifest = json.loads(path.read_text(encoding="utf-8"))
-    digest = manifest["package_identity"]["package_digest_sha256"]
-    if expected_digest and digest != expected_digest:
-        raise SystemExit(f"package digest mismatch: manifest={digest} expected={expected_digest}")
-    if int(manifest["target"]["qualified_major_version"]) != 16:
-        raise SystemExit("source build manifest baseline is not PostgreSQL 16-qualified")
-    print(f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}", flush=True)
+    path, _manifest, digest = load_and_verify_manifest(
+        expected_digest=expected_digest,
+        postgres_major=17,
+    )
+    print(
+        f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}",
+        flush=True,
+    )
     return digest
-
 
 def main() -> int:
     ap = argparse.ArgumentParser()
