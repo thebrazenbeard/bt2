@@ -64,6 +64,30 @@
       "result": "PASS_WITH_REFERENCE_DEBT",
       "work": "Verified current main has no open PR/issue frontier and current Verify Achilles runs pass. No speculative code change made.",
       "debt": "PROTOCOL_V2_CURRENT.md and README still reference the historical private thebrazenbeard/build-team-2.0 regression suite; canonical thebrazenbeard/bt2 does not currently contain that path, so migration requires an explicit source/provenance decision rather than copying private material into public Achilles."
+    },
+    {
+      "repo": "thebrazenbeard/driftguard",
+      "frontier": "PR #40",
+      "exact_head": "33b75523a1130c614c270f3de45417e1acf4e32b",
+      "result": "PASS_SOURCE_CI",
+      "work": "Implemented the current-main-native mechanical subset of the former effect-authorization CAS design: atomic effect reservation/fence, pre-dispatch cancellation, single-use dispatch claim, generic-ack bypass prevention, and explicit permit-not-authority ceiling.",
+      "validation": {
+        "tests_run": 35940612941,
+        "action_smoke_run": 35940613243,
+        "ubuntu": "PASS",
+        "windows": "PASS"
+      }
+    },
+    {
+      "repo": "thebrazenbeard/unbound-sol",
+      "frontier": "PR #38",
+      "exact_head": "e05cc2e648b7ead7768abec9c83a766ee4c6ad9f",
+      "result": "PASS_CONTINUITY",
+      "work": "Composed the independent vera-mono volatile-donor review lineage (#32/#33) with the active Behavior V3/observation/model-bus lineage (#34/#35/#37), merging the only overlapping validator path without dropping either claim ceiling.",
+      "validation": {
+        "continuity_run": 35940775841,
+        "result": "PASS"
+      }
     }
   ],
   "verified_existing_frontiers": [
@@ -103,13 +127,13 @@
   "next_source_frontiers": [
     {
       "priority": 1,
-      "repo": "thebrazenbeard/driftguard",
-      "action": "Refresh PR #34 exact head and preserve the benchmark/effect-fence composition boundary before new work."
+      "repo": "thebrazenbeard/meso-crct",
+      "action": "Refresh the salience-first V2 exact head and advance from architecture/proxy mechanisms into one executable salience/recruitment qualification slice."
     },
     {
       "priority": 2,
-      "repo": "thebrazenbeard/unbound-sol",
-      "action": "Reconcile the active PR #30/#32/#33/#34/#35/#37 stack into an explicit current development DAG without merging protected effects."
+      "repo": "thebrazenbeard/vera_model_training",
+      "action": "Continue source/static qualification and execute only genuinely zero-cost Hugging Face smoke; paid compute remains blocked."
     },
     {
       "priority": 3,
@@ -118,16 +142,6 @@
     },
     {
       "priority": 4,
-      "repo": "thebrazenbeard/driftguard",
-      "action": "Refresh PR #34 exact head and preserve the benchmark/effect-fence composition boundary before new work."
-    },
-    {
-      "priority": 5,
-      "repo": "thebrazenbeard/unbound-sol",
-      "action": "Reconcile the active PR #30/#32/#33/#34/#35/#37 stack into an explicit current development DAG without merging protected effects."
-    },
-    {
-      "priority": 6,
       "repo": "thebrazenbeard/vera_model_training",
       "action": "Run only a genuinely zero-cost Hugging Face smoke when available; otherwise keep paid compute blocked and continue source/static qualification."
     }
