@@ -13,10 +13,9 @@ from pathlib import Path
 import shutil
 
 import run_lantern_multisession_concurrency as races
+from bt2_build_manifest import load_and_verify_manifest
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "database" / "BUILD_MANIFEST_V2.json"
-
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -29,13 +28,15 @@ def main() -> int:
         raise SystemExit("DATABASE_URL or --database-url is required")
     if shutil.which("psql") is None:
         raise SystemExit("psql is required on PATH")
-    if not MANIFEST.is_file():
-        raise SystemExit("BUILD_MANIFEST_V2.json is required")
-
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    package_digest = manifest["package_identity"]["package_digest_sha256"]
-    if args.expected_package_digest and args.expected_package_digest != package_digest:
-        raise SystemExit(f"package digest mismatch: manifest={package_digest} expected={args.expected_package_digest}")
+    manifest_path, _manifest, package_digest = load_and_verify_manifest(
+        expected_digest=args.expected_package_digest,
+        postgres_major=16,
+    )
+    print(
+        f"QUALIFICATION_MANIFEST={manifest_path.relative_to(ROOT)} "
+        f"package_digest={package_digest}",
+        flush=True,
+    )
 
     version = races.scalar(args.database_url, "SHOW server_version_num;")
     if not version.startswith("16"):
