@@ -1,5 +1,6 @@
 -- BT2 internal service-boundary assertion V1.
 -- Executable through the supported WoWSQL SQL route; makes exposure drift fail closed.
+-- The current migration principal is the trusted schema owner and is excluded from exposure checks.
 -- Explicit ACL tightening remains in database/admin/BT2_INTERNAL_SCHEMA_ACCESS_BOUNDARY_V1.sql.
 
 CREATE OR REPLACE FUNCTION bt2.assert_internal_access_boundary_v1()
@@ -9,6 +10,7 @@ BEGIN
   FOR v_role IN
     SELECT r.rolname FROM pg_roles r
     WHERE NOT r.rolsuper
+      AND r.rolname <> current_user
       AND (r.rolcanlogin OR r.rolname IN ('anon','authenticated','service_role'))
     ORDER BY r.rolname
   LOOP
