@@ -45,7 +45,9 @@ jobs:
       PGPASSWORD: postgres
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bt2_ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Verify PostgreSQL client
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
@@ -91,11 +93,15 @@ jobs:
     env:
       DATABASE_URL: postgresql://bt2admin:bt2admin@localhost:5432/bt2_ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Prepare managed-service-style non-superuser owner
         run: |
-          PGPASSWORD=postgres psql             postgresql://postgres:postgres@localhost:5432/bt2_ci             -v ON_ERROR_STOP=1 <<'SQL'
+          PGPASSWORD=postgres psql \
+            postgresql://postgres:postgres@localhost:5432/bt2_ci \
+            -v ON_ERROR_STOP=1 <<'SQL'
           CREATE ROLE bt2admin
             LOGIN PASSWORD 'bt2admin'
             CREATEDB CREATEROLE NOSUPERUSER;
@@ -104,16 +110,23 @@ jobs:
 
       - name: Verify managed owner role
         run: |
-          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atqc             "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atqc \
+            "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb
              FROM pg_roles WHERE rolname=current_user;"
 
       - name: PostgreSQL 17 managed-role canonical rebuild compatibility
         run: |
-          PGPASSWORD=bt2admin python             tools/qualification/run_postgres17_blank_rebuild_compatibility.py             --database-url "$DATABASE_URL"             --evidence-out /tmp/bt2_pg17_rebuild_evidence.json
+          PGPASSWORD=bt2admin python \
+            tools/qualification/run_postgres17_blank_rebuild_compatibility.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_pg17_rebuild_evidence.json
 
       - name: PostgreSQL 17 managed-role Lantern concurrency
         run: |
-          PGPASSWORD=bt2admin python             tools/qualification/run_lantern_multisession_concurrency_v2.py             --database-url "$DATABASE_URL"             --evidence-out /tmp/bt2_pg17_lantern_concurrency_evidence.json
+          PGPASSWORD=bt2admin python \
+            tools/qualification/run_lantern_multisession_concurrency_v2.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_pg17_lantern_concurrency_evidence.json
 
       - name: PostgreSQL 17 evidence summary
         if: always()
