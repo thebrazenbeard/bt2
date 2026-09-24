@@ -1,6 +1,6 @@
 {
   "schema": "BT2_REPOSITORY_ESTATE_CENSUS_V1",
-  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL_WITH_2026_09_23_ESTATE_DELTA",
+  "status": "CURRENT_66_REPO_ESTATE_WITH_QUALIFIED_ACTIVE_FRONTIERS",
   "generated_date": "2026-09-20",
   "owner": "thebrazenbeard",
   "enumeration_count": 66,
@@ -335,7 +335,18 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 444,
-      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+      "census_state": "QWEN_SOURCE_ADAPTED_COST_GATE_BLOCKED",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "QWEN35_EXACT_BASE_FROZEN",
+        "TEXT_ONLY_ADAPTER_SOURCE",
+        "HF_PAID_COMPUTE_BLOCKED"
+      ],
+      "notes": [
+        "Draft PR #46 exact head 8a5bd42839bc88d2fa7580a4c77d53c844d03a01 corrects continuation state and preserves the exact Qwen3.5 text-only training contract.",
+        "Hugging Face Jobs is billable; no genuinely zero-cost Jobs GPU path was established and no training job was launched."
+      ]
     },
     {
       "name": "abil",
@@ -749,15 +760,18 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 316,
-      "census_state": "PARTIALLY_QUALIFIED",
+      "census_state": "RECRUITMENT_TRANSITION_QUALIFIED_DRAFT",
       "head": "6ca7873bf066178aa2a21cd9244f500a3ab1c845",
-      "open_pr_count": 3,
+      "open_pr_count": 4,
       "states": [
         "ACTIVE_IMPLEMENTATION",
-        "SALIENCE_ARCHITECTURE_FRONTIER"
+        "SALIENCE_ARCHITECTURE_FRONTIER",
+        "EXECUTABLE_RECRUITMENT_TRANSITION",
+        "EXACT_HEAD_CI_PASS"
       ],
       "notes": [
-        "New since the prior 58-repository census. Draft PR #3 head 8316eb3c3a82705e227cb0c275877fae039ab75a is the latest observed salience-first architecture frontier and its existing CI was observed green during the 2026-09-23 run."
+        "Draft PR #4 exact head 22c4a6a4b37abc0ff1e18aa5643848b0b12d122d adds deterministic salience-to-recruitment mechanics and passed Python 3.11/3.12 pytest in run 36030831204.",
+        "Claim ceiling remains synthetic reference mechanics; no biological/phenomenological equivalence is asserted."
       ]
     },
     {
@@ -798,7 +812,7 @@
       ]
     }
   ],
-  "last_updated": "2026-09-23",
+  "last_updated": "2026-09-24",
   "enumeration_history": [
     {
       "date": "2026-09-20",
