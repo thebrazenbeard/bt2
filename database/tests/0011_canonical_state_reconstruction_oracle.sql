@@ -29,7 +29,8 @@ DECLARE
   v_owner text;
   v_config text[];
   v_public_exec boolean;
-  v_postgres_exec boolean;
+  v_owner_exec boolean;
+  v_expected_owner text:=current_user;
 BEGIN
   -- Exact current workforce topology.
   WITH topo AS (
@@ -130,21 +131,21 @@ BEGIN
     RAISE EXCEPTION 'BT2_REBUILD_MIGRATION_RECEIPT_LEDGER_NOT_APPEND_ONLY';
   END IF;
 
-  -- The source-designed producer boundary must be installed in a real PG16 rebuild.
+  -- The source-designed producer boundary must be installed for the active migration principal.
   SELECT p.prosecdef,p.proowner::regrole::text,p.proconfig,
          has_function_privilege('public','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE'),
-         has_function_privilege('postgres','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
-  INTO v_secdef,v_owner,v_config,v_public_exec,v_postgres_exec
+         has_function_privilege(current_user,'bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
+  INTO v_secdef,v_owner,v_config,v_public_exec,v_owner_exec
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2' AND p.proname='append_material_v1'
     AND pg_get_function_identity_arguments(p.oid)='uuid, text, text, text, text, text';
 
   IF NOT coalesce(v_secdef,false)
-     OR v_owner <> 'postgres'
+     OR v_owner <> v_expected_owner
      OR NOT coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
      OR coalesce(v_public_exec,true)
-     OR NOT coalesce(v_postgres_exec,false) THEN
+     OR NOT coalesce(v_owner_exec,false) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_PRODUCER_BOUNDARY_MISMATCH';
   END IF;
 END
