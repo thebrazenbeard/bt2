@@ -1,7 +1,7 @@
 {
   "schema": "BT2_CURRENT_PORTFOLIO_FRONTIER_V3",
-  "status": "PORTFOLIO_EXECUTION_IN_PROGRESS",
-  "date": "2026-09-23",
+  "status": "CLEAN_CHECKPOINT_WITH_EXPLICIT_BLOCKERS",
+  "date": "2026-09-24",
   "owned_repository_count": 66,
   "evidence_order": [
     "current live user instruction",
@@ -40,9 +40,19 @@
     {
       "repo": "thebrazenbeard/vera_model_training",
       "frontier": "PR #46",
-      "exact_head": "d4a975d97277c3721f1613fdb02dee3c88faff07",
-      "result": "SOURCE_ADAPTED_NOT_RUNTIME_QUALIFIED",
-      "work": "Pinned rodrigomt/Qwen3.5-4B-Uncensored-Aggressive at cec7eb63d667bf2e7928e54598cb5f46aa3bdaaa; added a text-only fail-closed substrate adapter, hybrid-attention/MLP LoRA target contract, Qwen-specific training entrypoint, deterministic source tests, and updated durable training plan. No GPU run or paid compute occurred."
+      "exact_head": "8a5bd42839bc88d2fa7580a4c77d53c844d03a01",
+      "result": "SOURCE_ADAPTED_BASE_FROZEN_COST_GATE_BLOCKED",
+      "work": "Corrected stale continuation state to the frozen Qwen3.5 source revision, bound composite-checkpoint to text-only AutoModelForCausalLM contract, added continuation-state regression coverage, and resolved Hugging Face Jobs as billable rather than zero-cost. No training job launched.",
+      "validation": {
+        "frozen_revision": "cec7eb63d667bf2e7928e54598cb5f46aa3bdaaa",
+        "checkpoint_architecture": "Qwen3_5ForConditionalGeneration",
+        "text_loader_contract": "AutoModelForCausalLM -> Qwen3_5ForCausalLM / Qwen3_5TextConfig",
+        "hf_authenticated_account": "thebrazenbeard",
+        "hf_pro": false,
+        "running_jobs": 0,
+        "zero_cost_jobs_gpu_path": false,
+        "runtime_training_pass": false
+      }
     },
     {
       "repo": "thebrazenbeard/WorkBridgeMCP",
@@ -88,21 +98,22 @@
         "continuity_run": 35940775841,
         "result": "PASS"
       }
-    }
-  ],
-  "verified_existing_frontiers": [
-    {
-      "repo": "thebrazenbeard/unbound-sol",
-      "pr": 37,
-      "exact_head": "52d1cbb8dc43c85bfa79d69a8aac0c1ca2ecc421",
-      "observed_result": "HOSTED_ACTIONS_GREEN"
     },
     {
       "repo": "thebrazenbeard/meso-crct",
-      "pr": 3,
-      "exact_head": "8316eb3c3a82705e227cb0c275877fae039ab75a",
-      "observed_result": "HOSTED_ACTIONS_GREEN"
-    },
+      "frontier": "PR #4",
+      "exact_head": "22c4a6a4b37abc0ff1e18aa5643848b0b12d122d",
+      "result": "PASS_SOURCE_CI",
+      "work": "Advanced recruitment from bounded storage to an executable deterministic salience-to-recruitment reference transition with activation/coherence/persistence/resolution decomposition, attention-feedback exclusion, hostile invariants, and explicit synthetic-model claim ceiling.",
+      "validation": {
+        "workflow_run": 36030831204,
+        "python_3_11": "PASS",
+        "python_3_12": "PASS",
+        "full_pytest": "PASS"
+      }
+    }
+  ],
+  "verified_existing_frontiers": [
     {
       "repo": "thebrazenbeard/bt2",
       "pr": 45,
@@ -127,28 +138,22 @@
   "next_source_frontiers": [
     {
       "priority": 1,
-      "repo": "thebrazenbeard/meso-crct",
-      "action": "Refresh the salience-first V2 exact head and advance from architecture/proxy mechanisms into one executable salience/recruitment qualification slice."
+      "repo": "thebrazenbeard/vera_model_training",
+      "status": "BLOCKED_ON_COST_AUTHORITY_OR_FREE_HF_GPU",
+      "action": "Freeze exact V5 + Unbound-Sol corpus digests now; weight-changing Hugging Face smoke remains blocked until billable compute is explicitly authorized or a genuinely free Hugging Face GPU surface with appropriate artifact custody is established."
     },
     {
       "priority": 2,
-      "repo": "thebrazenbeard/vera_model_training",
-      "action": "Continue source/static qualification and execute only genuinely zero-cost Hugging Face smoke; paid compute remains blocked."
-    },
-    {
-      "priority": 3,
-      "repo": "thebrazenbeard/vera_model_training",
-      "action": "Run only a genuinely zero-cost Hugging Face smoke when available; otherwise keep paid compute blocked and continue source/static qualification."
-    },
-    {
-      "priority": 4,
-      "repo": "thebrazenbeard/vera_model_training",
-      "action": "Run only a genuinely zero-cost Hugging Face smoke when available; otherwise keep paid compute blocked and continue source/static qualification."
+      "repo": "thebrazenbeard/driftguard",
+      "status": "FUTURE_SOURCE_FRONTIER",
+      "action": "Implement effect-aware provider verification and acknowledgement/fence release only when a bounded source task is selected; PR #40 deliberately stops before provider I/O or protected-effect authority."
     }
   ],
   "lantern": {
-    "status": "UNKNOWN_NOT_ESTABLISHED_THIS_CUT",
-    "reason": "The exact WoWSQL connector call failed internally before the required projection preflight -> B0 -> payload -> B1 sequence could be established. No provider fallback was used."
+    "status": "UNKNOWN_CONNECTOR_INTERNAL_FAILURE_2026_09_24",
+    "reason": "The exact WoWSQL connector failed internally before the required bt2_project_read projection preflight could return, and a direct get_project sanity check on bt2-479e4ad9 also failed internally. The governed preflight -> B0 -> payload -> B1 sequence was not established. No Supabase/provider/Git/memory fallback was used.",
+    "exact_target": "bt2-479e4ad9",
+    "attempted_contract": "LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V3 / LANTERN_WOWSQL_READ_QUERIES_V3"
   },
   "runtime_tooling": {
     "desktop_commander": "UNAVAILABLE_MONTHLY_USAGE_CAP",
@@ -162,5 +167,20 @@
     "deploy_or_install": "NOT_EXECUTED",
     "provider_or_credential_change": "NOT_EXECUTED",
     "paid_compute": "NOT_EXECUTED"
+  },
+  "current_checkpoint": {
+    "as_of": "2026-09-24",
+    "owned_repository_count": 66,
+    "active_qualified_draft_frontiers": {
+      "fuckup": "PR #1 @ ff46bcf822a89701201e6153be923239814e5b61",
+      "WorkBridgeMCP": "PR #8 @ 6f578307d71b13ab93a8ab9e48bdfc547437a0e5",
+      "driftguard": "PR #40 @ 33b75523a1130c614c270f3de45417e1acf4e32b",
+      "unbound-sol": "PR #38 @ e05cc2e648b7ead7768abec9c83a766ee4c6ad9f",
+      "meso-crct": "PR #4 @ 22c4a6a4b37abc0ff1e18aa5643848b0b12d122d",
+      "vera_model_training": "PR #46 @ 8a5bd42839bc88d2fa7580a4c77d53c844d03a01"
+    },
+    "protected_effects": "NONE_EXECUTED",
+    "lantern": "UNKNOWN",
+    "qwen_training": "BLOCKED_BEFORE_BILLABLE_COMPUTE"
   }
 }
