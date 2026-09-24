@@ -1,0 +1,126 @@
+{
+  "schema": "BT2_CURRENT_PORTFOLIO_FRONTIER_V3",
+  "status": "PORTFOLIO_EXECUTION_IN_PROGRESS",
+  "date": "2026-09-23",
+  "owned_repository_count": 66,
+  "evidence_order": [
+    "current live user instruction",
+    "installed BT2 Project instructions",
+    "exact current Git source and PR/head evidence",
+    "WoWSQL live state when the exact Lantern read contract succeeds",
+    "historical/project material"
+  ],
+  "completed_this_cut": [
+    {
+      "repo": "thebrazenbeard/bt2",
+      "frontier": "PR #44",
+      "exact_head": "42496746d84a9838e465643730028990cdcc1e9f",
+      "result": "PASS",
+      "work": "Rebound the Native Project V4 manifest to a coherent payload source that actually contains the adversarial collaboration project file; exact-head Native project V4 qualification passed."
+    },
+    {
+      "repo": "thebrazenbeard/vera-mono",
+      "frontier": "PR #1",
+      "exact_head": "22559cb8d577a30abc13fb7c79546878d29f75e6",
+      "result": "PASS",
+      "work": "Added Ubuntu+Windows qualification and repaired CRLF-sensitive source-closure, affective provenance, implementation-cut, and sexual-drive semantic-owner hashing. Push and pull-request matrices passed on the exact head."
+    },
+    {
+      "repo": "thebrazenbeard/fuckup",
+      "frontier": "PR #1",
+      "exact_head": "7c9074b257dbe2b39a40f37adde769cb073d7d0e",
+      "result": "QUALIFICATION_RERUN_ACTIVE_AT_CUT",
+      "work": "Converted source-only claims into executable Python+PostgreSQL CI, fixed PostgreSQL authorization-record parsing and role-identifier ambiguity, aligned Python authorization-object tests, normalized psycopg UUID assertions, and removed editable-install source-tree pollution from the hygiene gate."
+    },
+    {
+      "repo": "thebrazenbeard/vera_model_training",
+      "frontier": "PR #46",
+      "exact_head": "d4a975d97277c3721f1613fdb02dee3c88faff07",
+      "result": "SOURCE_ADAPTED_NOT_RUNTIME_QUALIFIED",
+      "work": "Pinned rodrigomt/Qwen3.5-4B-Uncensored-Aggressive at cec7eb63d667bf2e7928e54598cb5f46aa3bdaaa; added a text-only fail-closed substrate adapter, hybrid-attention/MLP LoRA target contract, Qwen-specific training entrypoint, deterministic source tests, and updated durable training plan. No GPU run or paid compute occurred."
+    }
+  ],
+  "verified_existing_frontiers": [
+    {
+      "repo": "thebrazenbeard/unbound-sol",
+      "pr": 37,
+      "exact_head": "52d1cbb8dc43c85bfa79d69a8aac0c1ca2ecc421",
+      "observed_result": "HOSTED_ACTIONS_GREEN"
+    },
+    {
+      "repo": "thebrazenbeard/meso-crct",
+      "pr": 3,
+      "exact_head": "8316eb3c3a82705e227cb0c275877fae039ab75a",
+      "observed_result": "HOSTED_ACTIONS_GREEN"
+    },
+    {
+      "repo": "thebrazenbeard/bt2",
+      "pr": 45,
+      "exact_head": "99e60aebf919744322fd2e19ed3fbe80fa333dbf",
+      "observed_result": "HOSTED_ACTIONS_GREEN"
+    }
+  ],
+  "estate_delta_since_prior_census": {
+    "prior_count": 58,
+    "current_count": 66,
+    "newly_present": [
+      "RepairTracker",
+      "WorkBridgeMCP",
+      "ccb-core",
+      "freerowcochkar",
+      "fuckup",
+      "meso-crct",
+      "unbound-sol",
+      "vera-mono"
+    ]
+  },
+  "next_source_frontiers": [
+    {
+      "priority": 1,
+      "repo": "thebrazenbeard/fuckup",
+      "action": "Read final exact-head qualification and continue defect loop until green or externally blocked."
+    },
+    {
+      "priority": 2,
+      "repo": "thebrazenbeard/WorkBridgeMCP",
+      "action": "Investigate Draft PR #6 non-mergeability and preserve the tested current-main rebuild rather than allowing the Lappy bridge stack to fork."
+    },
+    {
+      "priority": 3,
+      "repo": "thebrazenbeard/project-achilles",
+      "action": "Refresh current main and determine whether the earlier repair is now source-complete or needs a current-main successor."
+    },
+    {
+      "priority": 4,
+      "repo": "thebrazenbeard/driftguard",
+      "action": "Refresh PR #34 exact head and preserve the benchmark/effect-fence composition boundary before new work."
+    },
+    {
+      "priority": 5,
+      "repo": "thebrazenbeard/unbound-sol",
+      "action": "Reconcile the active PR #30/#32/#33/#34/#35/#37 stack into an explicit current development DAG without merging protected effects."
+    },
+    {
+      "priority": 6,
+      "repo": "thebrazenbeard/vera_model_training",
+      "action": "Run only a genuinely zero-cost Hugging Face smoke when available; otherwise keep paid compute blocked and continue source/static qualification."
+    }
+  ],
+  "lantern": {
+    "status": "UNKNOWN_NOT_ESTABLISHED_THIS_CUT",
+    "reason": "The exact WoWSQL connector call failed internally before the required projection preflight -> B0 -> payload -> B1 sequence could be established. No provider fallback was used."
+  },
+  "runtime_tooling": {
+    "desktop_commander": "UNAVAILABLE_MONTHLY_USAGE_CAP",
+    "implication": "No desktop/local-runtime PASS may be inferred from this cut."
+  },
+  "protected_effects": {
+    "merge": "NOT_EXECUTED",
+    "close_pr_or_issue": "NOT_EXECUTED",
+    "branch_or_repo_deletion": "NOT_EXECUTED",
+    "force_push": "NOT_EXECUTED",
+    "deploy_or_install": "NOT_EXECUTED",
+    "provider_or_credential_change": "NOT_EXECUTED",
+    "paid_compute": "NOT_EXECUTED"
+  }
+}
