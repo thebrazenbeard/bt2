@@ -564,7 +564,19 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 259,
-      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+      "census_state": "CURRENT_MAIN_PLUS_EFFECT_FENCE_FRONTIER",
+      "head": "52fa829c629fa0f3e729204912db9f9f783f322a",
+      "open_pr_count": 1,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "R11_INTEGRATED",
+        "EFFECT_FENCE_SOURCE_CANDIDATE",
+        "EXACT_HEAD_CI_PASS"
+      ],
+      "notes": [
+        "Current main already integrates R11 V4; closed PR #34 is no longer the active frontier.",
+        "Draft PR #40 exact head 33b75523a1130c614c270f3de45417e1acf4e32b implements only the local mechanical reservation/fence subset of closed effect-CAS design #32 and passes Ubuntu/Windows tests plus action smoke."
+      ]
     },
     {
       "name": "brigit",
@@ -754,15 +766,17 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 636,
-      "census_state": "PARTIALLY_QUALIFIED",
+      "census_state": "COMPOSED_ACTIVE_DAG_FRONTIER",
       "head": "688094241755ed335cc1bad34008ffb686ec2e7f",
-      "open_pr_count": 6,
+      "open_pr_count": 7,
       "states": [
         "ACTIVE_IMPLEMENTATION",
-        "MULTI_LANE_DEVELOPMENT"
+        "COMPOSED_DEVELOPMENT_DAG",
+        "CONTINUITY_PASS"
       ],
       "notes": [
-        "New since the prior 58-repository census. Draft PR #37 head 52d1cbb8dc43c85bfa79d69a8aac0c1ca2ecc421 was observed green and remains the current external-model-bus restack frontier."
+        "Draft PR #38 exact head e05cc2e648b7ead7768abec9c83a766ee4c6ad9f composes the #32/#33 vera-mono donor-review lane with the #34/#35/#37 Behavior V3/model-bus lane.",
+        "Continuity workflow 35940775841 passed; predecessor PRs remain ancestry/review evidence."
       ]
     },
     {
