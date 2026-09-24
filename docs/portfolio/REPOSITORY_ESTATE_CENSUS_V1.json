@@ -1,10 +1,10 @@
 {
   "schema": "BT2_REPOSITORY_ESTATE_CENSUS_V1",
-  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL_WITH_FIRST_CANONICALIZATION_CANDIDATES",
+  "status": "IN_PROGRESS_EXACT_CURRENTNESS_PARTIAL_WITH_2026_09_23_ESTATE_DELTA",
   "generated_date": "2026-09-20",
   "owner": "thebrazenbeard",
-  "enumeration_count": 58,
-  "authority_note": "Repository enumeration is live GitHub evidence. Per-repository exact-head/PR/issue/branch details are filled only after explicit live readback; UNKNOWN_PENDING_CENSUS is not a negative finding.",
+  "enumeration_count": 66,
+  "authority_note": "Repository enumeration is live GitHub evidence. The estate was re-enumerated at 66 owned repositories on 2026-09-23; per-repository exact-head/PR/issue/branch details remain partial unless explicitly read back.",
   "protected_effect_boundary": "No merge, destructive closure/deletion, force push, deployment, provider/credential/visibility/ruleset mutation, or Project installation authorized.",
   "repositories": [
     {
@@ -630,7 +630,155 @@
       "default_branch": "main",
       "size_kib": 174,
       "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "RepairTracker",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 417,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "6b01c2a18035390c050ceecd0506181703d1f5fa",
+      "open_pr_count": 3,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "MULTI_PR_FRONTIER"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Latest observed active frontier is Draft PR #3 at 177fc49351336bc9564fa8eb2cd401a785fb43b3."
+      ]
+    },
+    {
+      "name": "WorkBridgeMCP",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 241,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "75c811f21ef97fe0356e8f54e007d086300dd0f1",
+      "open_pr_count": 2,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "STACKED_RUNTIME_REPAIR"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #6 head db56871f74f641a0819a601fe166e3241352edaf is currently not mergeable and remains a live repair frontier."
+      ]
+    },
+    {
+      "name": "ccb-core",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 172,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "157876c5c0434bf4f553d9e4f70f19076d058146",
+      "open_pr_count": 0,
+      "states": [
+        "NO_OPEN_PR_OBSERVED"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Deep semantic census remains pending."
+      ]
+    },
+    {
+      "name": "freerowcochkar",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 105,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "00562b5fedf5ff636750b87e5ba82dad2911e2ab",
+      "open_pr_count": 2,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "CURRENT_MAIN_RESTACK"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #2 head bc8ae31d2f24f9f4b9753a1bb4517affba398523 is the latest observed restack frontier."
+      ]
+    },
+    {
+      "name": "fuckup",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 358,
+      "census_state": "ACTIVE_QUALIFICATION",
+      "head": "e999607481ba706523209ce129955a5e3d2d6ef7",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "EXECUTABLE_POSTGRES_QUALIFICATION"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #1 head 7c9074b257dbe2b39a40f37adde769cb073d7d0e now has a real PostgreSQL CI gate; final exact-head run was still executing at this census cut."
+      ]
+    },
+    {
+      "name": "meso-crct",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 316,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "6ca7873bf066178aa2a21cd9244f500a3ab1c845",
+      "open_pr_count": 3,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "SALience_ARCHITECTURE_FRONTIER"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #3 head 8316eb3c3a82705e227cb0c275877fae039ab75a is the latest observed salience-first architecture frontier and its existing CI was observed green during the 2026-09-23 run."
+      ]
+    },
+    {
+      "name": "unbound-sol",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 636,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "688094241755ed335cc1bad34008ffb686ec2e7f",
+      "open_pr_count": 6,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "MULTI_LANE_DEVELOPMENT"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #37 head 52d1cbb8dc43c85bfa79d69a8aac0c1ca2ecc421 was observed green and remains the current external-model-bus restack frontier."
+      ]
+    },
+    {
+      "name": "vera-mono",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 845,
+      "census_state": "CROSS_PLATFORM_QUALIFIED_DRAFT",
+      "head": "ac1fe62ae02da1a4ad5928a836fbf39509a16023",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "NATIVE_MONOREPO",
+        "WINDOWS_PORTABILITY_QUALIFIED"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #1 exact head 22559cb8d577a30abc13fb7c79546878d29f75e6 passed the full GitHub Actions matrix on Ubuntu 24.04 and Windows after CRLF-sensitive source-binding fixes."
+      ]
     }
   ],
-  "last_updated": "2026-09-20"
+  "last_updated": "2026-09-23",
+  "enumeration_history": [
+    {
+      "date": "2026-09-20",
+      "count": 58,
+      "basis": "prior live GitHub census"
+    },
+    {
+      "date": "2026-09-23",
+      "count": 66,
+      "basis": "live GitHub list_repositories readback"
+    }
+  ]
 }
