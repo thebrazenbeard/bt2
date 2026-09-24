@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "hardening/github-native-audit-v1-20260924",
-    "head_before_manifest": "019bf32c36b99b78275e1c41b0f527354b17c31f"
+    "head_before_manifest": "1840a63deb86b0364f82485b004683727310c817"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -18,7 +18,7 @@
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
     "migrations_tree": "79d3ceb9558a31312c51665a80b53648ffcb72a5",
-    "tests_tree": "afd5335e1faf481793e8a27e33c8618b9e9e1133",
+    "tests_tree": "0a6a25ad5b2c54985c7fbcc38e54f5bee93b047f",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
     "lantern_archive_tree": "1160a339b175b9bfc76c6db1238ffd7cb978b453",
@@ -26,8 +26,8 @@
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
     "qualification_tools_tree": "99525d5f709bd0d300b2233d7abcabb0f5c33121",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:79d3ceb9558a31312c51665a80b53648ffcb72a5|tests:afd5335e1faf481793e8a27e33c8618b9e9e1133|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:99525d5f709bd0d300b2233d7abcabb0f5c33121|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "2ae0dba51cce7345a120f41d041b6be0ef859c7f29801e79c106c5a4c29af958"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:79d3ceb9558a31312c51665a80b53648ffcb72a5|tests:0a6a25ad5b2c54985c7fbcc38e54f5bee93b047f|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:99525d5f709bd0d300b2233d7abcabb0f5c33121|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "850b9737f36086a5a2fe1762302d53fd134e01022edfb603ab4d56fc50c0d1fb"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
