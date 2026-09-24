@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Manifest-V2 driver for true multi-session Lantern qualification.
+"""Manifest-bound driver for true multi-session Lantern qualification.
 
-Reuses the bounded V1 race mechanics, but binds evidence to BUILD_MANIFEST_V2 and
-emits the exact top-level fields consumed by bt2.evaluate_bt2_merge_readiness_v1().
+Reuses the bounded V1 race mechanics and binds evidence to the exact admitted
+PostgreSQL package/major before emitting the readiness evidence fields.
 """
 from __future__ import annotations
 
@@ -28,19 +28,21 @@ def main() -> int:
         raise SystemExit("DATABASE_URL or --database-url is required")
     if shutil.which("psql") is None:
         raise SystemExit("psql is required on PATH")
+    version = races.scalar(args.database_url, "SHOW server_version_num;")
+    try:
+        postgres_major = int(version) // 10000
+    except ValueError as exc:
+        raise SystemExit(f"unparseable server_version_num: {version}") from exc
+
     manifest_path, _manifest, package_digest = load_and_verify_manifest(
         expected_digest=args.expected_package_digest,
-        postgres_major=16,
+        postgres_major=postgres_major,
     )
     print(
         f"QUALIFICATION_MANIFEST={manifest_path.relative_to(ROOT)} "
-        f"package_digest={package_digest}",
+        f"package_digest={package_digest} postgres_major={postgres_major}",
         flush=True,
     )
-
-    version = races.scalar(args.database_url, "SHOW server_version_num;")
-    if not version.startswith("16"):
-        raise SystemExit(f"PostgreSQL 16 required; observed {version}")
 
     real_before = races.scalar(
         args.database_url,
@@ -77,7 +79,7 @@ def main() -> int:
 
     evidence = {
         "package_digest_sha256": package_digest,
-        "postgres_major": 16,
+        "postgres_major": postgres_major,
         "true_multisession": True,
         "same_subject_race": "PASS",
         "different_subject_race": "PASS",
