@@ -70,3 +70,53 @@ jobs:
         run: |
           test ! -f /tmp/bt2_blank_rebuild_evidence.json || cat /tmp/bt2_blank_rebuild_evidence.json
           test ! -f /tmp/bt2_lantern_concurrency_evidence.json || cat /tmp/bt2_lantern_concurrency_evidence.json
+
+
+  postgres17-managed-role:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bt2_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d bt2_ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: postgresql://bt2admin:bt2admin@localhost:5432/bt2_ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare managed-service-style non-superuser owner
+        run: |
+          PGPASSWORD=postgres psql             postgresql://postgres:postgres@localhost:5432/bt2_ci             -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE bt2admin
+            LOGIN PASSWORD 'bt2admin'
+            CREATEDB CREATEROLE NOSUPERUSER;
+          ALTER DATABASE bt2_ci OWNER TO bt2admin;
+          SQL
+
+      - name: Verify managed owner role
+        run: |
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atqc             "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb
+             FROM pg_roles WHERE rolname=current_user;"
+
+      - name: PostgreSQL 17 managed-role canonical rebuild compatibility
+        run: |
+          PGPASSWORD=bt2admin python             tools/qualification/run_postgres17_blank_rebuild_compatibility.py             --database-url "$DATABASE_URL"             --evidence-out /tmp/bt2_pg17_rebuild_evidence.json
+
+      - name: PostgreSQL 17 managed-role Lantern concurrency
+        run: |
+          PGPASSWORD=bt2admin python             tools/qualification/run_lantern_multisession_concurrency_v2.py             --database-url "$DATABASE_URL"             --evidence-out /tmp/bt2_pg17_lantern_concurrency_evidence.json
+
+      - name: PostgreSQL 17 evidence summary
+        if: always()
+        run: |
+          test ! -f /tmp/bt2_pg17_rebuild_evidence.json || cat /tmp/bt2_pg17_rebuild_evidence.json
+          test ! -f /tmp/bt2_pg17_lantern_concurrency_evidence.json || cat /tmp/bt2_pg17_lantern_concurrency_evidence.json
