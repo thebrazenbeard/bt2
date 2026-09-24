@@ -1,0 +1,80 @@
+{
+  "manifest_version": "BT2_DATABASE_BUILD_MANIFEST_V3",
+  "coordination_id": "BT2-LANTERN-POSTGRESQL-V4-20260924",
+  "supersedes_manifest": "database/BUILD_MANIFEST_V2.json",
+  "supersession_reason": "V3 binds the provider-neutral Lantern owner/access-boundary fixes and PostgreSQL 17 managed-role compatibility qualification to an exact source package.",
+  "source_subject": {
+    "repository": "thebrazenbeard/bt2",
+    "branch": "runtime/lantern-postgresql-v4-20260924",
+    "head_before_manifest": "5f92d9f5fd7a3dfc65fe95d9051019d7ddceba7d"
+  },
+  "target": {
+    "backend": "PostgreSQL",
+    "canonical_qualified_major_version": 16,
+    "compatibility_qualified_major_versions": [17],
+    "required_extensions": ["pgcrypto"],
+    "provider_semantics": "provider-neutral"
+  },
+  "package_identity": {
+    "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
+    "migrations_tree": "7b602b29de470b467536a10cd07142566dbddbf3",
+    "tests_tree": "7b07b4affcd0508b2cdeb9e24b7aad1363259b8a",
+    "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
+    "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
+    "lantern_archive_tree": "1160a339b175b9bfc76c6db1238ffd7cb978b453",
+    "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
+    "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
+    "qualification_tools_tree": "edad94e7448f276a08188e0834fdd98b178fb70d",
+    "digest_algorithm": "sha256",
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:7b602b29de470b467536a10cd07142566dbddbf3|tests:7b07b4affcd0508b2cdeb9e24b7aad1363259b8a|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:edad94e7448f276a08188e0834fdd98b178fb70d|canonical-postgres-major:16|compat-postgres-major:17|required-extension:pgcrypto",
+    "package_digest_sha256": "167b2fdde94bfe9801e296005455cc2096a7e65782813e68927e533b839130cd"
+  },
+  "portability_changes": {
+    "trusted_runtime_owner": "current migration principal rather than provider-specific role name",
+    "internal_access_assertion": "exempts current migration/schema owner while still testing other non-superuser login roles",
+    "producer_boundary": "SECURITY DEFINER owner and execute grant bind to CURRENT_USER",
+    "provider_specific_projection": "not required for canonical PostgreSQL reconstruction"
+  },
+  "canonical_reconstruction": {
+    "postgres16_runner": "tools/qualification/run_postgres16_blank_rebuild.py",
+    "postgres17_compatibility_runner": "tools/qualification/run_postgres17_blank_rebuild_compatibility.py",
+    "concurrency_runner": "tools/qualification/run_lantern_multisession_concurrency_v2.py",
+    "workflow": ".github/workflows/database-rebuild-qualification.yml",
+    "precondition": "empty BT2 schemas in the target database",
+    "sequence": [
+      "database/schema/*.sql",
+      "database/migrations/*.sql",
+      "database/tests/0001..0010 rollback regression suite",
+      "database/seeds/*.sql replayed twice",
+      "database/data/0001..0004",
+      "database/loaders/lantern_cohosted_history_v2.py --mode apply",
+      "SKIP database/data/0005_project_lantern_cohosted_history_receipt_v1.sql",
+      "database/data/0006..0008",
+      "database/tests/0011_canonical_state_reconstruction_oracle.sql"
+    ]
+  },
+  "canonical_state_subject": {
+    "topology_sha256": "45d262aae7285a69a66a3d5b35c04537899ba33f5eb7388b9731071e8907c0d8",
+    "training_package_count": 13,
+    "training_frontier_sha256": "8c30820432c95f5fd0e663cd6054c522b41b18c0979ce11c06e967037116eabc",
+    "training_qualification_count": 0,
+    "training_installation_event_count": 0,
+    "lantern_governed_state_sha256": "29da0892c199207bf566e8cf62c0ae8921d63950796fd58204577c464ca59dc5",
+    "lantern_current_producer_authority": 0,
+    "lantern_cohosted_history_row_count": 16,
+    "lantern_cohosted_history_sha256": "6ae6aad2fe494576a48ac505195c9315e932776c51a6f1c9480884bfa8185712"
+  },
+  "qualification": {
+    "postgres16_canonical_blank_rebuild": "CI_REQUIRED",
+    "postgres17_managed_role_compatibility": "CI_REQUIRED",
+    "true_multisession_concurrency": "CI_REQUIRED",
+    "aiven_runtime_reconstruction": "NOT_ESTABLISHED",
+    "lantern_v4_runtime_currentness": "UNKNOWN"
+  },
+  "authority": {
+    "merge_deploy_not_granted": true,
+    "project_installation_not_granted": true,
+    "producer_enablement_not_granted": true,
+    "destructive_provider_retirement_not_granted": true
+  }
+}
