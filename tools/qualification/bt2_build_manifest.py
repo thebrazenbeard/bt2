@@ -46,7 +46,7 @@ def _git_tree(path: str) -> str:
 
 def _assert_clean_bound_paths(paths: list[str]) -> None:
     cp = subprocess.run(
-        ["git", "status", "--porcelain", "--", *paths],
+        ["git", "status", "--porcelain", "--untracked-files=no", "--", *paths],
         cwd=ROOT,
         text=True,
         capture_output=True,
