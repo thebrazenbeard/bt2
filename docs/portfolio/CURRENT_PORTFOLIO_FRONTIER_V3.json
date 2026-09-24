@@ -28,9 +28,14 @@
     {
       "repo": "thebrazenbeard/fuckup",
       "frontier": "PR #1",
-      "exact_head": "7c9074b257dbe2b39a40f37adde769cb073d7d0e",
-      "result": "QUALIFICATION_RERUN_ACTIVE_AT_CUT",
-      "work": "Converted source-only claims into executable Python+PostgreSQL CI, fixed PostgreSQL authorization-record parsing and role-identifier ambiguity, aligned Python authorization-object tests, normalized psycopg UUID assertions, and removed editable-install source-tree pollution from the hygiene gate."
+      "exact_head": "ff46bcf822a89701201e6153be923239814e5b61",
+      "result": "PASS",
+      "work": "Executable Python + PostgreSQL 16 qualification now passes on exact-head push and pull-request runs after parser, PL/pgSQL identifier, authorization-boundary, UUID assertion, and CI source-hygiene repairs.",
+      "validation": {
+        "push_run": 35939854192,
+        "pull_request_run": 35939858313,
+        "result": "PASS"
+      }
     },
     {
       "repo": "thebrazenbeard/vera_model_training",
@@ -38,6 +43,27 @@
       "exact_head": "d4a975d97277c3721f1613fdb02dee3c88faff07",
       "result": "SOURCE_ADAPTED_NOT_RUNTIME_QUALIFIED",
       "work": "Pinned rodrigomt/Qwen3.5-4B-Uncensored-Aggressive at cec7eb63d667bf2e7928e54598cb5f46aa3bdaaa; added a text-only fail-closed substrate adapter, hybrid-attention/MLP LoRA target contract, Qwen-specific training entrypoint, deterministic source tests, and updated durable training plan. No GPU run or paid compute occurred."
+    },
+    {
+      "repo": "thebrazenbeard/WorkBridgeMCP",
+      "frontier": "PR #8",
+      "exact_head": "6f578307d71b13ab93a8ab9e48bdfc547437a0e5",
+      "result": "PASS_SOURCE_CI",
+      "work": "Restacked the seven-path VeraMesh repair from stale/non-mergeable PR #6 onto current PR #5 head 8a0ba65b7991cedee03827be067f6dbfd1e63dee while preserving build-cache hardening; corrected the stale installer source-pin documentation.",
+      "validation": {
+        "ci_run": 35939810274,
+        "result": "PASS",
+        "security_agent_run": 35939812776,
+        "security_agent_result": "UNAVAILABLE_REQUESTED_MODEL_NOT_SUPPORTED"
+      }
+    },
+    {
+      "repo": "thebrazenbeard/project-achilles",
+      "frontier": "main",
+      "exact_head": "6776d8c059e3f9ad791a47a0b62bb56588332968",
+      "result": "PASS_WITH_REFERENCE_DEBT",
+      "work": "Verified current main has no open PR/issue frontier and current Verify Achilles runs pass. No speculative code change made.",
+      "debt": "PROTOCOL_V2_CURRENT.md and README still reference the historical private thebrazenbeard/build-team-2.0 regression suite; canonical thebrazenbeard/bt2 does not currently contain that path, so migration requires an explicit source/provenance decision rather than copying private material into public Achilles."
     }
   ],
   "verified_existing_frontiers": [
@@ -77,18 +103,18 @@
   "next_source_frontiers": [
     {
       "priority": 1,
-      "repo": "thebrazenbeard/fuckup",
-      "action": "Read final exact-head qualification and continue defect loop until green or externally blocked."
+      "repo": "thebrazenbeard/driftguard",
+      "action": "Refresh PR #34 exact head and preserve the benchmark/effect-fence composition boundary before new work."
     },
     {
       "priority": 2,
-      "repo": "thebrazenbeard/WorkBridgeMCP",
-      "action": "Investigate Draft PR #6 non-mergeability and preserve the tested current-main rebuild rather than allowing the Lappy bridge stack to fork."
+      "repo": "thebrazenbeard/unbound-sol",
+      "action": "Reconcile the active PR #30/#32/#33/#34/#35/#37 stack into an explicit current development DAG without merging protected effects."
     },
     {
       "priority": 3,
-      "repo": "thebrazenbeard/project-achilles",
-      "action": "Refresh current main and determine whether the earlier repair is now source-complete or needs a current-main successor."
+      "repo": "thebrazenbeard/vera_model_training",
+      "action": "Run only a genuinely zero-cost Hugging Face smoke when available; otherwise keep paid compute blocked and continue source/static qualification."
     },
     {
       "priority": 4,
