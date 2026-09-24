@@ -3,16 +3,16 @@
   "project": "Build Team Two",
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
-  "payload_source_commit": "1eedd1e42fb764d1b032528f0c40ca51be98d7f8",
-  "payload_source_tree": "d1644d9ac6945ac8c4b5ae493197775617a60131",
+  "payload_source_commit": "dabe1b5194b5b6f4825a676c5b58d578b9916989",
+  "payload_source_tree": "f8e930c4dffb42be0285b12444070456942c79d9",
   "content_binding": "exact Git blob IDs under one reviewed payload source commit/tree",
   "payload_digest_algorithm": "sha256(sorted(path|git_blob)+newline)",
-  "payload_digest": "2c078638ef79713d8a5c2b88252d08d31da7940d38928664d0f225731908599a",
+  "payload_digest": "e1b41ed0322cb5ed00fa57b3ea7f6944b27ecc1ae82708f5e551cce68f27a7f8",
   "runtime_backend": "WoWSQL:bt2-479e4ad9",
   "general_bt2_availability_dependency": false,
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
-    "git_blob": "523fb6f54facfaf75f6fd002e81a4e8e847ca154"
+    "git_blob": "605ec618a380b5dbf0e740628ba83fe233c73c41"
   },
   "required_project_files": [
     {
@@ -26,6 +26,10 @@
     {
       "path": "native/project/BT2_RECOVERY_AND_STATE_V2.md",
       "git_blob": "31a315a65f1552593a0b2d5ab44fe7da91cb93d4"
+    },
+    {
+      "path": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+      "git_blob": "297fbe3631c360b0cdac49ffc043c207fee74330"
     },
     {
       "path": "docs/runtime/RUNTIME_PROVIDER_DEGRADATION_V1.md",
@@ -62,15 +66,15 @@
   },
   "installer": {
     "path": "native/project/INSTALL_V4.md",
-    "git_blob": "8d335b702fdc6559e67b810ab61833c221c3aa15"
+    "git_blob": "c480f9b992999cf28b0958126ad30a178fe0aaa4"
   },
   "lantern_package": {
     "version": "V4",
-    "source_commit": "1eedd1e42fb764d1b032528f0c40ca51be98d7f8",
-    "source_tree": "d1644d9ac6945ac8c4b5ae493197775617a60131",
+    "source_commit": "dabe1b5194b5b6f4825a676c5b58d578b9916989",
+    "source_tree": "f8e930c4dffb42be0285b12444070456942c79d9",
     "same_subject_required": true
   },
-  "installation_rule": "Install Project Instructions V4, the V2 core runtime/recovery/coding files, the provider-degradation contract, and exactly the four Lantern V4 files from this payload subject. Retain older V1/V2/V3 files as historical/inactive material rather than mixing them into the active package.",
+  "installation_rule": "Install Project Instructions V4, the V2 core runtime/recovery/coding files, the adversarial collaboration posture, the provider-degradation contract, and exactly the four Lantern V4 files from this payload subject. Retain older V1/V2/V3 files as historical/inactive material rather than mixing them into the active package.",
   "runtime_mode": "CLAIM_DOMAIN_SCOPED_PROVIDER_DEPENDENCY",
   "lantern_runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
   "wowsql_unavailable_behavior": "RUNTIME_ONLY_AND_LANTERN_CURRENTNESS_UNKNOWN; INDEPENDENT_SOURCE_WORK_CONTINUES",
@@ -80,11 +84,30 @@
   "qualification_support": [
     {
       "path": "tools/native/verify_native_project_v4.py",
-      "git_blob": "4135216543ede1b50f258e58eca48b03e83b8fb5"
+      "git_blob": "3ae367751e85b4c209ff4d761fa5eca280f2def3"
     },
     {
       "path": ".github/workflows/native-project-v4-qualification.yml",
-      "git_blob": "fc143a008183e745cc82309d992bda8ffd4d8b75"
+      "git_blob": "712fee6e6c08f00466cc645aea77960cb4e33918"
     }
-  ]
+  ],
+  "behavior_contract_support": [
+    {
+      "path": "specs/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.yaml",
+      "git_blob": "5c184dbc9ddf6f5339247c4609335c75280d7383"
+    },
+    {
+      "path": "docs/bt2/ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+      "git_blob": "51ab06c6169ef945198e17022997e42540b148ee"
+    },
+    {
+      "path": "tools/native/test_bt2_adversarial_collaboration_posture_v1.py",
+      "git_blob": "f2076b2564492320caf5c92f435c99e4acbd44cb"
+    }
+  ],
+  "adversarial_collaboration": {
+    "source_artifact_sha256": "828a3995dd0e49999c7ebc51753cfa17508935b45b99c01c79f456845994826f",
+    "native_project_file": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+    "effect_authority": "UNCHANGED"
+  }
 }
