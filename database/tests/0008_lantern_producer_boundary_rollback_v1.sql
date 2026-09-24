@@ -3,11 +3,11 @@
 
 BEGIN;
 
-ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) OWNER TO postgres;
+ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) OWNER TO CURRENT_USER;
 ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SECURITY DEFINER;
 ALTER FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) SET search_path TO pg_catalog, bt2, pg_temp;
 REVOKE ALL ON FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) TO postgres;
+GRANT EXECUTE ON FUNCTION bt2.append_material_v1(uuid,text,text,text,text,text) TO CURRENT_USER;
 
 DO $boundary$
 DECLARE
@@ -15,24 +15,25 @@ DECLARE
   v_owner text;
   v_config text[];
   v_public_exec boolean;
-  v_postgres_exec boolean;
+  v_owner_exec boolean;
+  v_expected_owner text:=current_user;
 BEGIN
   SELECT p.prosecdef,p.proowner::regrole::text,p.proconfig,
          has_function_privilege('public','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE'),
-         has_function_privilege('postgres','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
-  INTO v_secdef,v_owner,v_config,v_public_exec,v_postgres_exec
+         has_function_privilege(current_user,'bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
+  INTO v_secdef,v_owner,v_config,v_public_exec,v_owner_exec
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2' AND p.proname='append_material_v1';
 
-  IF NOT v_secdef OR v_owner<>'postgres' THEN
+  IF NOT v_secdef OR v_owner<>v_expected_owner THEN
     RAISE EXCEPTION 'LANTERN_PRODUCER_BOUNDARY_OWNER_OR_SECURITY_DEFINER_MISMATCH';
   END IF;
   IF v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[] THEN
     RAISE EXCEPTION USING MESSAGE =
       'LANTERN_PRODUCER_BOUNDARY_SEARCH_PATH_MISMATCH:' || coalesce(array_to_string(v_config,','),'NULL');
   END IF;
-  IF v_public_exec OR NOT v_postgres_exec THEN
+  IF v_public_exec OR NOT v_owner_exec THEN
     RAISE EXCEPTION 'LANTERN_PRODUCER_BOUNDARY_EXECUTE_ACL_MISMATCH';
   END IF;
 END

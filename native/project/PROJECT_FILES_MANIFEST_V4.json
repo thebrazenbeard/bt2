@@ -1,0 +1,62 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V4",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_contract": "POSTGRESQL_SQL_CONNECTOME_V4",
+  "payload_source_commit": "6098b4ecdf2f34d8a1af443c94baac04f28f0ba5",
+  "payload_source_tree": "1ac4d89c8b35454ac97d05a18891db047cfbbf48",
+  "binding_algorithm": "exact source commit + Git blob identity",
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
+    "git_blob": "ac002c7793c04031f35f152bb3902a3af4669557"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V2.md",
+      "git_blob": "89d0cd7a3c796140038a43eb9cdb5b77060fe213"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_OPERATOR_HANDSHAKE_V4.md",
+      "git_blob": "1b7d4dc591acef360217d6527595a783db86512a"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_READ_QUERIES_V4.md",
+      "git_blob": "a77f323249aedd299b8e9919e16975e8b08cd78e"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_RUNTIME_CONTRACT_V4.md",
+      "git_blob": "3516c5cdec29b803bc6223208c9cf1dd47a842e6"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_ACCEPTANCE_V4.md",
+      "git_blob": "fa2b8e12d39c3fd53d1ee289188b4cddc60220d0"
+    }
+  ],
+  "installation_packet": {
+    "path": "native/project/INSTALL_V4.md",
+    "git_blob": "cba3bcbc1256e978f20f576fde03ea9b553c9762"
+  },
+  "historical_runtime_packages": [
+    "LANTERN_WOWSQL_*_V1.md",
+    "LANTERN_WOWSQL_*_V2.md",
+    "LANTERN_WOWSQL_*_V3.md",
+    "database/provider/wowsql/**"
+  ],
+  "historical_retention_rule": "Preserve V1-V3 and WoWSQL provider artifacts as inactive historical evidence. V4 does not authorize destructive deletion.",
+  "runtime_state_at_source_binding": {
+    "sql_connectome_control_schema": "INSTALLED_ON_REPLACEMENT_DEVELOPMENT_POSTGRESQL",
+    "bt2_runtime_reconstruction": "NOT_ESTABLISHED",
+    "lantern_state_reconstruction": "NOT_ESTABLISHED",
+    "v4_runtime_qualification": "NOT_ESTABLISHED",
+    "lantern_currentness": "UNKNOWN"
+  },
+  "provider_semantics": "Provider-neutral PostgreSQL. Provider/cloud/region are infrastructure metadata, not Lantern identity.",
+  "installation_rule": "Install Project Instructions V4 and the five required V4 Project files only after V4 database/runtime acceptance passes. Keep historical V1-V3 files present but inactive.",
+  "protected_effects": {
+    "merge_deploy_not_granted": true,
+    "project_installation_not_granted": true,
+    "producer_enablement_not_granted": true,
+    "historical_provider_deletion_not_granted": true
+  }
+}

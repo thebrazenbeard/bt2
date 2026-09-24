@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run the exact BT2 PostgreSQL 16 canonical blank-rebuild qualification.
+"""Run BT2 canonical blank-rebuild compatibility qualification on PostgreSQL 17.
 
 Requires:
   - Python 3
   - psql on PATH
-  - DATABASE_URL or --database-url pointing at a disposable *empty* PostgreSQL 16 DB
+  - DATABASE_URL or --database-url pointing at a disposable *empty* PostgreSQL 17 DB
 
 This runner does not append acceptance receipts or mutate any production provider.
 """
@@ -76,7 +76,7 @@ def assert_empty(url: str) -> None:
 def check_manifest(expected_digest: str | None) -> str:
     path, _manifest, digest = load_and_verify_manifest(
         expected_digest=expected_digest,
-        postgres_major=16,
+        postgres_major=17,
     )
     print(
         f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}",
@@ -99,8 +99,8 @@ def main() -> int:
     package_digest = check_manifest(args.expected_package_digest)
 
     version_num = psql_scalar(args.database_url, "SHOW server_version_num;")
-    if not version_num.startswith("16"):
-        raise SystemExit(f"PostgreSQL 16 required; observed server_version_num={version_num}")
+    if not version_num.startswith("17"):
+        raise SystemExit(f"PostgreSQL 17 required; observed server_version_num={version_num}")
 
     assert_empty(args.database_url)
     run(psql_args(args.database_url) + ["-c", "CREATE EXTENSION IF NOT EXISTS pgcrypto;"])
@@ -150,7 +150,8 @@ def main() -> int:
 
     evidence = {
         "package_digest_sha256": package_digest,
-        "postgres_major": 16,
+        "postgres_major": 17,
+        "qualification_kind": "POSTGRESQL_17_COMPATIBILITY",
         "blank_rebuild": "PASS",
         "canonical_state_reconstruction": "PASS",
         "topology_sha256": "45d262aae7285a69a66a3d5b35c04537899ba33f5eb7388b9731071e8907c0d8",
@@ -169,7 +170,7 @@ def main() -> int:
     if args.evidence_out:
         Path(args.evidence_out).write_text(text + "\n", encoding="utf-8")
 
-    print(f"BT2_POSTGRES16_CANONICAL_BLANK_REBUILD_PASS package_digest={package_digest}", flush=True)
+    print(f"BT2_POSTGRES17_CANONICAL_BLANK_REBUILD_COMPATIBILITY_PASS package_digest={package_digest}", flush=True)
     return 0
 
 

@@ -22,7 +22,7 @@ DECLARE
   v_owner text;
   v_config text[];
   v_public_exec boolean;
-  v_postgres_exec boolean;
+  v_owner_exec boolean;
   v_append_only_trigger boolean := false;
   v_training_frontier boolean := false;
   v_lantern_history boolean := false;
@@ -125,8 +125,8 @@ BEGIN
 
   SELECT p.prosecdef,p.proowner::regrole::text,p.proconfig,
          has_function_privilege('public','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE'),
-         has_function_privilege('postgres','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
-  INTO v_secdef,v_owner,v_config,v_public_exec,v_postgres_exec
+         has_function_privilege(p.proowner,p.oid,'EXECUTE')
+  INTO v_secdef,v_owner,v_config,v_public_exec,v_owner_exec
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2'
@@ -134,10 +134,10 @@ BEGIN
     AND oidvectortypes(p.proargtypes)='uuid, text, text, text, text, text';
 
   v_producer_boundary := coalesce(v_secdef,false)
-    AND v_owner='postgres'
+    AND v_owner IS NOT NULL
     AND coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
     AND NOT coalesce(v_public_exec,true)
-    AND coalesce(v_postgres_exec,false);
+    AND coalesce(v_owner_exec,false);
 
   IF NOT v_producer_boundary THEN
     v_blockers := array_append(v_blockers,'LANTERN_PRODUCER_BOUNDARY_NOT_ESTABLISHED');

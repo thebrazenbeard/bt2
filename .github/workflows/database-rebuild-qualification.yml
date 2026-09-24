@@ -8,12 +8,16 @@ on:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
   pull_request:
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
   workflow_dispatch:
 
@@ -48,6 +52,9 @@ jobs:
       - name: Verify PostgreSQL client
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
 
+      - name: Verify Lantern PostgreSQL V4 source package
+        run: python tools/qualification/test_lantern_postgresql_v4_source_binding.py
+
       - name: Canonical PostgreSQL 16 blank rebuild
         run: |
           python tools/qualification/run_postgres16_blank_rebuild.py \
@@ -65,3 +72,64 @@ jobs:
         run: |
           test ! -f /tmp/bt2_blank_rebuild_evidence.json || cat /tmp/bt2_blank_rebuild_evidence.json
           test ! -f /tmp/bt2_lantern_concurrency_evidence.json || cat /tmp/bt2_lantern_concurrency_evidence.json
+
+
+  postgres17-managed-role:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bt2_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d bt2_ci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: postgresql://bt2admin:bt2admin@localhost:5432/bt2_ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare managed-service-style non-superuser owner
+        run: |
+          PGPASSWORD=postgres psql \
+            postgresql://postgres:postgres@localhost:5432/bt2_ci \
+            -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE bt2admin
+            LOGIN PASSWORD 'bt2admin'
+            CREATEDB CREATEROLE NOSUPERUSER;
+          ALTER DATABASE bt2_ci OWNER TO bt2admin;
+          SQL
+
+      - name: Verify managed owner role
+        run: |
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atqc \
+            "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb
+             FROM pg_roles WHERE rolname=current_user;"
+
+      - name: PostgreSQL 17 managed-role canonical rebuild compatibility
+        run: |
+          PGPASSWORD=bt2admin python \
+            tools/qualification/run_postgres17_blank_rebuild_compatibility.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_pg17_rebuild_evidence.json
+
+      - name: PostgreSQL 17 managed-role Lantern concurrency
+        run: |
+          PGPASSWORD=bt2admin python \
+            tools/qualification/run_lantern_multisession_concurrency_v2.py \
+            --database-url "$DATABASE_URL" \
+            --evidence-out /tmp/bt2_pg17_lantern_concurrency_evidence.json
+
+      - name: PostgreSQL 17 evidence summary
+        if: always()
+        run: |
+          test ! -f /tmp/bt2_pg17_rebuild_evidence.json || cat /tmp/bt2_pg17_rebuild_evidence.json
+          test ! -f /tmp/bt2_pg17_lantern_concurrency_evidence.json || cat /tmp/bt2_pg17_lantern_concurrency_evidence.json
