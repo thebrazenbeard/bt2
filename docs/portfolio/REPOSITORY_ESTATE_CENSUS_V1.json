@@ -462,7 +462,18 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 27,
-      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+      "census_state": "VERIFIED_GREEN_REFERENCE_DEBT",
+      "head": "6776d8c059e3f9ad791a47a0b62bb56588332968",
+      "open_pr_count": 0,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "NO_OPEN_PR_OBSERVED",
+        "HISTORICAL_CROSS_REPO_REFERENCE_DEBT"
+      ],
+      "notes": [
+        "Verify Achilles passes on current main.",
+        "Current protocol references historical private build-team-2.0 regression material; canonical bt2 lacks an equivalent path, so no public-copy or authority promotion was performed."
+      ]
     },
     {
       "name": "transcendence",
@@ -654,15 +665,18 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 241,
-      "census_state": "PARTIALLY_QUALIFIED",
+      "census_state": "CURRENT_BASE_RESTACK_QUALIFIED",
       "head": "75c811f21ef97fe0356e8f54e007d086300dd0f1",
-      "open_pr_count": 2,
+      "open_pr_count": 3,
       "states": [
         "ACTIVE_IMPLEMENTATION",
-        "STACKED_RUNTIME_REPAIR"
+        "CURRENT_MAIN_REBUILD",
+        "RESTACKED_RUNTIME_REPAIR",
+        "EXACT_HEAD_CI_PASS"
       ],
       "notes": [
-        "New since the prior 58-repository census. Draft PR #6 head db56871f74f641a0819a601fe166e3241352edaf is currently not mergeable and remains a live repair frontier."
+        "PR #8 exact head 6f578307d71b13ab93a8ab9e48bdfc547437a0e5 restacks stale PR #6 onto current PR #5 head and passed CI run 35939810274.",
+        "Separate security-agent run failed before review because the requested model was unsupported; no independent security-review PASS is claimed."
       ]
     },
     {
@@ -704,15 +718,17 @@
       "archived": false,
       "default_branch": "main",
       "size_kib": 358,
-      "census_state": "ACTIVE_QUALIFICATION",
+      "census_state": "EXECUTABLE_QUALIFICATION_PASS",
       "head": "e999607481ba706523209ce129955a5e3d2d6ef7",
       "open_pr_count": 1,
       "states": [
         "ACTIVE_IMPLEMENTATION",
-        "EXECUTABLE_POSTGRES_QUALIFICATION"
+        "EXECUTABLE_POSTGRES_QUALIFICATION",
+        "EXACT_HEAD_CI_PASS"
       ],
       "notes": [
-        "New since the prior 58-repository census. Draft PR #1 head 7c9074b257dbe2b39a40f37adde769cb073d7d0e now has a real PostgreSQL CI gate; final exact-head run was still executing at this census cut."
+        "Draft PR #1 exact head ff46bcf822a89701201e6153be923239814e5b61 passed both push and pull-request qualification workflows with live PostgreSQL 16.",
+        "No merge/deploy/install or external migration effect is implied."
       ]
     },
     {
