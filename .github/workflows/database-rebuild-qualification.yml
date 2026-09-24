@@ -8,12 +8,16 @@ on:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
   pull_request:
     paths:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
+      - 'native/project/**'
+      - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
   workflow_dispatch:
 
@@ -45,6 +49,9 @@ jobs:
 
       - name: Verify PostgreSQL client
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'select version();'
+
+      - name: Verify Lantern PostgreSQL V4 source package
+        run: python tools/qualification/test_lantern_postgresql_v4_source_binding.py
 
       - name: Canonical PostgreSQL 16 blank rebuild
         run: |
