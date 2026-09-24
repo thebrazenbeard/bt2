@@ -726,7 +726,7 @@
       "open_pr_count": 3,
       "states": [
         "ACTIVE_IMPLEMENTATION",
-        "SALience_ARCHITECTURE_FRONTIER"
+        "SALIENCE_ARCHITECTURE_FRONTIER"
       ],
       "notes": [
         "New since the prior 58-repository census. Draft PR #3 head 8316eb3c3a82705e227cb0c275877fae039ab75a is the latest observed salience-first architecture frontier and its existing CI was observed green during the 2026-09-23 run."
