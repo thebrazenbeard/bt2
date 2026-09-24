@@ -1,0 +1,82 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V4",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_backend": "WoWSQL:bt2-479e4ad9",
+  "predecessor_manifest": {
+    "path": "native/project/PROJECT_FILES_MANIFEST_V3.json",
+    "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V3",
+    "sha256": "0886fd0b7521e89ca7b1367db2d130b9511ec508c41fe9dadef7cea05a670566"
+  },
+  "payload_source_commit": "8b165ae59abcd02d49333addd8d07dd5314329ac",
+  "payload_source_tree": "b844006a3accc7ca1803068e8e55ba965aad1b59",
+  "payload_digest_algorithm": "sha256(sorted(path|git_blob|sha256)+newline)",
+  "payload_digest": "420ac8f94cf79269a752b7b2e0a3529327448e4a04c9ad12d7e81bd99edb4a59",
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
+    "git_blob": "3c6e4e9492640ea7cd7367f09b1abbe720386ded",
+    "sha256": "f603e20b6a5fd8ca4b78176c12c0b58cc66b9c722b958cdaa77cdd761ff8737d"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V1.md",
+      "git_blob": "a614e25e92994fc4892b2dcf4e1042971b5acece",
+      "sha256": "8f67444f8684f556c81caa1e95d9c9d4a0f98031de65d6504f83937ef2d6faf7"
+    },
+    {
+      "path": "native/project/BT2_CODING_OPERATIONS_V1.md",
+      "git_blob": "364a8ec604f5f8b42d2f0312e02eec6a17caf103",
+      "sha256": "5708bdb8c9af3ab22beb6a2525983f93d560e2ad21b042bf1066cfce55bd1d1d"
+    },
+    {
+      "path": "native/project/BT2_RECOVERY_AND_STATE_V1.md",
+      "git_blob": "e4cfeec391ff679cc8d35ce1bec7323c1dc9a1db",
+      "sha256": "6b48befe2970fc0485481f3083bd96179cad9b3a57ac21c251cc2172d8ea86ff"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_OPERATOR_HANDSHAKE_V3.md",
+      "git_blob": "4dec3d96dd124f67d26459752c880949f4f93789",
+      "sha256": "1aec5476e4e4cbea495f600226ba3c2c69d31d35474148e2cc5375039277b921"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_READ_QUERIES_V3.md",
+      "git_blob": "98188148be3c42500a0986371f9ea48b17b19b73",
+      "sha256": "717c7a698d97b1a983e4d6cad3c6c139e8e54a8140f660b2e925ac35f924150c"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_RUNTIME_CONTRACT_V3.md",
+      "git_blob": "9d8903de1ca5683d64f812df60c1e40dc6576028",
+      "sha256": "551d589ba4981f41275eefcdf0a4d108a952de9c071ba7476f9674272f67a58c"
+    },
+    {
+      "path": "docs/runtime/LANTERN_WOWSQL_ACCEPTANCE_V3.md",
+      "git_blob": "27f360237209cfcb60164cdfe220268a003d8021",
+      "sha256": "d1e281cd0e0f33297dfde03999d1461afa08b87d270bbb840d71f73df364efdf"
+    },
+    {
+      "path": "docs/runtime/HYPERCONNECTOME_RUNTIME_MODEL.md",
+      "git_blob": "17593d4e3601590d8af9a9dd72692c55cb128fc9",
+      "sha256": "0dca117746d948d79f6b931c47a5fc78e8b40aa67cb9376f86296656497137e9"
+    },
+    {
+      "path": "docs/runtime/PLASTICITY_AND_STATE_GOVERNANCE.md",
+      "git_blob": "a3ea01eedc70f5c13d09115b690cf9a60bf85b87",
+      "sha256": "a51ea8caa7bb685e3c34a425fa109f8caee6bb918af2df88850a7433437ca5dd"
+    },
+    {
+      "path": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+      "git_blob": "297fbe3631c360b0cdac49ffc043c207fee74330",
+      "sha256": "828a3995dd0e49999c7ebc51753cfa17508935b45b99c01c79f456845994826f"
+    }
+  ],
+  "adversarial_collaboration": {
+    "source_artifact_sha256": "828a3995dd0e49999c7ebc51753cfa17508935b45b99c01c79f456845994826f",
+    "native_project_file": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+    "scope": "ALL_BT2_ROLES_AND_LANES",
+    "effect_authority": "UNCHANGED"
+  },
+  "installation_rule": "Replace active Project Instructions with V4 and add exactly BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md. Preserve existing V1/V2/V3 and transport-suffixed Project files; do not treat source presence as installation.",
+  "runtime_mode": "WOWSQL_FREE_SHARED_READ_FROZEN_ZERO_PRODUCER",
+  "producer_enablement": "NOT_QUALIFIED_UNTIL_STRICT_HOSTED_BOUNDARY_VERIFIER_PASSES"
+}
