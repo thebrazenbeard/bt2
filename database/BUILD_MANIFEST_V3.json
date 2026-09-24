@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "runtime/lantern-postgresql-v4-20260924",
-    "head_before_manifest": "bba49945ad2f657d1a9ff5ebabd8fd0dd0806637"
+    "head_before_manifest": "fac39ab236aa067f0dbcb3c75778f0f59ffa1cd6"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -21,7 +21,7 @@
   },
   "package_identity": {
     "schema_tree": "12e5e5846881f82845875ffe26644bbdeb0729c6",
-    "migrations_tree": "43f868918f85fc05e4ce53ee1f085d2770eb3129",
+    "migrations_tree": "847111746611331974e60305f4abe28d86bfe0d8",
     "tests_tree": "b3000469d2f066b4fd12b77ef2d419856bfcc99f",
     "admin_tree": "6447503b9ab4f4613c657488742da88abea7cffa",
     "data_tree": "63c70dc233b967464d284dbea2107e21a209249a",
@@ -30,8 +30,8 @@
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
     "qualification_tools_tree": "bc6a89c137206be3f1f392c6b21ab1fff0cb1ebb",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:43f868918f85fc05e4ce53ee1f085d2770eb3129|tests:b3000469d2f066b4fd12b77ef2d419856bfcc99f|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:bc6a89c137206be3f1f392c6b21ab1fff0cb1ebb|canonical-postgres-major:16|compat-postgres-major:17|required-extension:pgcrypto",
-    "package_digest_sha256": "1e03521aa13208397272039dcca154ca2993131d09343bb72aa2ddc3b0521172"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:847111746611331974e60305f4abe28d86bfe0d8|tests:b3000469d2f066b4fd12b77ef2d419856bfcc99f|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:bc6a89c137206be3f1f392c6b21ab1fff0cb1ebb|canonical-postgres-major:16|compat-postgres-major:17|required-extension:pgcrypto",
+    "package_digest_sha256": "f30831e49fe91ce207692cc08e87f024aba7da6b273bb33e8d36e3423d928f30"
   },
   "portability_changes": {
     "trusted_runtime_owner": "current migration principal rather than provider-specific role name",
