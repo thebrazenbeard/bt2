@@ -6,7 +6,7 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "hardening/github-native-audit-v1-20260924",
-    "head_before_manifest": "1840a63deb86b0364f82485b004683727310c817"
+    "head_before_manifest": "edef5ac48bf012724d6a44da882d6680992d8567"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -24,10 +24,10 @@
     "lantern_archive_tree": "1160a339b175b9bfc76c6db1238ffd7cb978b453",
     "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
-    "qualification_tools_tree": "99525d5f709bd0d300b2233d7abcabb0f5c33121",
+    "qualification_tools_tree": "46ad5d61044f1be25942300e424d2b8c99f26615",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:79d3ceb9558a31312c51665a80b53648ffcb72a5|tests:0a6a25ad5b2c54985c7fbcc38e54f5bee93b047f|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:99525d5f709bd0d300b2233d7abcabb0f5c33121|postgres-major:16|required-extension:pgcrypto",
-    "package_digest_sha256": "850b9737f36086a5a2fe1762302d53fd134e01022edfb603ab4d56fc50c0d1fb"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:79d3ceb9558a31312c51665a80b53648ffcb72a5|tests:0a6a25ad5b2c54985c7fbcc38e54f5bee93b047f|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:46ad5d61044f1be25942300e424d2b8c99f26615|postgres-major:16|required-extension:pgcrypto",
+    "package_digest_sha256": "e0254debe6b49e768546474998f5f7c601a2b2f90eb200eda390b770bcd4c24c"
   },
   "canonical_reconstruction": {
     "runner": "tools/qualification/run_postgres16_blank_rebuild.py",
