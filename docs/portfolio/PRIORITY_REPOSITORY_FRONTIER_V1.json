@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "authority": "live_user_priority_2026-09-21",
+  "purpose": "Restrict active repository-consolidation effort to the eight repositories the user explicitly identified as important. Other repositories remain inventoried but are not active work unless required as a dependency.",
+  "priority_repositories": [
+    {
+      "repo": "thebrazenbeard/vera-control-plane",
+      "main_sha": "505c395890bde275cbbc6327be8f387e7f25ca3a",
+      "state": "MULTI_LANE_RECONCILIATION_REQUIRED",
+      "active_frontiers": [
+        {
+          "pr": 106,
+          "head_sha": "b5c978ea10ab7693c8e2c0f3658e159a4c28ee98",
+          "role": "current-main custody/authority reconciliation"
+        },
+        {
+          "pr": 105,
+          "head_sha": "7910c27eab4c9e5ffd466dbdf939d2455893af7c",
+          "role": "issue-18 hostile repair successor",
+          "stacked_on_pr": 101
+        }
+      ],
+      "validation": {
+        "pr_106_hosted_actions": "INFRASTRUCTURE_NO_RUN",
+        "evidence": "workflow 35671042836 concluded failure but validate job exposed steps=null"
+      },
+      "next": "Preserve PR #106 as the current-main governance/custody frontier and separately reconcile the issue-18 #101->#105 behavior line; do not flatten distinct effect/recovery lanes."
+    },
+    {
+      "repo": "thebrazenbeard/on-theo",
+      "main_sha": "eedbcf660c2cfe6cff5636e798806b0cd3d56efc",
+      "state": "INFRASTRUCTURE_CANDIDATE_PLUS_ACTIVE_RESEARCH_DAG",
+      "active_frontiers": [
+        {
+          "pr": 138,
+          "head_sha": "f54fd3cb17399384c0a2b3e1def6f8772d33a373",
+          "role": "reconstructible infrastructure canonical-main candidate"
+        },
+        {
+          "pr": 154,
+          "head_sha": "1b6f5c19e649cccd4020987990e17bf04c469da4",
+          "role": "Yeshua adversarial research spine"
+        },
+        {
+          "pr": 155,
+          "head_sha": "7b5aa8f3f93c31a69c1d324004feace9cb275d4f",
+          "role": "early-source constrained baseline"
+        },
+        {
+          "pr": 156,
+          "head_sha": "443e45a2132a18d92344115e306c2a58dfda4950",
+          "role": "Kingdom teaching"
+        },
+        {
+          "pr": 157,
+          "head_sha": "facb8789bbbd0c77f0c3fa27ab71bb3d77b0557d",
+          "role": "people/source clock"
+        },
+        {
+          "pr": 158,
+          "head_sha": "65ac0ff29e8366f3e0fbd9d40aa24ad63f98b1f8",
+          "role": "Judas research leaf"
+        },
+        {
+          "pr": 159,
+          "head_sha": "a06eaf0d062f226e903dd642ba511124a686be1b",
+          "role": "James research leaf"
+        },
+        {
+          "pr": 160,
+          "head_sha": "9c85c6592a191c333f4cde6db1c82c3f86e1a62a",
+          "role": "Mary Magdalene research leaf"
+        },
+        {
+          "pr": 161,
+          "head_sha": "a9179a332e266603d10cb7c98e829d9d48bea02f",
+          "role": "Peter research leaf"
+        }
+      ],
+      "validation": {
+        "pr_138": "PASS",
+        "evidence": "Validate registries workflow 35542584091 succeeded"
+      },
+      "next": "Keep PR #138 as infrastructure-only canonical candidate. Preserve the #154->#157 research spine and its #158-#161 fan-out as separate research evidence rather than forcing them into main."
+    },
+    {
+      "repo": "thebrazenbeard/chat-communication-bus",
+      "main_sha": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+      "state": "EXISTING_CANONICAL_RECONCILIATION_FRONTIER",
+      "active_frontiers": [
+        {
+          "pr": 194,
+          "head_sha": "aad280c68957f38204d49c61fb94cefcab458692",
+          "role": "repaired canonical-main reconciliation"
+        }
+      ],
+      "validation": {
+        "current_head_hosted_actions": "INFRASTRUCTURE_NO_RUN",
+        "evidence": "workflow 35537387124 had sql/test/edge jobs with steps=null",
+        "exact_reconciliation_parent": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+        "exact_reconciliation_parent_tests": "323/323 PASS as recorded by PR #194",
+        "current_head_delta_from_tested_parent": {
+          "ahead": 1,
+          "behind": 0,
+          "changed_files": [
+            "architecture/REPOSITORY_RECONCILIATION_V1.json",
+            "docs/CURRENTNESS_AND_RECONCILIATION_V1.md"
+          ]
+        }
+      },
+      "next": "Keep PR #194 as the Bus canonical-repair frontier; do not treat hosted no-run failures as source-test failures."
+    },
+    {
+      "repo": "thebrazenbeard/abil",
+      "main_sha": "0812d9780ce1648820269fa142a43e17030ef793",
+      "state": "RESEARCH_FANOUT_RECONCILIATION_REQUIRED",
+      "active_frontiers": [
+        {
+          "pr": 26,
+          "head_sha": "e7b5439bd886c0dcc0127852a4d3557cfa169028",
+          "role": "chat-independent recovery/execution-state frontier"
+        },
+        {
+          "pr": 2,
+          "head_sha": "712d5b30b45ba9299dcfce0599878cb81db70e8f",
+          "role": "control-reconstruction successor architecture base"
+        },
+        {
+          "pr": 25,
+          "head_sha": "7e760c0f1bd4384a079948a20dba1cdef188f0dc",
+          "role": "protected-head witness semantic research leaf"
+        }
+      ],
+      "validation": {
+        "pr_26_hosted_actions": "NO_RUNS_OBSERVED"
+      },
+      "next": "Map and semantically reconcile the research fan-out rooted at PR #2 while keeping PR #26 recovery/dechatification separate until composition is justified."
+    },
+    {
+      "repo": "thebrazenbeard/driftguard",
+      "main_sha": "9894692ff6b549e4378bcc2b8ca46813ff18bf37",
+      "state": "TWO_CURRENT_FRONTIERS",
+      "active_frontiers": [
+        {
+          "pr": 34,
+          "head_sha": "351b7a57b7213bd72cf881aa2bbaa449fb0fbc8f",
+          "role": "R11 governed benchmark on reviewed atomic-currentness base"
+        },
+        {
+          "pr": 32,
+          "head_sha": "8a81745b24278e6e2e948115ae6ff3ada56c250b",
+          "role": "durable effect-fence / authorization-CAS design"
+        }
+      ],
+      "validation": {
+        "pr_34": "PASS",
+        "evidence": "tests workflow 35611543932 succeeded"
+      },
+      "next": "Preserve benchmark and effect-fence lanes separately; determine their explicit composition boundary instead of collapsing one into the other."
+    },
+    {
+      "repo": "thebrazenbeard/vera",
+      "main_sha": "6388f9e2564795530db35728f42d5ab9f50275ae",
+      "state": "CURRENT_MAIN_MOVED_WITH_ACTIVE_STALE_BASE_FRONTIERS",
+      "active_frontiers": [
+        {
+          "pr": 175,
+          "head_sha": "9c791f438aa223908b0c344931991590271b226b",
+          "role": "current-main Bus transport policy hardening"
+        },
+        {
+          "pr": 170,
+          "head_sha": "0b23118e630a03608f17d26116df09455a716d32",
+          "role": "base-bound coherent currentness V3 R2",
+          "base_sha": "d696e659853ab12bb0a3f0cefb2022b3f8a45e32"
+        },
+        {
+          "pr": 172,
+          "head_sha": "5890ecd8751f2543c74b846c6df4e5bd9678c9bd",
+          "role": "Datum V2 mutation RPC ACL hardening",
+          "base_sha": "d696e659853ab12bb0a3f0cefb2022b3f8a45e32"
+        }
+      ],
+      "validation": {
+        "pr_175_hosted_actions": "INFRASTRUCTURE_NO_RUN",
+        "evidence": "four workflows concluded failure but all exposed jobs had steps=null"
+      },
+      "next": "Reconcile #170 and #172 against current main 6388f9e... without rewriting their exact-base evidence, then evaluate composition with current-main PR #175."
+    },
+    {
+      "repo": "thebrazenbeard/project-runner",
+      "main_sha": "bc05812b560b4fcde3a362e72fba04c626cafac8",
+      "state": "MINIMAL_BASELINE_PLUS_OPTIONAL_INTEROP_LINE",
+      "active_frontiers": [
+        {
+          "pr": 29,
+          "head_sha": "48c2074ce4f679c724036e14c5b6910e145c2492",
+          "role": "minimal canonical-baseline candidate"
+        },
+        {
+          "pr": 30,
+          "head_sha": "3fab1f3c94c260501c048edd253e6aa5ec37186f",
+          "role": "broader interoperability composition"
+        },
+        {
+          "pr": 31,
+          "head_sha": "8e588bd1cb72808b4a611d2a0bcbaeba6cb10b15",
+          "role": "hardened Rezon evidence contract successor to PR #27"
+        }
+      ],
+      "validation": {
+        "pr_29": "PASS",
+        "evidence": "test workflow 35538015801 succeeded"
+      },
+      "next": "Keep #29 as the minimal baseline. Treat #30/#31 as optional interoperability/evidence work until exact dependency evidence justifies promotion."
+    },
+    {
+      "repo": "thebrazenbeard/rezon",
+      "main_sha": "e3d7a41eccb49a9f403ef66f511faef677ceec1b",
+      "state": "EXISTING_CANONICAL_BASELINE_FRONTIER",
+      "active_frontiers": [
+        {
+          "pr": 80,
+          "head_sha": "90140fa109bdfe5bd5aba24dec4afab799b25848",
+          "role": "current Kernel + Benchmark R4 canonical-baseline candidate"
+        },
+        {
+          "pr": 79,
+          "head_sha": "8289914ec500a1392b10fe1a3774dee166e73b40",
+          "role": "R51 source parent preserved as provenance",
+          "state": "closed_unmerged"
+        }
+      ],
+      "validation": {
+        "pr_80_hosted_actions": "NO_RUNS_OBSERVED",
+        "source_parent_containment": {
+          "base": "8289914ec500a1392b10fe1a3774dee166e73b40",
+          "head": "90140fa109bdfe5bd5aba24dec4afab799b25848",
+          "status": "ahead",
+          "ahead": 56,
+          "behind": 0
+        }
+      },
+      "next": "Use #80 as the consolidation frontier and qualify its exact head rather than reopening predecessor R51 branches."
+    }
+  ],
+  "execution_rule": "No merge, PR closure, branch deletion, force-push, deployment, provider mutation, credential/permission change, or other protected effect is implied or authorized by this priority declaration."
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "BT2_REPOSITORY_CLOSURE_CANDIDATES_V1",
+  "status": "PREPARED_NOT_EXECUTED",
+  "date": "2026-09-20",
+  "candidates": [
+    {
+      "repo": "discovery",
+      "after": "PR #19 canonicalized and exact main verified",
+      "prs": [
+        2,
+        3,
+        7
+      ],
+      "disposition": "SUPERSEDED_CLOSURE_CANDIDATES"
+    },
+    {
+      "repo": "discovery",
+      "after": "PR #19 canonicalized and exact main verified",
+      "prs": [
+        1,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "disposition": "STACK_HISTORY_CLOSURE_CANDIDATES_WITH_SUPERSESSION_POINTERS"
+    },
+    {
+      "repo": "discovery",
+      "after": "PR #19 canonicalized and exact main verified",
+      "prs": [
+        18
+      ],
+      "disposition": "FAILED_PRESERVED_EVIDENCE_CLOSURE_CANDIDATE_NOT_MERGED"
+    },
+    {
+      "repo": "chat-communication-bus",
+      "after": "future repaired canonical main is qualified/reviewed/canonicalized",
+      "prs": [
+        67
+      ],
+      "disposition": "PLAN_SUPERSEDED_BY_EXECUTED_RECONCILIATION_OBJECT"
+    },
+    {
+      "repo": "chat-communication-bus",
+      "after": "future repaired canonical main is qualified/reviewed/canonicalized",
+      "prs": [
+        80
+      ],
+      "disposition": "SOURCE_CONSUMED_IN_CANONICAL_CANDIDATE_CLOSE_WITH_PROVENANCE_POINTER"
+    }
+  ]
+}

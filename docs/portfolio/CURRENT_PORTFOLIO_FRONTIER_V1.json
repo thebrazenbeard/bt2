@@ -1,0 +1,45 @@
+{
+  "schema": "BT2_CURRENT_PORTFOLIO_FRONTIER_V1",
+  "status": "ACTIVE",
+  "date": "2026-09-20",
+  "pair_division": {
+    "coordinator": [
+      "portfolio census",
+      "bt2",
+      "chat-communication-bus",
+      "discovery",
+      "god-brain",
+      "world-zero",
+      "on-theo"
+    ],
+    "parallel": [
+      "vera",
+      "vera-control-plane",
+      "driftguard",
+      "rezon",
+      "hc-brain",
+      "semanticatlas",
+      "noema",
+      "project-runner",
+      "vera-mesh",
+      "abil"
+    ],
+    "parallel_ack_commit": "ba3d2c4fd9b75ac23dd98427d6be186fde50733d"
+  },
+  "now": [
+    "Finish exact qualification and independent review of Bus reconciliation candidate 95225255.",
+    "Persist Bus reconciliation/currentness manifest and open Draft canonicalization PR only after candidate qualification.",
+    "Consume parallel-lane archaeology returns and update census without duplicating exact subjects.",
+    "Reconstruct ON_THEO synthesis/currentness DAG; avoid treating research breadth as a merge stack.",
+    "Resolve outstanding God Brain review debt separately from already-main-ready PR #6.",
+    "Continue deep census of unqualified repositories by centrality and canonical-state risk."
+  ],
+  "do_not_do": [
+    "merge",
+    "close historical PRs/issues destructively",
+    "delete branches",
+    "force push",
+    "deploy",
+    "mutate providers/credentials/rulesets/visibility"
+  ]
+}

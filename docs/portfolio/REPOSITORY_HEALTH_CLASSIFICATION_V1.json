@@ -1,0 +1,62 @@
+{
+  "schema": "BT2_REPOSITORY_HEALTH_CLASSIFICATION_V1",
+  "status": "IN_PROGRESS",
+  "date": "2026-09-20",
+  "classification_rule": "Only live-read repositories are classified beyond UNKNOWN_PENDING_DEEP_CENSUS.",
+  "repositories": {
+    "bt2": [
+      "CURRENTNESS_AMBIGUOUS",
+      "CANONICAL_IDENTITY_COLLISION",
+      "PR_SPRAWL",
+      "ACTIVE_IMPLEMENTATION"
+    ],
+    "build-team-2.0": [
+      "HISTORICAL_OR_SUPERSEDED_CANONICAL_CANDIDATE",
+      "CURRENTNESS_AMBIGUOUS"
+    ],
+    "hc-brain": [
+      "ACTIVE_IMPLEMENTATION",
+      "CANONICAL_IDENTITY_COLLISION"
+    ],
+    "discovery": [
+      "MAIN_TRIVIAL_OR_EMPTY",
+      "PR_STACK_IS_DE_FACTO_PROJECT",
+      "CANONICALIZATION_CANDIDATE_READY"
+    ],
+    "chat-communication-bus": [
+      "MAIN_CONTAMINATED_WRONG_TARGET_APPEND",
+      "PR_SPRAWL",
+      "ISSUE_SPRAWL",
+      "FOUNDATIONAL_SHARED_INFRASTRUCTURE",
+      "CANONICALIZATION_CANDIDATE_IN_QUALIFICATION"
+    ],
+    "god-brain": [
+      "MAIN_BEHIND_ACTIVE_WORK",
+      "ACTIVE_RESEARCH",
+      "MAIN_READY_CANDIDATE_EXISTS",
+      "PROTECTED_EFFECT_BLOCKED"
+    ],
+    "world-zero": [
+      "HEALTHY_CANONICAL_MAIN",
+      "ACTIVE_RESEARCH"
+    ],
+    "on-theo": [
+      "MAIN_BEHIND_ACTIVE_WORK",
+      "PR_SPRAWL",
+      "ACTIVE_RESEARCH",
+      "CURRENTNESS_AMBIGUOUS"
+    ],
+    "conditioning": [
+      "HISTORICAL_ONLY",
+      "ARCHIVED"
+    ],
+    "vera-apk": [
+      "MAIN_TRIVIAL_OR_EMPTY",
+      "RECOVERY_INCOMPLETE"
+    ],
+    "vera-habitat": [
+      "MAIN_TRIVIAL_OR_EMPTY",
+      "RECOVERY_INCOMPLETE"
+    ]
+  }
+}

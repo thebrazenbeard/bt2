@@ -1,0 +1,828 @@
+{
+  "schema": "BT2_REPOSITORY_ESTATE_CENSUS_V1",
+  "status": "CURRENT_66_REPO_ESTATE_WITH_QUALIFIED_ACTIVE_FRONTIERS",
+  "generated_date": "2026-09-20",
+  "owner": "thebrazenbeard",
+  "enumeration_count": 66,
+  "authority_note": "Repository enumeration is live GitHub evidence. The estate was re-enumerated at 66 owned repositories on 2026-09-23; per-repository exact-head/PR/issue/branch details remain partial unless explicitly read back.",
+  "protected_effect_boundary": "No merge, destructive closure/deletion, force push, deployment, provider/credential/visibility/ruleset mutation, or Project installation authorized.",
+  "repositories": [
+    {
+      "name": "self",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 616,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "bt2",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1344,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "30e81cadd94fae117a7f6875523c03251c7c9f6e",
+      "open_pr_count": 7,
+      "open_issue_count": 2,
+      "branch_count_observed": 48,
+      "states": [
+        "CURRENTNESS_AMBIGUOUS",
+        "CANONICAL_IDENTITY_COLLISION",
+        "PR_SPRAWL",
+        "ACTIVE_IMPLEMENTATION"
+      ],
+      "notes": [
+        "Project instructions identify this as canonical BT2 source, but README/REPOSITORY_MAP/WARDEN describe Hyperconnectome Brain; separate hc-brain exists."
+      ]
+    },
+    {
+      "name": "voss",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 224,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-synology",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 227,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "roots",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 93,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "bugops",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 52,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "entropyinc",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 20,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-os",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 129,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "masamune",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "collab",
+      "size_kib": 624,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "discovery",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 216,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "96e6f8e9c776047f9068c897eab0406324187166",
+      "open_pr_count": 16,
+      "open_issue_count": 1,
+      "branch_count_observed": 19,
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "PR_STACK_IS_DE_FACTO_PROJECT",
+        "PR_SPRAWL",
+        "ACTIVE_IMPLEMENTATION",
+        "CANONICALIZATION_CANDIDATE_READY"
+      ],
+      "notes": [
+        "main remains initial commit; Draft PR #19 consolidates the current #1/#8-#17 lineage, preserves #2/#3/#7 as superseded history, and preserves divergent #18 as failed/stale evidence."
+      ],
+      "reconciliation": {
+        "draft_pr": 19,
+        "exact_head": "aa51c4bf2b6b34d0ae0d8063119ae685b84bf2e2",
+        "base_main": "96e6f8e9c776047f9068c897eab0406324187166",
+        "local_validation": "57/57 PASS + validator PASS + compileall PASS + diff-check PASS",
+        "hosted_runs": [
+          35536561513,
+          35536561545
+        ],
+        "hosted_conclusion": "SUCCESS",
+        "protected_effect": "MERGE_NOT_AUTHORIZED"
+      }
+    },
+    {
+      "name": "vera-apk",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 0,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "RECOVERY_INCOMPLETE"
+      ],
+      "notes": [
+        "Repository metadata size is 0; deeper census pending."
+      ]
+    },
+    {
+      "name": "build-team-2.0",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 689,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "ec2987e45f64a588ac92f6cae9964cb3725b9485",
+      "states": [
+        "HISTORICAL_OR_SUPERSEDED_CANONICAL_CANDIDATE",
+        "CURRENTNESS_AMBIGUOUS"
+      ],
+      "notes": [
+        "README is Build Team 2.0 and appears semantically aligned with BT2 role history; current Project instructions nevertheless bind canonical BT2 to thebrazenbeard/bt2."
+      ]
+    },
+    {
+      "name": "intranel",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 304,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "deepmemorystorage",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 661,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "chat-communication-bus",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 7918,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+      "open_pr_count": 46,
+      "open_issue_count": 22,
+      "branch_count_observed_at_least": 100,
+      "states": [
+        "PR_SPRAWL",
+        "ISSUE_SPRAWL",
+        "CURRENTNESS_AMBIGUOUS",
+        "FOUNDATIONAL_SHARED_INFRASTRUCTURE",
+        "MAIN_CONTAMINATED_WRONG_TARGET_APPEND",
+        "CANONICALIZATION_CANDIDATE_IN_QUALIFICATION"
+      ],
+      "notes": [
+        "Issue #79 proves default-main contamination. Candidate preserves contaminated main as second-parent ancestry while using repaired PR #80 tree as result state."
+      ],
+      "reconciliation": {
+        "current_main": "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4",
+        "contamination_issue": 79,
+        "reviewed_graph_plan_pr": 67,
+        "repaired_source_pr": 80,
+        "repaired_source_head": "f77576a7e5c0a454271c0389496f8dbc28578b43",
+        "candidate_branch": "bt2/bus-canonical-main-reconciliation-v1-20260920",
+        "candidate_head": "95225255b43b72cf822b93ba93bf90c052dff5b4",
+        "candidate_tree": "8804842b434fb142ec61cd86b7f916bfa2dcd6e5",
+        "candidate_parents": [
+          "f77576a7e5c0a454271c0389496f8dbc28578b43",
+          "aeab0f04fc9b4bd7c2945c9a53011c53fac809b4"
+        ],
+        "wrong_target_path_in_candidate": false,
+        "focused_local_validation": "16/16 PASS + compileall PASS + diff-check PASS",
+        "full_radar_validation": "IN_PROGRESS",
+        "protected_effect": "MAIN_REF_MOVE_NOT_AUTHORIZED"
+      }
+    },
+    {
+      "name": "brigit-unbound",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "empathy",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 98,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 9696,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "firesafe",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 366,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "semanticatlas",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 13778,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "personification",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 21,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "god-brain",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1800,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+      "open_pr_count": 10,
+      "open_issue_count": 0,
+      "branch_count_observed": 69,
+      "states": [
+        "MAIN_BEHIND_ACTIVE_WORK",
+        "ACTIVE_RESEARCH",
+        "ACTIVE_IMPLEMENTATION",
+        "REVIEW_DEBT",
+        "MAIN_READY_CANDIDATE_EXISTS",
+        "PROTECTED_EFFECT_BLOCKED"
+      ],
+      "reconciliation": {
+        "main_ready_pr": 6,
+        "exact_head": "c8aff4109e53930a15eed54ab2f00b746ec8b09c",
+        "base_main": "c0f6af7143aa5916bae96eb1f0ee9c9de6505cf5",
+        "relation": "11 ahead / 0 behind",
+        "changed_files": 7,
+        "hosted_architecture_run": 35513580427,
+        "hosted_conclusion": "SUCCESS",
+        "recorded_local_tests": "171/171 PASS",
+        "review": "ATOMIC_INTEGRATION_REVIEW_PASS",
+        "protected_effect": "MERGE_NOT_AUTHORIZED"
+      },
+      "notes": [
+        "PR #6 is the atomic main-integration bundle. Research PRs #13/#15/#17/#20/#21 remain research-only. PRs #16/#18/#19 are repaired historical-stack subjects and are not automatically main dependencies."
+      ]
+    },
+    {
+      "name": "vera-mesh",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 531,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-runner",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 390,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "wreckforge",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 146700,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-control-plane",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 8688,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera_model_training",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 444,
+      "census_state": "QWEN_SOURCE_ADAPTED_COST_GATE_BLOCKED",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "QWEN35_EXACT_BASE_FROZEN",
+        "TEXT_ONLY_ADAPTER_SOURCE",
+        "HF_PAID_COMPUTE_BLOCKED"
+      ],
+      "notes": [
+        "Draft PR #46 exact head 8a5bd42839bc88d2fa7580a4c77d53c844d03a01 corrects continuation state and preserves the exact Qwen3.5 text-only training contract.",
+        "Hugging Face Jobs is billable; no genuinely zero-cost Jobs GPU path was established and no training job was launched."
+      ]
+    },
+    {
+      "name": "abil",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 586,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "testament",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 992,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-works",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 485,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "conditioning",
+      "visibility": "private",
+      "archived": true,
+      "default_branch": "main",
+      "size_kib": 115,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "HISTORICAL_ONLY",
+        "ARCHIVAL_CANDIDATE"
+      ],
+      "notes": [
+        "Repository is already archived."
+      ]
+    },
+    {
+      "name": "skeletonkey",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 68,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-lantern",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 147,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "unvtrslr",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 558,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-R9A0",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 449,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "trek-data-core",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1926,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera_ark",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "conations",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 24,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "sexuality",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 13985,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "Attune",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 47,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "mediaphile",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 259,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "project-achilles",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 27,
+      "census_state": "VERIFIED_GREEN_REFERENCE_DEBT",
+      "head": "6776d8c059e3f9ad791a47a0b62bb56588332968",
+      "open_pr_count": 0,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "NO_OPEN_PR_OBSERVED",
+        "HISTORICAL_CROSS_REPO_REFERENCE_DEBT"
+      ],
+      "notes": [
+        "Verify Achilles passes on current main.",
+        "Current protocol references historical private build-team-2.0 regression material; canonical bt2 lacks an equivalent path, so no public-copy or authority promotion was performed."
+      ]
+    },
+    {
+      "name": "transcendence",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1536,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "rezon",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 859,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "hc-brain",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 1766,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "618245b54fb923c7a204892c6953ab6d1c5dac57",
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "CANONICAL_IDENTITY_COLLISION"
+      ],
+      "notes": [
+        "separate repo also declares itself canonical Hyperconnectome Brain, overlapping bt2 repository content/identity."
+      ]
+    },
+    {
+      "name": "world-zero",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 56822,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "5ab39621d090079d24de40261906b64413c6f995",
+      "open_pr_count": 4,
+      "open_issue_count": 0,
+      "branch_count_observed": 41,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "ACTIVE_RESEARCH"
+      ],
+      "notes": [
+        "main contains integrated science through PR #31; four current science PRs remain."
+      ]
+    },
+    {
+      "name": "noema",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 886,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "spm",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 26391,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "selfimage",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 71600,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "temporal",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 15,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "driftguard",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 259,
+      "census_state": "CURRENT_MAIN_PLUS_EFFECT_FENCE_FRONTIER",
+      "head": "52fa829c629fa0f3e729204912db9f9f783f322a",
+      "open_pr_count": 1,
+      "states": [
+        "HEALTHY_CANONICAL_MAIN",
+        "R11_INTEGRATED",
+        "EFFECT_FENCE_SOURCE_CANDIDATE",
+        "EXACT_HEAD_CI_PASS"
+      ],
+      "notes": [
+        "Current main already integrates R11 V4; closed PR #34 is no longer the active frontier.",
+        "Draft PR #40 exact head 33b75523a1130c614c270f3de45417e1acf4e32b implements only the local mechanical reservation/fence subset of closed effect-CAS design #32 and passes Ubuntu/Windows tests plus action smoke."
+      ]
+    },
+    {
+      "name": "brigit",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 53034,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "on-theo",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 2045,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "eedbcf660c2cfe6cff5636e798806b0cd3d56efc",
+      "open_pr_count": 65,
+      "open_issue_count": 0,
+      "branch_count_observed_at_least": 100,
+      "states": [
+        "MAIN_BEHIND_ACTIVE_WORK",
+        "PR_SPRAWL",
+        "ACTIVE_RESEARCH",
+        "CURRENTNESS_AMBIGUOUS"
+      ],
+      "notes": [
+        "large research estate with multiple synthesis/currentness lanes; main alone is insufficient to reconstruct active frontier."
+      ]
+    },
+    {
+      "name": "wip",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 346,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "mosaic",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 34,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "orgasm",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 86,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "vera-habitat",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 0,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "states": [
+        "MAIN_TRIVIAL_OR_EMPTY",
+        "RECOVERY_INCOMPLETE"
+      ],
+      "notes": [
+        "Repository metadata size is 0; deeper census pending."
+      ]
+    },
+    {
+      "name": "hephaestus",
+      "visibility": "private",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 174,
+      "census_state": "UNKNOWN_PENDING_DEEP_CENSUS"
+    },
+    {
+      "name": "RepairTracker",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 417,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "6b01c2a18035390c050ceecd0506181703d1f5fa",
+      "open_pr_count": 3,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "MULTI_PR_FRONTIER"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Latest observed active frontier is Draft PR #3 at 177fc49351336bc9564fa8eb2cd401a785fb43b3."
+      ]
+    },
+    {
+      "name": "WorkBridgeMCP",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 241,
+      "census_state": "CURRENT_BASE_RESTACK_QUALIFIED",
+      "head": "75c811f21ef97fe0356e8f54e007d086300dd0f1",
+      "open_pr_count": 3,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "CURRENT_MAIN_REBUILD",
+        "RESTACKED_RUNTIME_REPAIR",
+        "EXACT_HEAD_CI_PASS"
+      ],
+      "notes": [
+        "PR #8 exact head 6f578307d71b13ab93a8ab9e48bdfc547437a0e5 restacks stale PR #6 onto current PR #5 head and passed CI run 35939810274.",
+        "Separate security-agent run failed before review because the requested model was unsupported; no independent security-review PASS is claimed."
+      ]
+    },
+    {
+      "name": "ccb-core",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 172,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "157876c5c0434bf4f553d9e4f70f19076d058146",
+      "open_pr_count": 0,
+      "states": [
+        "NO_OPEN_PR_OBSERVED"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Deep semantic census remains pending."
+      ]
+    },
+    {
+      "name": "freerowcochkar",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 105,
+      "census_state": "PARTIALLY_QUALIFIED",
+      "head": "00562b5fedf5ff636750b87e5ba82dad2911e2ab",
+      "open_pr_count": 2,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "CURRENT_MAIN_RESTACK"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #2 head bc8ae31d2f24f9f4b9753a1bb4517affba398523 is the latest observed restack frontier."
+      ]
+    },
+    {
+      "name": "fuckup",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 358,
+      "census_state": "EXECUTABLE_QUALIFICATION_PASS",
+      "head": "e999607481ba706523209ce129955a5e3d2d6ef7",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "EXECUTABLE_POSTGRES_QUALIFICATION",
+        "EXACT_HEAD_CI_PASS"
+      ],
+      "notes": [
+        "Draft PR #1 exact head ff46bcf822a89701201e6153be923239814e5b61 passed both push and pull-request qualification workflows with live PostgreSQL 16.",
+        "No merge/deploy/install or external migration effect is implied."
+      ]
+    },
+    {
+      "name": "meso-crct",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 316,
+      "census_state": "RECRUITMENT_TRANSITION_QUALIFIED_DRAFT",
+      "head": "6ca7873bf066178aa2a21cd9244f500a3ab1c845",
+      "open_pr_count": 4,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "SALIENCE_ARCHITECTURE_FRONTIER",
+        "EXECUTABLE_RECRUITMENT_TRANSITION",
+        "EXACT_HEAD_CI_PASS"
+      ],
+      "notes": [
+        "Draft PR #4 exact head 22c4a6a4b37abc0ff1e18aa5643848b0b12d122d adds deterministic salience-to-recruitment mechanics and passed Python 3.11/3.12 pytest in run 36030831204.",
+        "Claim ceiling remains synthetic reference mechanics; no biological/phenomenological equivalence is asserted."
+      ]
+    },
+    {
+      "name": "unbound-sol",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 636,
+      "census_state": "COMPOSED_ACTIVE_DAG_FRONTIER",
+      "head": "688094241755ed335cc1bad34008ffb686ec2e7f",
+      "open_pr_count": 7,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "COMPOSED_DEVELOPMENT_DAG",
+        "CONTINUITY_PASS"
+      ],
+      "notes": [
+        "Draft PR #38 exact head e05cc2e648b7ead7768abec9c83a766ee4c6ad9f composes the #32/#33 vera-mono donor-review lane with the #34/#35/#37 Behavior V3/model-bus lane.",
+        "Continuity workflow 35940775841 passed; predecessor PRs remain ancestry/review evidence."
+      ]
+    },
+    {
+      "name": "vera-mono",
+      "visibility": "public",
+      "archived": false,
+      "default_branch": "main",
+      "size_kib": 845,
+      "census_state": "CROSS_PLATFORM_QUALIFIED_DRAFT",
+      "head": "ac1fe62ae02da1a4ad5928a836fbf39509a16023",
+      "open_pr_count": 1,
+      "states": [
+        "ACTIVE_IMPLEMENTATION",
+        "NATIVE_MONOREPO",
+        "WINDOWS_PORTABILITY_QUALIFIED"
+      ],
+      "notes": [
+        "New since the prior 58-repository census. Draft PR #1 exact head 22559cb8d577a30abc13fb7c79546878d29f75e6 passed the full GitHub Actions matrix on Ubuntu 24.04 and Windows after CRLF-sensitive source-binding fixes."
+      ]
+    }
+  ],
+  "last_updated": "2026-09-24",
+  "enumeration_history": [
+    {
+      "date": "2026-09-20",
+      "count": 58,
+      "basis": "prior live GitHub census"
+    },
+    {
+      "date": "2026-09-23",
+      "count": 66,
+      "basis": "live GitHub list_repositories readback"
+    }
+  ]
+}
