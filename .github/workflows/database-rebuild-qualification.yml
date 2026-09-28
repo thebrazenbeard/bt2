@@ -8,7 +8,7 @@ on:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
-      - 'tests/test_postgres_qualification_image_identity.py'
+      - 'tests/**'
       - 'native/project/**'
       - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
@@ -17,7 +17,7 @@ on:
       - 'database/**'
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
-      - 'tests/test_postgres_qualification_image_identity.py'
+      - 'tests/**'
       - 'native/project/**'
       - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
@@ -62,8 +62,8 @@ jobs:
           echo "POSTGRES_CONTAINER_ID=${{ job.services.postgres.id }}" >> "$GITHUB_ENV"
       - name: Verify V4 source package
         run: python tools/qualification/test_lantern_postgresql_v4_source_binding.py
-      - name: Run image-identity hostile tests
-        run: python -m unittest discover -s tests -p 'test_postgres_qualification_image_identity.py' -v
+      - name: Run PostgreSQL qualification policy tests
+        run: python -m unittest discover -s tests -p 'test_postgres*.py' -v
       - name: Canonical PostgreSQL 16 blank rebuild
         run: |
           python tools/qualification/run_postgres16_blank_rebuild.py \
@@ -123,8 +123,10 @@ jobs:
         run: |
           PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -Atqc \
             "SELECT current_user,rolsuper,rolcreaterole,rolcreatedb FROM pg_roles WHERE rolname=current_user;"
-      - name: Run image-identity hostile tests
-        run: python -m unittest discover -s tests -p 'test_postgres_qualification_image_identity.py' -v
+      - name: Verify V4 source package
+        run: python tools/qualification/test_lantern_postgresql_v4_source_binding.py
+      - name: Run PostgreSQL qualification policy tests
+        run: python -m unittest discover -s tests -p 'test_postgres*.py' -v
       - name: PostgreSQL 17 canonical rebuild compatibility
         run: |
           PGPASSWORD=bt2admin python tools/qualification/run_postgres17_blank_rebuild_compatibility.py \
