@@ -20,6 +20,23 @@ At minimum verify:
 5. migration/build receipts and reconstruction oracle;
 6. no WoWSQL-only projection is required for ordinary currentness reads.
 
+PostgreSQL 16 is the canonical full-replay qualification and applies every
+historical migration in order.
+
+PostgreSQL 17 managed-owner qualification is a compatibility qualification,
+not a claim that provider-specific historical bytes are portable. It may skip
+only these two historical subjects:
+
+- `0012_internal_schema_access_assertion_v1.sql`;
+- `0018_lantern_producer_boundary_v1.sql`.
+
+Those historical subjects encode WoWSQL/superuser-era assumptions. The
+compatibility path MUST still apply forward migration
+`0024_postgresql_v4_provider_neutral_owner_boundary_v1.sql`, run the complete
+current regression suite, and pass the final canonical reconstruction oracle.
+Any additional skipped migration is a failure requiring a new reviewed source
+subject.
+
 Object presence alone is not parity.
 
 ## Lantern state acceptance

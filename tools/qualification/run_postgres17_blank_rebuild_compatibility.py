@@ -37,6 +37,14 @@ CANONICAL_DATA_AFTER_HISTORY = [
     DB / "data" / "0008_verified_training_source_registry_receipt_v4.sql",
 ]
 
+COMPATIBILITY_SKIPPED_MIGRATIONS = {
+    DB / "migrations" / "0012_internal_schema_access_assertion_v1.sql",
+    DB / "migrations" / "0018_lantern_producer_boundary_v1.sql",
+}
+COMPATIBILITY_REPLACEMENT_MIGRATION = (
+    DB / "migrations" / "0024_postgresql_v4_provider_neutral_owner_boundary_v1.sql"
+)
+
 
 def run(cmd: list[str], *, input_text: str | None = None) -> subprocess.CompletedProcess[str]:
     print("+", " ".join(cmd), flush=True)
@@ -110,10 +118,36 @@ def main() -> int:
     assert_empty(args.database_url)
     run(psql_args(args.database_url) + ["-c", "CREATE EXTENSION IF NOT EXISTS pgcrypto;"])
 
-    for path in sorted((DB / "schema").glob("*.sql")):
+    schema_files = sorted((DB / "schema").glob("*.sql"))
+    migration_files = sorted((DB / "migrations").glob("*.sql"))
+    if not COMPATIBILITY_REPLACEMENT_MIGRATION.is_file():
+        raise SystemExit("PostgreSQL 17 compatibility replacement migration 0024 is missing")
+    if not COMPATIBILITY_SKIPPED_MIGRATIONS.issubset(set(migration_files)):
+        missing = sorted(
+            str(path.relative_to(ROOT))
+            for path in COMPATIBILITY_SKIPPED_MIGRATIONS - set(migration_files)
+        )
+        raise SystemExit(f"declared PostgreSQL 17 compatibility skips are missing: {missing}")
+
+    for path in schema_files:
         psql_file(args.database_url, path)
-    for path in sorted((DB / "migrations").glob("*.sql")):
+
+    skipped_migrations: list[str] = []
+    for path in migration_files:
+        if path in COMPATIBILITY_SKIPPED_MIGRATIONS:
+            rel = str(path.relative_to(ROOT))
+            print(
+                f"SKIP PostgreSQL 17 historical provider-specific migration: {rel}",
+                flush=True,
+            )
+            skipped_migrations.append(rel)
+            continue
         psql_file(args.database_url, path)
+
+    if str(COMPATIBILITY_REPLACEMENT_MIGRATION.relative_to(ROOT)) not in [
+        str(path.relative_to(ROOT)) for path in migration_files
+    ]:
+        raise SystemExit("forward compatibility replacement migration 0024 was not in migration order")
 
     # Regression suite runs before durable seeds because several smoke tests create
     # intentionally synthetic subjects under rollback. 0011 is the final state oracle.
@@ -157,6 +191,10 @@ def main() -> int:
         "source_commit": source_commit,
         "source_tree": source_tree,
         "package_digest_sha256": package_digest,
+        "compatibility_skipped_historical_migrations": skipped_migrations,
+        "compatibility_replacement_migration": str(
+            COMPATIBILITY_REPLACEMENT_MIGRATION.relative_to(ROOT)
+        ),
         "postgres_image_digest": image_attestation["repo_digest"],
         "postgres_image_attestation": image_attestation,
         "postgres_major": 17,
