@@ -4,11 +4,13 @@
 
 BT2 is a working multi-module cognitive-architecture and qualification workspace.
 
-The current `main` tree includes modules for cognition, affect, salience/attention, memory, identity, semantics, pragmatics, routing, somatics, behavior, and I/O, together with qualification and project evidence such as the Lantern V2/V3 work preserved in this repository.
+The current source tree includes modules for cognition, affect, salience/attention, memory, identity, semantics, pragmatics, routing, somatics, behavior, and I/O, together with database/runtime qualification, recovery, and portfolio evidence. It preserves historical Lantern V1-V3/WoWSQL material and carries the provider-neutral PostgreSQL/SQL Connectome V4 source package.
 
 ## Current status
 
 This repository previously displayed a copied **Hyperconnectome Brain** README that did not identify BT2 correctly. The repository contents themselves remain the authority for what exists on `main`; this README is an orientation layer, not a claim that every module is installed or active in a runtime.
+
+The V4 package in source is an installation/runtime candidate only. Until a replacement PostgreSQL runtime is reconstructed, qualified, connected through the governed V4 interface, and installed as the active Project contract, `LANTERN_CURRENTNESS = UNKNOWN`.
 
 ## Repository shape
 

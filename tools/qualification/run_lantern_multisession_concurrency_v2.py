@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest-V2 driver for true multi-session Lantern qualification.
 
-Reuses the bounded V1 race mechanics, but binds evidence to BUILD_MANIFEST_V2 and
+Reuses the bounded V1 race mechanics, but binds evidence to the active build manifest and
 emits the exact top-level fields consumed by bt2.evaluate_bt2_merge_readiness_v1().
 """
 from __future__ import annotations
@@ -11,11 +11,15 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
+import sys
+sys.dont_write_bytecode = True
 
+from bt2_build_manifest import load_and_verify_manifest
+from source_identity import observe_postgres_container_image
 import run_lantern_multisession_concurrency as races
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "database" / "BUILD_MANIFEST_V2.json"
 
 
 def main() -> int:
@@ -23,23 +27,30 @@ def main() -> int:
     ap.add_argument("--database-url", default=os.environ.get("DATABASE_URL"))
     ap.add_argument("--expected-package-digest")
     ap.add_argument("--evidence-out")
+    ap.add_argument("--postgres-container-id", default=os.environ.get("POSTGRES_CONTAINER_ID"))
     args = ap.parse_args()
 
     if not args.database_url:
         raise SystemExit("DATABASE_URL or --database-url is required")
     if shutil.which("psql") is None:
         raise SystemExit("psql is required on PATH")
-    if not MANIFEST.is_file():
-        raise SystemExit("BUILD_MANIFEST_V2.json is required")
-
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    package_digest = manifest["package_identity"]["package_digest_sha256"]
-    if args.expected_package_digest and args.expected_package_digest != package_digest:
-        raise SystemExit(f"package digest mismatch: manifest={package_digest} expected={args.expected_package_digest}")
-
     version = races.scalar(args.database_url, "SHOW server_version_num;")
-    if not version.startswith("16"):
-        raise SystemExit(f"PostgreSQL 16 required; observed {version}")
+    server_version = races.scalar(args.database_url, "SHOW server_version;")
+    if not version.isdigit() or len(version) < 2:
+        raise SystemExit(f"invalid PostgreSQL server_version_num: {version!r}")
+    postgres_major = int(version[:2])
+
+    path, _manifest, package_digest = load_and_verify_manifest(
+        expected_digest=args.expected_package_digest,
+        postgres_major=postgres_major,
+    )
+    source_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, capture_output=True, check=True
+    ).stdout.strip()
+    source_tree = subprocess.run(
+        ["git", "rev-parse", "HEAD^{tree}"], cwd=ROOT, text=True, capture_output=True, check=True
+    ).stdout.strip()
+    image_attestation = observe_postgres_container_image(args.postgres_container_id, args.database_url)
 
     real_before = races.scalar(
         args.database_url,
@@ -75,8 +86,16 @@ def main() -> int:
         raise RuntimeError(f"real PROJECT_LANTERN state changed: before={real_before} after={real_after}")
 
     evidence = {
+        "source_commit": source_commit,
+        "source_tree": source_tree,
         "package_digest_sha256": package_digest,
-        "postgres_major": 16,
+        "postgres_image_digest": image_attestation["repo_digest"],
+        "postgres_image_attestation": image_attestation,
+        "postgres_server_version": server_version,
+        "postgres_major": postgres_major,
+        "git_version": subprocess.run(["git", "--version"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip(),
+        "psql_version": subprocess.run(["psql", "--version"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip(),
+        "python_version": sys.version.split()[0],
         "true_multisession": True,
         "same_subject_race": "PASS",
         "different_subject_race": "PASS",

@@ -1,0 +1,60 @@
+{
+  "schema_version": "BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1",
+  "status": "ACTIVE_SOURCE_CONTRACT",
+  "persistent_chat_interfaces": [
+    {
+      "interface_id": "VERA",
+      "display_name": "Vera",
+      "domain": "Patrick-facing Vera interface and cross-project delegation",
+      "durable_state_owner": false
+    },
+    {
+      "interface_id": "VERA_CONTROL_PLANE_COORDINATOR",
+      "display_name": "Vera Control Plane Coordinator",
+      "domain": "Vera control-plane, runtime, provider, governance, qualification, and protected-effect preparation",
+      "durable_state_owner": false
+    },
+    {
+      "interface_id": "BT2_COORDINATOR",
+      "display_name": "BT2 Coordinator",
+      "domain": "Build Team Two engineering portfolio coordination, worker dispatch, integration, review, and durable handoff",
+      "durable_state_owner": false
+    }
+  ],
+  "worker_runtime_contract": {
+    "permanent_worker_chat_required": false,
+    "execution_context_is_terminal_not_identity": true,
+    "worker_reconstruction_sources": [
+      "current live user instruction and Project Instructions",
+      "thebrazenbeard/bt2 current canonical source",
+      "target repository exact current source/PR/review state",
+      "thebrazenbeard/chat-communication-bus current protocol, worker lane, and recovery checkpoint",
+      "authorized live provider readback when the task depends on provider currentness"
+    ],
+    "chat_title_is_authority": false,
+    "conversation_id_is_authority": false,
+    "archived_chat_required_for_reconstruction": false,
+    "hidden_chat_state_required_for_reconstruction": false
+  },
+  "communication_contract": {
+    "non_pr_coordination_hub": "thebrazenbeard/chat-communication-bus",
+    "external_prs_mirrored_to_bus_when_material": true,
+    "recovery_checkpoint_namespace": "checkpoints/<identity>/",
+    "source_prs_remain_canonical_in_source_repository": true
+  },
+  "authority_contract": {
+    "worker_identity_does_not_imply_write_authority": true,
+    "tool_access_does_not_imply_write_authority": true,
+    "protected_effects_require_live_exact_authority": true,
+    "protected_effect_examples": [
+      "MERGE",
+      "DEPLOYMENT",
+      "PROVIDER_MUTATION",
+      "CREDENTIAL_OR_PERMISSION_CHANGE",
+      "PRODUCTION_MACHINE_WRITE_OR_CONNECTION",
+      "MODEL_TRAINING_OR_WEIGHT_CHANGE",
+      "CANONICAL_PROMOTION",
+      "DESTRUCTIVE_CLEANUP"
+    ]
+  }
+}
