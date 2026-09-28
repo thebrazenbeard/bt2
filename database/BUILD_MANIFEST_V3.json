@@ -6,8 +6,8 @@
   "source_subject": {
     "repository": "thebrazenbeard/bt2",
     "branch": "repair/bt2-current-main-remote-20260928",
-    "head_before_manifest": "d3b6d4e50f403e51d6127c79cabbf1e44edce7d4",
-    "tree_before_manifest": "5afb4f82aa27c5449fb471e18b549b4b74d07829"
+    "head_before_manifest": "d7f84061bfab36f8aeca3762ee26cd6684bbafb9",
+    "tree_before_manifest": "c2d431503ab5fc34a9373bd2d1a0cc14beed241b"
   },
   "target": {
     "backend": "PostgreSQL",
@@ -29,11 +29,11 @@
     "lantern_archive_tree": "1160a339b175b9bfc76c6db1238ffd7cb978b453",
     "loaders_tree": "d309e0d790dbc353faa0772b19247d1806732c30",
     "seeds_tree": "71e713ceae32c260525f57a92bb43eb28ed6c9af",
-    "qualification_tools_tree": "c926106789b32dcfcce04bb9c41556639d4a601f",
-    "qualification_tests_tree": "55294026164d494b7913d5f6ff0c2c25395673da",
+    "qualification_tools_tree": "08dd12e98d7a8356851da108aacfe4be6ef9a5f0",
+    "qualification_tests_tree": "e5c349c9f80fe9a91e501706bef8753f609b2069",
     "digest_algorithm": "sha256",
-    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:589ba2edefe8d255e5f01cd486c4ccc2d3480437|tests:2af56f47d3d9b1ae55aaf1919f1674e11abe1209|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:c926106789b32dcfcce04bb9c41556639d4a601f|qualification-tests:55294026164d494b7913d5f6ff0c2c25395673da|canonical-postgres-major:16|compat-postgres-major:17|required-extension:pgcrypto",
-    "package_digest_sha256": "4328b0942cd61a3552053070cd16a4db88870a75693dc59ff9f5fdf7a8ac51f2"
+    "digest_input": "schema:12e5e5846881f82845875ffe26644bbdeb0729c6|migrations:589ba2edefe8d255e5f01cd486c4ccc2d3480437|tests:2af56f47d3d9b1ae55aaf1919f1674e11abe1209|admin:6447503b9ab4f4613c657488742da88abea7cffa|data:63c70dc233b967464d284dbea2107e21a209249a|archive:1160a339b175b9bfc76c6db1238ffd7cb978b453|loaders:d309e0d790dbc353faa0772b19247d1806732c30|seeds:71e713ceae32c260525f57a92bb43eb28ed6c9af|qualification-tools:08dd12e98d7a8356851da108aacfe4be6ef9a5f0|qualification-tests:e5c349c9f80fe9a91e501706bef8753f609b2069|canonical-postgres-major:16|compat-postgres-major:17|required-extension:pgcrypto",
+    "package_digest_sha256": "68eb79d473aecb0bb40b0efe50cb3633e944af47188a3730a6f68a89270696c3"
   },
   "portability_changes": {
     "trusted_runtime_owner": "current migration principal rather than provider-specific role name",
@@ -49,10 +49,12 @@
     "workflow": ".github/workflows/database-rebuild-qualification.yml",
     "precondition": "empty BT2 schemas in the target database",
     "sequence": [
-      "database/schema/*.sql",
-      "database/migrations/*.sql including forward repairs 0021..0024",
+      "PostgreSQL 16 canonical: database/schema/*.sql",
+      "PostgreSQL 16 canonical: every database/migrations/*.sql in order",
+      "PostgreSQL 17 compatibility: every migration except historical provider-specific 0012 and 0018, then mandatory forward 0024",
       "database/tests/0001..0010 + 0012..0013 rollback regression suite; 0011 is final oracle",
       "tests/test_postgres_qualification_image_identity.py",
+      "tests/test_postgres17_compatibility_policy.py",
       "database/seeds/*.sql replayed twice",
       "database/data/0001..0004",
       "database/loaders/lantern_cohosted_history_v2.py --mode apply",
@@ -74,7 +76,7 @@
   },
   "qualification": {
     "postgres16_canonical_blank_rebuild": "CI_REQUIRED_ON_COMPOSED_HEAD",
-    "postgres17_managed_owner_compatibility": "CI_REQUIRED_ON_COMPOSED_HEAD",
+    "postgres17_managed_owner_compatibility": "CI_REQUIRED_ON_COMPOSED_HEAD_WITH_DECLARED_0012_0018_COMPATIBILITY_SKIPS",
     "true_multisession_concurrency": "CI_REQUIRED_ON_COMPOSED_HEAD",
     "replacement_runtime_reconstruction": "NOT_ESTABLISHED",
     "lantern_v4_runtime_currentness": "UNKNOWN"

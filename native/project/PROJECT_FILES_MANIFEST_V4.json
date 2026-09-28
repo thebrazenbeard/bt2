@@ -4,8 +4,8 @@
   "canonical_repository": "thebrazenbeard/bt2",
   "canonical_branch": "main",
   "runtime_contract": "POSTGRESQL_SQL_CONNECTOME_V4",
-  "payload_source_commit": "d3b6d4e50f403e51d6127c79cabbf1e44edce7d4",
-  "payload_source_tree": "5afb4f82aa27c5449fb471e18b549b4b74d07829",
+  "payload_source_commit": "d7f84061bfab36f8aeca3762ee26cd6684bbafb9",
+  "payload_source_tree": "c2d431503ab5fc34a9373bd2d1a0cc14beed241b",
   "binding_algorithm": "exact ancestral source commit/tree + Git blob identity",
   "project_instructions": {
     "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
@@ -54,7 +54,7 @@
     },
     {
       "path": "docs/runtime/LANTERN_POSTGRESQL_ACCEPTANCE_V4.md",
-      "git_blob": "fa2b8e12d39c3fd53d1ee289188b4cddc60220d0"
+      "git_blob": "0355bb92e5f5a2415d9f8d78181f7c93bb9289af"
     }
   ],
   "installation_packet": {
