@@ -1,0 +1,113 @@
+schema: BT2_RUNTIME_PROVIDER_RESILIENCE_V1
+status: SOURCE_CONTRACT_CANDIDATE
+purpose: >
+  Ensure external runtime-provider failures narrow only the claims and effects
+  that depend on those providers, without blocking independent BT2 source work.
+
+providers:
+  active_v4_runtime:
+    contract: POSTGRESQL_SQL_CONNECTOME_V4
+    physical_provider: REPLACEABLE_INFRASTRUCTURE
+    roles:
+      - RUNTIME_ONLY_STATE
+      - LANTERN_CURRENTNESS
+    general_bt2_availability_dependency: false
+    lantern_fallback_provider: null
+  historical_wowsql:
+    target: bt2-479e4ad9
+    currentness_authority: false
+
+claim_domains:
+  SOURCE:
+    authority: CANONICAL_GIT
+    runtime_provider_required: false
+  COORDINATION:
+    authority: CHAT_COMMUNICATION_BUS_OR_OWNING_REPOSITORY_HANDOFF
+    runtime_provider_required: false
+  PROJECT_INSTALL:
+    authority: INSTALLED_PROJECT_STATE
+    runtime_provider_required: false
+  RUNTIME_ONLY:
+    authority: EXACT_ACTIVE_V4_QUALIFIED_RUNTIME
+    runtime_provider_required: true
+    unavailable_result: UNKNOWN
+  LANTERN_CURRENTNESS:
+    authority: V4_GOVERNED_LANTERN_READ
+    runtime_provider_required: true
+    unavailable_result: UNKNOWN
+    fallback_forbidden:
+      - WOWSQL
+      - SUPABASE
+      - OTHER_PROVIDER
+      - GIT
+      - PROJECT_PROSE
+      - HISTORICAL_RECEIPT
+      - MODEL_MEMORY
+
+invariants:
+  - id: RESILIENCE-001
+    rule: RUNTIME_PROVIDER_OUTAGE_DOES_NOT_BLOCK_SOURCE_WORK
+  - id: RESILIENCE-002
+    rule: RUNTIME_PROVIDER_OUTAGE_DOES_NOT_BLOCK_GIT_OR_BUS_RECOVERY
+  - id: RESILIENCE-003
+    rule: RUNTIME_ONLY_FACTS_FAIL_CLOSED_TO_UNKNOWN
+  - id: RESILIENCE-004
+    rule: LANTERN_CURRENTNESS_HAS_NO_PROVIDER_FALLBACK
+  - id: RESILIENCE-005
+    rule: NO_INDISPENSABLE_CONTINUATION_STATE_EXISTS_ONLY_IN_RUNTIME_PROVIDER
+  - id: RESILIENCE-006
+    rule: EQUIVALENT_PROVIDER_FAILURES_ARE_NOT_RETRIED_IN_A_LOOP
+  - id: RESILIENCE-007
+    rule: PROVIDER_RECOVERY_REQUIRES_FRESH_READBACK
+  - id: RESILIENCE-008
+    rule: PROVIDER_AVAILABILITY_NEVER_GRANTS_AUTHORITY
+
+acceptance_cases:
+  - id: SOURCE_TASK_RUNTIME_DOWN
+    given:
+      task: edit_and_test_repository_source
+      active_v4_runtime: UNAVAILABLE
+    require:
+      - source_work_continues
+      - runtime_only_claims_not_invented
+
+  - id: LANTERN_QUERY_RUNTIME_DOWN
+    given:
+      task: establish_current_lantern_material
+      active_v4_runtime: UNAVAILABLE
+    require:
+      - lantern_result_is_UNKNOWN
+      - no_historical_or_alternate_provider_fallback
+      - unrelated_source_work_may_continue
+
+  - id: RUNTIME_RECEIPT_PROVIDER_DOWN
+    given:
+      task: verify_current_runtime_receipt
+      active_v4_runtime: UNAVAILABLE
+    require:
+      - receipt_state_is_UNKNOWN
+      - git_does_not_substitute_for_receipt
+
+  - id: CONTINUATION_DURING_OUTAGE
+    given:
+      source_work_in_progress: true
+      active_v4_runtime: UNAVAILABLE
+    require:
+      - resumable_checkpoint_in_git_or_bus
+      - next_source_action_recoverable_without_runtime_provider
+
+  - id: REPEATED_INTERNAL_FAILURE
+    given:
+      first_runtime_call: INTERNAL_FAILURE
+      route_or_state_changed: false
+    require:
+      - no_equivalent_retry_loop
+      - bounded_failure_recorded
+
+  - id: PROVIDER_RETURNS
+    given:
+      prior_runtime_state: UNAVAILABLE
+      current_runtime_access: RESTORED
+    require:
+      - fresh_readback
+      - historical_pass_not_treated_as_current

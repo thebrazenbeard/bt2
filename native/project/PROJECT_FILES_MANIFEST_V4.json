@@ -1,0 +1,85 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V4",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_contract": "POSTGRESQL_SQL_CONNECTOME_V4",
+  "payload_source_commit": "d7f84061bfab36f8aeca3762ee26cd6684bbafb9",
+  "payload_source_tree": "c2d431503ab5fc34a9373bd2d1a0cc14beed241b",
+  "binding_algorithm": "exact ancestral source commit/tree + Git blob identity",
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V4.md",
+    "git_blob": "ab873d5516572a4b2d7be283cdb8575db017bce6"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V2.md",
+      "git_blob": "3d543c1c471f8ab29fbad2ed3df3c78de29e2905"
+    },
+    {
+      "path": "native/project/BT2_CODING_OPERATIONS_V2.md",
+      "git_blob": "22ccd20bf841e233cc7bc495262cbed2c54dbf06"
+    },
+    {
+      "path": "native/project/BT2_RECOVERY_AND_STATE_V2.md",
+      "git_blob": "9fc31cc2e6cba277ed6df54c2d01af05825803e0"
+    },
+    {
+      "path": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+      "git_blob": "297fbe3631c360b0cdac49ffc043c207fee74330"
+    },
+    {
+      "path": "native/project/BT2_COORDINATOR_RECONSTRUCTION_V1.md",
+      "git_blob": "aee70f9632de13a21ff2bfb222f6efbf67915f99"
+    },
+    {
+      "path": "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json",
+      "git_blob": "adb2c13ddf3fb29d4610ae32d5239bcca46d8ff4"
+    },
+    {
+      "path": "native/project/BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1.json",
+      "git_blob": "3825f51a67d736879d9d998e42bd4d1c802aab78"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_OPERATOR_HANDSHAKE_V4.md",
+      "git_blob": "1b7d4dc591acef360217d6527595a783db86512a"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_READ_QUERIES_V4.md",
+      "git_blob": "a77f323249aedd299b8e9919e16975e8b08cd78e"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_RUNTIME_CONTRACT_V4.md",
+      "git_blob": "3516c5cdec29b803bc6223208c9cf1dd47a842e6"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_ACCEPTANCE_V4.md",
+      "git_blob": "0355bb92e5f5a2415d9f8d78181f7c93bb9289af"
+    }
+  ],
+  "installation_packet": {
+    "path": "native/project/INSTALL_V4.md",
+    "git_blob": "da177ac202e07b7cbaece55b887272ad44f3b07f"
+  },
+  "historical_runtime_packages": [
+    "LANTERN_WOWSQL_*_V1.md",
+    "LANTERN_WOWSQL_*_V2.md",
+    "LANTERN_WOWSQL_*_V3.md",
+    "database/provider/wowsql/**"
+  ],
+  "historical_retention_rule": "Preserve V1-V3 and WoWSQL provider artifacts as inactive historical evidence. V4 does not authorize destructive deletion.",
+  "runtime_state_at_source_binding": {
+    "bt2_runtime_reconstruction": "NOT_ESTABLISHED",
+    "lantern_state_reconstruction": "NOT_ESTABLISHED",
+    "v4_runtime_qualification": "NOT_ESTABLISHED",
+    "lantern_currentness": "UNKNOWN"
+  },
+  "provider_semantics": "Provider-neutral PostgreSQL through SQL Connectome; provider/cloud/region are infrastructure metadata, not Lantern identity.",
+  "installation_rule": "Install Project Instructions V4 and required V4 Project files only after V4 database/runtime acceptance. Historical V1-V3 files remain present but inactive.",
+  "protected_effects": {
+    "merge_deploy_not_granted": true,
+    "project_installation_not_granted": true,
+    "producer_enablement_not_granted": true,
+    "historical_provider_deletion_not_granted": true
+  }
+}

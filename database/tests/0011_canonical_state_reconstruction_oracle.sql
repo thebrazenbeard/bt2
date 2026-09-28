@@ -29,7 +29,8 @@ DECLARE
   v_owner text;
   v_config text[];
   v_public_exec boolean;
-  v_postgres_exec boolean;
+  v_owner_exec boolean;
+  v_expected_owner text:=current_user;
 BEGIN
   -- Exact current workforce topology.
   WITH topo AS (
@@ -61,6 +62,24 @@ BEGIN
        OR compatibility_state <> 'UNASSESSED'
   ) THEN
     RAISE EXCEPTION 'BT2_REBUILD_TRAINING_STATE_COLLAPSED';
+  END IF;
+
+  IF (SELECT count(*) FROM bt2.training_preservation_digest_bindings_v1) <> 13 THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_COUNT_MISMATCH';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM bt2.training_packages tp
+    JOIN bt2.migration_receipts mr
+      ON mr.migration_receipt_id=tp.preservation_receipt_id
+    LEFT JOIN bt2.training_preservation_digest_bindings_v1 db
+      ON db.preservation_migration_key=mr.migration_key
+    WHERE db.preservation_migration_key IS NULL
+       OR tp.manifest_digest_sha256 IS DISTINCT FROM db.manifest_digest_sha256
+       OR tp.source_set_digest_sha256 IS DISTINCT FROM db.source_set_digest_sha256
+  ) THEN
+    RAISE EXCEPTION 'BT2_REBUILD_TRAINING_DIGEST_BINDING_MISMATCH';
   END IF;
 
   IF (SELECT count(*) FROM bt2.training_qualifications) <> 0
@@ -130,21 +149,21 @@ BEGIN
     RAISE EXCEPTION 'BT2_REBUILD_MIGRATION_RECEIPT_LEDGER_NOT_APPEND_ONLY';
   END IF;
 
-  -- The source-designed producer boundary must be installed in a real PG16 rebuild.
+  -- The source-designed producer boundary must be installed for the active migration principal.
   SELECT p.prosecdef,p.proowner::regrole::text,p.proconfig,
          has_function_privilege('public','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE'),
-         has_function_privilege('postgres','bt2.append_material_v1(uuid,text,text,text,text,text)','EXECUTE')
-  INTO v_secdef,v_owner,v_config,v_public_exec,v_postgres_exec
+         has_function_privilege(p.proowner,p.oid,'EXECUTE')
+  INTO v_secdef,v_owner,v_config,v_public_exec,v_owner_exec
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname='bt2' AND p.proname='append_material_v1'
     AND oidvectortypes(p.proargtypes)='uuid, text, text, text, text, text';
 
   IF NOT coalesce(v_secdef,false)
-     OR v_owner <> 'postgres'
-     OR NOT coalesce(v_config @> ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[],false)
+     OR v_owner <> v_expected_owner
+     OR v_config IS DISTINCT FROM ARRAY['search_path=pg_catalog, bt2, pg_temp']::text[]
      OR coalesce(v_public_exec,true)
-     OR NOT coalesce(v_postgres_exec,false) THEN
+     OR NOT coalesce(v_owner_exec,false) THEN
     RAISE EXCEPTION 'BT2_REBUILD_LANTERN_PRODUCER_BOUNDARY_MISMATCH';
   END IF;
 END

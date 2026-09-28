@@ -1,0 +1,72 @@
+{
+  "schema": "PROJECT_RUNNER_P0_PROJECT_MANIFEST_V2",
+  "corpus_id": "PROJECT_RUNNER_PORTFOLIO_CORPUS_V1",
+  "classification": {
+    "project_id": "bt2",
+    "repository": "thebrazenbeard/bt2",
+    "priority": "P0",
+    "family_id": "portfolio-spine",
+    "activity_state": "ACTIVE_HEAVY",
+    "observed_at": "2026-09-28",
+    "source_kind": "PUBLIC_CORPUS_SNAPSHOT_PLUS_CURRENT_SOURCE_REPAIR",
+    "source_subject": "thebrazenbeard/project-runner@c505366e7294dbb922c0f26b88491b05e3f909d0:portfolio/corpus.public.json",
+    "source_corpus_blob": "4112da68dcf9e008f042c3284653b006d081f1e3",
+    "estate_counts": {
+      "total": 71,
+      "public": 53,
+      "private": 18,
+      "archived": 2
+    }
+  },
+  "role": {
+    "purpose": "Canonical Build Team Two engineering, runtime-state, qualification, recovery, and portfolio-spine source.",
+    "status": "Provider-neutral PostgreSQL V4 source composition, training-preservation integrity, Exodus reconstruction, and sequential portfolio repair are active.",
+    "current_frontier": "Qualify and canonicalize the composed PostgreSQL V4/database-integrity source while preserving runtime/install/effect boundaries."
+  },
+  "governance": {
+    "priority_is_authority": false,
+    "scheduling_requires_currentness": true,
+    "effect_requires_explicit_authority": true,
+    "merge_deploy_not_granted_by_manifest": true,
+    "runtime_currentness_not_granted_by_manifest": true
+  },
+  "build_tracks": [
+    {
+      "id": "postgresql-v4-lantern",
+      "goal": "Keep Lantern semantics provider-neutral and reconstructible on qualified PostgreSQL through SQL Connectome.",
+      "acceptance": [
+        "Historical migrations remain immutable and repairs are forward-only.",
+        "PostgreSQL 16 canonical reconstruction passes.",
+        "PostgreSQL 17 managed-owner compatibility passes.",
+        "Lantern currentness remains UNKNOWN until a V4 runtime is reconstructed, qualified, and read live."
+      ]
+    },
+    {
+      "id": "training-preservation-integrity",
+      "goal": "Bind preserved training packages to exact immutable provenance and digest claims.",
+      "acceptance": [
+        "All 13 preserved packages bind exact source provenance.",
+        "Manifest/source-set digest claims cannot be silently rewritten.",
+        "Preservation never implies qualification, installation, or activation."
+      ]
+    },
+    {
+      "id": "exodus-reconstruction",
+      "goal": "Keep BT2 identities, topology, and continuation reconstructible without chat-session identity.",
+      "acceptance": [
+        "Worker and persistent-interface topology validates fail-closed.",
+        "BT2 Coordinator remains an interface, not durable state ownership.",
+        "Continuation state is recoverable from canonical source and durable coordination surfaces."
+      ]
+    },
+    {
+      "id": "portfolio-repair",
+      "goal": "Repair the 71-repository estate sequentially without creating duplicate control planes.",
+      "acceptance": [
+        "Each repository receives a current-main, role-appropriate disposition.",
+        "Verification evidence binds the exact integrated subject.",
+        "Destructive cleanup remains separately authorized."
+      ]
+    }
+  ]
+}

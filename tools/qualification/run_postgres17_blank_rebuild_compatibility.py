@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run the exact BT2 PostgreSQL 16 canonical blank-rebuild qualification.
+"""Run BT2 canonical blank-rebuild compatibility qualification on PostgreSQL 17.
 
 Requires:
   - Python 3
   - psql on PATH
-  - DATABASE_URL or --database-url pointing at a disposable *empty* PostgreSQL 16 DB
+  - DATABASE_URL or --database-url pointing at a disposable *empty* PostgreSQL 17 DB
 
 This runner does not append acceptance receipts or mutate any production provider.
 """
@@ -14,13 +14,12 @@ import argparse
 import json
 import os
 from pathlib import Path
-import shutil
-import subprocess
-import sys
-sys.dont_write_bytecode = True
 
 from bt2_build_manifest import load_and_verify_manifest
 from source_identity import observe_postgres_container_image
+import shutil
+import subprocess
+import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 DB = ROOT / "database"
@@ -37,6 +36,14 @@ CANONICAL_DATA_AFTER_HISTORY = [
     DB / "data" / "0007_remaining_numbered_training_source_registration_v1.sql",
     DB / "data" / "0008_verified_training_source_registry_receipt_v4.sql",
 ]
+
+COMPATIBILITY_SKIPPED_MIGRATIONS = {
+    DB / "migrations" / "0012_internal_schema_access_assertion_v1.sql",
+    DB / "migrations" / "0018_lantern_producer_boundary_v1.sql",
+}
+COMPATIBILITY_REPLACEMENT_MIGRATION = (
+    DB / "migrations" / "0024_postgresql_v4_provider_neutral_owner_boundary_v1.sql"
+)
 
 
 def run(cmd: list[str], *, input_text: str | None = None) -> subprocess.CompletedProcess[str]:
@@ -75,29 +82,16 @@ def assert_empty(url: str) -> None:
         raise SystemExit(f"qualification database is not blank: {relation_count} BT2 relations already exist")
 
 
-def check_manifest(expected_digest: str | None) -> tuple[str, str, str]:
+def check_manifest(expected_digest: str | None) -> str:
     path, _manifest, digest = load_and_verify_manifest(
         expected_digest=expected_digest,
-        postgres_major=16,
+        postgres_major=17,
     )
-    source_commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, capture_output=True, check=True
-    ).stdout.strip()
-    source_tree = subprocess.run(
-        ["git", "rev-parse", "HEAD^{tree}"], cwd=ROOT, text=True, capture_output=True, check=True
-    ).stdout.strip()
     print(
-        f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest} "
-        f"source_commit={source_commit} source_tree={source_tree}",
+        f"QUALIFICATION_MANIFEST={path.relative_to(ROOT)} package_digest={digest}",
         flush=True,
     )
-    return digest, source_commit, source_tree
-
-
-def command_version(cmd: list[str]) -> str:
-    cp = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, check=True)
-    return (cp.stdout or cp.stderr).strip()
-
+    return digest
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -112,28 +106,54 @@ def main() -> int:
     if shutil.which("psql") is None:
         raise SystemExit("psql is required on PATH")
 
-    package_digest, source_commit, source_tree = check_manifest(args.expected_package_digest)
+    package_digest = check_manifest(args.expected_package_digest)
+    source_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip()
+    source_tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip()
     image_attestation = observe_postgres_container_image(args.postgres_container_id, args.database_url)
 
     version_num = psql_scalar(args.database_url, "SHOW server_version_num;")
-    server_version = psql_scalar(args.database_url, "SHOW server_version;")
-    if not version_num.startswith("16"):
-        raise SystemExit(f"PostgreSQL 16 required; observed server_version_num={version_num}")
+    if not version_num.startswith("17"):
+        raise SystemExit(f"PostgreSQL 17 required; observed server_version_num={version_num}")
 
     assert_empty(args.database_url)
     run(psql_args(args.database_url) + ["-c", "CREATE EXTENSION IF NOT EXISTS pgcrypto;"])
 
     schema_files = sorted((DB / "schema").glob("*.sql"))
     migration_files = sorted((DB / "migrations").glob("*.sql"))
+    if not COMPATIBILITY_REPLACEMENT_MIGRATION.is_file():
+        raise SystemExit("PostgreSQL 17 compatibility replacement migration 0024 is missing")
+    if not COMPATIBILITY_SKIPPED_MIGRATIONS.issubset(set(migration_files)):
+        missing = sorted(
+            str(path.relative_to(ROOT))
+            for path in COMPATIBILITY_SKIPPED_MIGRATIONS - set(migration_files)
+        )
+        raise SystemExit(f"declared PostgreSQL 17 compatibility skips are missing: {missing}")
+
     for path in schema_files:
         psql_file(args.database_url, path)
+
+    skipped_migrations: list[str] = []
     for path in migration_files:
+        if path in COMPATIBILITY_SKIPPED_MIGRATIONS:
+            rel = str(path.relative_to(ROOT))
+            print(
+                f"SKIP PostgreSQL 17 historical provider-specific migration: {rel}",
+                flush=True,
+            )
+            skipped_migrations.append(rel)
+            continue
         psql_file(args.database_url, path)
+
+    if str(COMPATIBILITY_REPLACEMENT_MIGRATION.relative_to(ROOT)) not in [
+        str(path.relative_to(ROOT)) for path in migration_files
+    ]:
+        raise SystemExit("forward compatibility replacement migration 0024 was not in migration order")
 
     # Regression suite runs before durable seeds because several smoke tests create
     # intentionally synthetic subjects under rollback. 0011 is the final state oracle.
-    regression_tests = [path for path in sorted((DB / "tests").glob("*.sql")) if path != FINAL_ORACLE]
-    for path in regression_tests:
+    for path in sorted((DB / "tests").glob("*.sql")):
+        if path == FINAL_ORACLE:
+            continue
         psql_file(args.database_url, path)
 
     # Canonical durable state. Run seed files twice to prove replay convergence.
@@ -167,29 +187,18 @@ def main() -> int:
 
     psql_file(args.database_url, FINAL_ORACLE)
 
-    executed_order = (
-        [str(path.relative_to(ROOT)) for path in schema_files]
-        + [str(path.relative_to(ROOT)) for path in migration_files]
-        + [str(path.relative_to(ROOT)) for path in regression_tests]
-        + [str(path.relative_to(ROOT)) for _ in range(2) for path in seeds]
-        + [str(path.relative_to(ROOT)) for path in CANONICAL_DATA_BEFORE_HISTORY]
-        + [str(loader.relative_to(ROOT)) + " --mode apply"]
-        + ["SKIP " + str(SKIPPED_DATA.relative_to(ROOT))]
-        + [str(path.relative_to(ROOT)) for path in CANONICAL_DATA_AFTER_HISTORY]
-        + [str(FINAL_ORACLE.relative_to(ROOT))]
-    )
     evidence = {
         "source_commit": source_commit,
         "source_tree": source_tree,
         "package_digest_sha256": package_digest,
+        "compatibility_skipped_historical_migrations": skipped_migrations,
+        "compatibility_replacement_migration": str(
+            COMPATIBILITY_REPLACEMENT_MIGRATION.relative_to(ROOT)
+        ),
         "postgres_image_digest": image_attestation["repo_digest"],
         "postgres_image_attestation": image_attestation,
-        "postgres_server_version": server_version,
-        "postgres_major": 16,
-        "git_version": command_version(["git", "--version"]),
-        "psql_version": command_version(["psql", "--version"]),
-        "python_version": sys.version.split()[0],
-        "executed_order": executed_order,
+        "postgres_major": 17,
+        "qualification_kind": "POSTGRESQL_17_COMPATIBILITY",
         "blank_rebuild": "PASS",
         "canonical_state_reconstruction": "PASS",
         "topology_sha256": "45d262aae7285a69a66a3d5b35c04537899ba33f5eb7388b9731071e8907c0d8",
@@ -208,7 +217,7 @@ def main() -> int:
     if args.evidence_out:
         Path(args.evidence_out).write_text(text + "\n", encoding="utf-8")
 
-    print(f"BT2_POSTGRES16_CANONICAL_BLANK_REBUILD_PASS package_digest={package_digest}", flush=True)
+    print(f"BT2_POSTGRES17_CANONICAL_BLANK_REBUILD_COMPATIBILITY_PASS package_digest={package_digest}", flush=True)
     return 0
 
 
