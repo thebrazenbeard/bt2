@@ -1,0 +1,22 @@
+{
+  "schema": "BT2_CURRENTNESS_BACKEND_STATUS_V1",
+  "observed_source_base": "66ecc19b60036c14f6c0327787bddf9e2cb6b132",
+  "observed_at": "2026-09-30",
+  "wowsql": {
+    "target": "bt2-479e4ad9",
+    "currentness_role": "RETIRED"
+  },
+  "active_currentness_backend": null,
+  "replacement_currentness_backend": "NOT_ESTABLISHED",
+  "candidate_source_contract": "POSTGRESQL_SQL_CONNECTOME_V4",
+  "candidate_contract_state": "SOURCE_ONLY_NOT_ACTIVE_CURRENTNESS_BACKEND",
+  "lantern_currentness": "UNKNOWN",
+  "rules": {
+    "do_not_query_retired_wowsql_for_currentness": true,
+    "do_not_infer_replacement_backend": true,
+    "candidate_source_presence_does_not_establish_runtime": true,
+    "no_provider_fallback": true,
+    "source_work_may_continue_without_runtime_currentness": true
+  },
+  "evidence_ceiling": "SOURCE_STATE_ONLY_NO_RUNTIME_READ_PERFORMED"
+}
