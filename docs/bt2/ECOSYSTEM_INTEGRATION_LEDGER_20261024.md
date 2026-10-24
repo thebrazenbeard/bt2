@@ -52,14 +52,14 @@ flowchart TD
 
 Solid arrows mean only the named limited evidence was observed; dashed arrows are proposed/missing runtime contracts. No edge alone proves effect authorization or whole-system installation. Independent product/research repositories stay isolated until a justified, executed interface is demonstrated.
 
-The 45/78 finding is a **reported independent exact-blob source
-scan**, not a host probe. Reproduction subject: public owner repo trees
-at the snapshot, with affected `.vscode/tasks.json` blob SHAs
-`de6de3adea989c8e85a4d39ce0337378d92be7db` or
-`1a828db96e870c5db15b61f9e82f515cbb26f4c3`; inspect associated
-font-path references without executing assets. The list of checked
-public paths is not yet persisted as a complete immutable manifest,
-so a later scan must recompute membership against explicit heads.
+The 45/78 finding is an exact-blob **SOURCE** scan, not a host
+probe. Its [immutable public source manifest](PUBLIC_VSCODE_TASK_EXPOSURE_MANIFEST_20261024.md)
+binds all 78 public repositories to their individual `main` HEAD
+commits and task-blob identities at this snapshot: 41 match one concealed
+Node loader variant, 4 match a second, 26 have nonmatching task files,
+and 7 lack that path. The suspicious asset was present at each affected
+pinned source head. No asset was executed, and current main/host status
+may differ from the pinned snapshot.
 
 ### Public main source-head bindings at this checkpoint
 
