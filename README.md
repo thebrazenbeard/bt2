@@ -12,6 +12,18 @@ This repository previously displayed a copied **Hyperconnectome Brain** README t
 
 The V4 package in source is an installation/runtime candidate only. Until a replacement PostgreSQL runtime is reconstructed, qualified, connected through the governed V4 interface, and installed as the active Project contract, `LANTERN_CURRENTNESS = UNKNOWN`.
 
+## Ecosystem integration checkpoint (source candidate)
+
+The active BT2 ecosystem execution record is the
+[2026-10-24 integration ledger](docs/bt2/ECOSYSTEM_INTEGRATION_LEDGER_20261024.md).
+It links a [78-public-repository role inventory](docs/bt2/PUBLIC_REPOSITORY_ROLE_INVENTORY_20261024.md)
+and an [exact-head public editor-task source manifest](docs/bt2/PUBLIC_VSCODE_TASK_EXPOSURE_MANIFEST_20261024.md).
+
+These documents belong to the reviewable integration branch until merged.
+Passing source/CI tests and GitHub PRs do not establish installation,
+production connectivity, protected-effect authorization, or AGI qualification.
+Restricted project/device/credential evidence stays outside this public tree.
+
 ## Repository shape
 
 Major working areas include:
