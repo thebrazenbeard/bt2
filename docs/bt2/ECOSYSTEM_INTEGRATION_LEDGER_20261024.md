@@ -31,7 +31,7 @@ exists; neither counts nor identities are published here.
 | --- | --- | --- | --- |
 | `vera-mono` | Canonical assembled Vera code: 12 Python package roots, persistent governance/recovery | Models, devices, databases and transports remain separately admitted external services | SOURCE and BUILD verified; installed Lappy Pilot is drifted/stopped |
 | `rezon` | Multi-model reasoning and worker hearings | External repo is a donor/worker infrastructure; absorbed `packages/rezon` is internal to Mono | Test harness exists; production credential enrollment incomplete |
-| `chat-communication-bus` | Non-PR agent messaging | Canonical shared coordination route, separate from PR activity and model reasoning | Whole-path current delivery qualification not established here |
+| Restricted Bus transport | Non-PR agent messaging | Canonical shared coordination route, separate from PR activity and model reasoning | Whole-path current delivery qualification not established here |
 | `blotter` | Agent event and effect/claim journaling | Authenticated local Lappy event endpoint; events must not be mistaken for independently verified effects | Real durable event read/write verified on Lappy |
 | `executor`, `portal`, local devices | Authenticated execution and host/service interfaces | Devices require per-host connection, explicit capability and authority; no assumed implicit tunnel | Lappy direct use verified; cross-machine aggregate E2E UNKNOWN |
 | `hc-brain` and AGI research documents | Hyperconnectome cognitive-organ design and evaluation contracts | Conceptual design/qualification evidence, not proof of a running organ or AGI | DOCUMENTED, not INSTALLED |
