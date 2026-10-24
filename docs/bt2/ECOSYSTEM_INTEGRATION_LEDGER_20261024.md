@@ -19,7 +19,7 @@ private records.
 
 ## Public owner inventory and dependency boundaries
 
-Owner-scoped public discovery identified 78 public repositories. An
+Owner-scoped public discovery identified 78 public repositories. The [public repository role inventory](PUBLIC_REPOSITORY_ROLE_INVENTORY_20261024.md) names all 78 and classifies them from current README/metadata only; its repository-specific installation and runtime states are UNKNOWN. An
 exact Git-blob scan found a concealed VS Code `folderOpen` task and
 disguised Node executable in **45 of those 78** public repositories,
 across two observed asset variants. The affected checkout is a
