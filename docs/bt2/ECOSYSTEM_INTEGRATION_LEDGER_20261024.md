@@ -126,6 +126,20 @@ affected. Windows VS Code automatic-task behavior depends on effective
 user/application settings and consent; a workspace setting is not a
 reliable mitigation.
 
+
+## Source merge and installation dependency gates
+
+| Scope | Safe candidate order | Required qualification before effect |
+| --- | --- | --- |
+| Mediaphile Client | Security PR #9 precedes rebuilt subtitle feature PR #10 (currently stacked on #9), never merge stale #7/#8 heads as-is | Rebase final combined head, source guard + browser CI, owner merge, installed client version and live API E2E |
+| Mediaphile Server | Security PR #11 precedes rebuilt subtitle backend PR #12 (stacked on #11), never merge stale feature-chain heads as-is | Final Go tests/vet/build, isolated private staging root, owner merge, NAS deployment readback and explicit staged-to-reviewed-install workflow |
+| Vera Mono | Consolidated PR #99 is integration candidate; independent #88/#96/#97/#98 are overlapping donors, not four separate production installs | Reviewed exact aggregate, owner merge, wheel install/version, bound model adapter, model-to-effect adversarial E2E |
+| Rezon external workers | PR #119's test-isolation/credential backend fix stays in external worker project, not absorbed Mono reasoning kernel | Owner merge/installation and confidential local enrollment before four-real-worker persisted production hearing |
+| Public editor-source containment | Security guards precede older feature PRs that may reintroduce known startup blobs | Inspect every final Git tree, source CI, and relevant application build; no host-clean claim from Git changes |
+| Public Bus diagnostic source | ccb-core PR #22 is diagnostics, not a provider repair; active projector source remains separately pinned and qualified | Owner-authorized source activation and provider cause correction, successful authenticated cursor/journal receipt and canary message |
+
+No single PR is a deployment receipt. Protected trust anchors and private runtime paths are deliberately excluded from this public report.
+
 ## Restricted runtime evidence (not public telemetry)
 
 Authorized private operator readback confirmed bounded **real** local-model
