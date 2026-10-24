@@ -37,6 +37,32 @@ exists; neither counts nor identities are published here.
 | `hc-brain` and AGI research documents | Hyperconnectome cognitive-organ design and evaluation contracts | Conceptual design/qualification evidence, not proof of a running organ or AGI | DOCUMENTED, not INSTALLED |
 | Product/research repos | Other independent research or business domains | Use Bus/Blotter when coordination is justified; do not invent runtime dependency on Vera | Deliberately isolated unless tested interface warrants integration |
 
+The 45/78 finding is a **reported independent exact-blob source
+scan**, not a host probe. Reproduction subject: public owner repo trees
+at the snapshot, with affected `.vscode/tasks.json` blob SHAs
+`de6de3adea989c8e85a4d39ce0337378d92be7db` or
+`1a828db96e870c5db15b61f9e82f515cbb26f4c3`; inspect associated
+font-path references without executing assets. The list of checked
+public paths is not yet persisted as a complete immutable manifest,
+so a later scan must recompute membership against explicit heads.
+
+### Public main source-head bindings at this checkpoint
+
+| Repository | Main commit |
+| --- | --- |
+| `bt2` | `ba830cc2914813c3b4e76751f77b1cf3a132a5c4` |
+| `vera-mono` | `64c4a756a8c4d6fc791787de80303f7ee0f64869` |
+| `rezon` | `d27da3cab31ae96aff3c65385fc31354dc8aeb8c` |
+| `blotter` | `2493b354488cefe4a3f0d2b80372b93c6b1cfeb4` |
+| `portal` | `6b601b8b291bd59cd79bcc1a96befab50ec2ebda` |
+| `vera-mesh` | `3242f72a0c4b9cb53679563c78f66528841296f5` |
+| `vera-control-plane` | `0654b4a646f2168b672f4f78cef71e33bc79d643` |
+
+All implementation PRs cited below are **draft and unmerged**;
+none is an installation receipt. Source/change ownership is BT2 One
+or the named independent specialist; merge/legal attestations remain
+with Patrick and any repository-specific protected workflow.
+
 ## Verified source repairs and exact subjects
 
 | Subject | Defect and minimum repair | Source head / tests | Install/runtime/effect |
