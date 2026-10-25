@@ -330,3 +330,12 @@ Fresh authoritative GitHub [DriftGuard main](https://github.com/thebrazenbeard/d
 - [WIP Draft PR #6](https://github.com/thebrazenbeard/wip/pull/6) exact head `9010143c2bd89cd79a6e08627697a757cf60bb5a`: [GitHub run 40159148059](https://github.com/thebrazenbeard/wip/actions/runs/40159148059) completed SUCCESS, including `Unit tests` and `Repository validation` steps.
 - [Ingest Draft PR #28](https://github.com/thebrazenbeard/ingest/pull/28) exact head `40a6777f46796f7d1f3e2e93e7381b00b5e5a771`: [GitHub run 40159146262](https://github.com/thebrazenbeard/ingest/actions/runs/40159146262) completed SUCCESS, both `test (3.12)` and `test (3.13)` including `Run tests` steps.
 - Both PRs remain Draft, non-merged, pending hostile review and repository CLA/local merge governance. CI does not establish historical source execution, installed runtime cleanup, or host effects. 
+
+
+## 2026-10-25 hostile falsifier and corrected WIP/Ingest heads
+
+> **Independent hostile RED:** first-pass WIP PR6 `9010143...` and Ingest PR28 `40a677...` neglected a second source configuration surface: `.vscode/settings.json` still contained `task.allowAutomaticTasks: true` and nested `tasks.runOn: folderOpen`. Stock VS Code execution of the nested setting was *not* established; nevertheless the asserted no-auto-start invariant and regression were incomplete. Initial CI GREEN did not excuse this semantic defect.
+
+- Corrected SOURCE heads: [WIP #6](https://github.com/thebrazenbeard/wip/pull/6) `150e2e322e8cc5673269086779863dd515d7dbbf`; [Ingest #28](https://github.com/thebrazenbeard/ingest/pull/28) `4d7e4b26a74953755252041899c84f995823c6ba`. `.vscode/settings.json` now explicitly sets `task.allowAutomaticTasks: "off"` per official Microsoft VS Code string-enum source/docs, removes nested `tasks`; tests cover no `runOn: folderOpen` across all tracked `.vscode/*.json` and root `*.code-workspace` plus pseudo-font absence. Read-only exact-head JSON and Git tree verified both.
+- Corrected BUILD/TEST hosted: [WIP run 40159318040](https://github.com/thebrazenbeard/wip/actions/runs/40159318040) `validate` SUCCESS; [Ingest run 40159317302](https://github.com/thebrazenbeard/ingest/actions/runs/40159317302) Python 3.12/3.13 `test` jobs SUCCESS. These supersede initial runs 40159148059/40159146262 for merge review.
+- Independent reviewer was re-engaged on these *new heads*; both Draft, non-merged, CLA still gated. No workstation execution/deployment/install/effect qualification inferred.
