@@ -30,6 +30,15 @@ COVERAGE_STATUSES = {
     "empty_input", "no_rules_extracted", "heuristic_partial",
     "heuristic_extracted_unverified",
 }
+_COVERAGE_FIELDS = {
+    "status", "nonempty_clause_count", "extracted_rule_count",
+    "unparsed_normative_clause_count", "unparsed_normative_clauses",
+    "nonoperative_clause_count", "nonoperative_clauses", "notice",
+}
+_INTENT_UNSUPPORTED_MECHANISMS = [
+    "ordered_state_transitions", "cross_instance_identity_and_credit",
+    "external_evidence_custody",
+]
 
 
 class InvalidAdvisory(ValueError):
@@ -114,11 +123,26 @@ def build_advisory(
     if declared_url is not None:
         declared_url = _string(declared_url, "declared_url", 2048)
 
-    coverage = _fields(obj["coverage"], {
-        "status", "nonempty_clause_count", "extracted_rule_count",
-        "unparsed_normative_clause_count", "unparsed_normative_clauses",
-        "nonoperative_clause_count", "nonoperative_clauses", "notice",
-    }, "coverage")
+    raw_coverage = obj["coverage"]
+    if type(raw_coverage) is not dict:
+        raise InvalidAdvisory("coverage: invalid object")
+    # Lou-Pole now emits this explicit limitation whenever --intent is used.
+    # Accept the old exact schema too, but never mistake the new annotation
+    # for evaluated intent, proof of clearance, or an authority grant.
+    if "intent_evaluation" in raw_coverage:
+        if intent is None:
+            raise InvalidAdvisory("coverage: intent evaluation without intent")
+        evaluation = _fields(raw_coverage["intent_evaluation"], {
+            "status", "unsupported_mechanisms", "notice",
+        }, "coverage.intent_evaluation")
+        if (evaluation["status"] != "not_evaluated"
+                or evaluation["unsupported_mechanisms"] != _INTENT_UNSUPPORTED_MECHANISMS):
+            raise InvalidAdvisory("coverage: unsupported intent evaluation claim")
+        if not _string(evaluation["notice"], "coverage.intent_evaluation.notice", 2048).strip():
+            raise InvalidAdvisory("coverage: missing intent limitation")
+        coverage = _fields(raw_coverage, _COVERAGE_FIELDS | {"intent_evaluation"}, "coverage")
+    else:
+        coverage = _fields(raw_coverage, _COVERAGE_FIELDS, "coverage")
     if type(coverage["status"]) is not str or coverage["status"] not in COVERAGE_STATUSES:
         raise InvalidAdvisory("coverage: unsupported status")
     _count(coverage["nonempty_clause_count"], "nonempty_clause_count")
