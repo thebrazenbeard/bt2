@@ -24,6 +24,43 @@ The green tests exercise *only this local reference contract*:
 - valid fixture evidence produces a single in-process, thread-serialized
   revision advance, even when competing claims arrive concurrently.
 
+## Source-only MESO -> Volition -> Pre-Active correlation envelope
+
+`lineage_envelope.py` is a separate, narrower **advisory-only** contract and
+does not run the outcome oracle's test-controlled verifier. Its `ForwardTrace`
+records *claimed* MESO source event -> signal -> goal/choice/target identity,
+`CurrentGoalBinding` records a *claimed* current goal receipt, and
+`CandidateTrace` reflects the current Pre-Active V1 outcome candidate fields.
+When the goal instance, choice, signal, target, candidate goal, candidate state
+and observation window are structurally consistent, the only result is
+`CORRELATED_UNVERIFIED`, with `authorization_effect=NONE`,
+`may_complete_goal=False` and `may_update_need=False`. The SHA-256 correlation
+digest proves deterministic serialization of **caller inputs only**, never
+the existence, custody, authenticity, or causal relationship of an observation.
+
+The V1 candidate itself has **no choice ID, MESO event ID or signal ID**. The
+candidate `need_id` and `action_request_id` remain claimant supplied, with
+neither an upstream MESO need observation nor any independently verified tool
+effect. The complete Pre-Active V1 claim fields affecting identity are included
+in the correlation digest, notably `claimed_need_change`, `source_actor_id`,
+`source_revision`, `schema_version` and evidence timing. No independent
+**absolute need observation** is admitted from this self-reported delta. A
+same-target stale-goal/choice (ABA) mismatch, future/expired or
+rejected candidate and model-generated self-report are held. Even a
+structurally correlated `SUCCESS` cannot claim satisfaction or need reduction.
+This correlation seam is not a substitute for independent witness custody.
+
+`InertLineageIndex` reserves event identities and rejects conflicting replays
+**within one process** (including initial HOLD receipts), but it is purposely
+volatile. Recreating the index after a crash forgets all event IDs; cross-
+restart idempotence, durable rejection records, and atomic rollback are still
+unimplemented **runtime blockers**, not green-test achievements. Separately,
+the MESO, Volition and Pre-Active repositories must integrate their own
+persisted receipts under independent custody before this can advance beyond
+source-level conformance. LGCM (prediction/evaluation), F.U.C.K.U.P. (durable
+reconciliation) and Physica (simulation) are adjacent evaluation candidates,
+**not** qualified outcome observers or a source of admitted effect evidence.
+
 One restart test is deliberately `expectedFailure` and two unimplemented
 runtime qualification tests are explicitly skipped: there is **no installed**
 MESO -> Volition -> Pre-Active -> independently witnessed outcome -> MESO/Volition
