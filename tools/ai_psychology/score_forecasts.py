@@ -6,8 +6,13 @@ It emits no DriftGuard CI report, training result, trusted PASS, or effect.
 """
 from __future__ import annotations
 
+import argparse
+import hashlib
+import json
 import math
+from pathlib import Path
 import re
+import sys
 from typing import Any
 
 SCHEMA = "BT2_PAIRED_FORECAST_SCORE_V1"
@@ -72,11 +77,18 @@ def _measure(values: list[float | None], outcomes: list[int]) -> dict[str, objec
         ABSTENTION_LOSS if p is None else (p - outcome) ** 2
         for p, outcome in zip(values, outcomes, strict=True)
     ]
-    predicted = [p for p in values if p is not None]
+    predicted_losses = [
+        (p - outcome) ** 2 for p, outcome in zip(values, outcomes, strict=True)
+        if p is not None
+    ]
+    predicted = len(predicted_losses)
     return {
         "n": len(values),
-        "coverage": len(predicted) / len(values),
-        "abstention_rate": (len(values) - len(predicted)) / len(values),
+        "coverage": predicted / len(values),
+        "abstention_rate": (len(values) - predicted) / len(values),
+        "mean_brier_answered_only": (
+            math.fsum(predicted_losses) / predicted if predicted else None
+        ),
         "mean_fixed_loss": math.fsum(losses) / len(losses),
         "abstention_fixed_loss": ABSTENTION_LOSS,
     }
@@ -175,9 +187,13 @@ def score_events(raw: object) -> dict[str, object]:
                 candidate["mean_fixed_loss"] - baseline["mean_fixed_loss"]
             ),
         }
+    claim_digest = hashlib.sha256(
+        json.dumps(doc, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    ).hexdigest()
     return {
         "schema": SCHEMA,
         "run_id": run_id,
+        "input_claim_sha256": claim_digest,
         "status": STATUS,
         "preview_only": True,
         "independent_custody_verified": False,
@@ -191,3 +207,21 @@ def score_events(raw: object) -> dict[str, object]:
             "candidate_loss_claimed_shift": results["shift"]["candidate"]["mean_fixed_loss"],
         },
     }
+
+def main(argv: list[str] | None = None) -> int:
+    """Read bounded untrusted JSON and print a non-admitting research preview."""
+    from tools.ai_psychology.validate_receipt import InvalidReceipt, load_receipt
+    parser = argparse.ArgumentParser(description="Recompute unverified paired forecast scores")
+    parser.add_argument("claims_json", type=Path)
+    args = parser.parse_args(argv)
+    try:
+        result = score_events(load_receipt(args.claims_json))
+    except (ScoreError, InvalidReceipt, OverflowError, ValueError) as exc:
+        print(json.dumps({"status": "INVALID_CLAIMS", "reason": str(exc)}), file=sys.stderr)
+        return 2
+    print(json.dumps(result, sort_keys=True, allow_nan=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
