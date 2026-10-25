@@ -5,10 +5,10 @@ production driver. It can falsify unsafe proposed outcome-reducer behavior
 without requiring the private Bus, Supabase, a model server, MESO, Volition or
 Pre-Active to be installed. No outgoing network and no external writes occur.
 
-Run from this directory:
+Run from the repository root:
 
 ```bash
-python -m unittest discover -s tests/ai_psychology -p 'test_*.py' -v
+python -m unittest discover -s conformance/ai_psychology -p 'test_*.py' -v
 ```
 
 The green tests exercise *only this local reference contract*:

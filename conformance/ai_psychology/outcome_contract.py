@@ -1,4 +1,4 @@
-"""Inert reference oracle for the missing AI-psychology outcome feedback seam.
+"""Inert conformance oracle for the missing AI-psychology outcome feedback seam.
 
 This module deliberately has no imports from MESO, Volition, or Pre-Active. It
 does not authenticate observers, persist data, or execute an effect. An adapter

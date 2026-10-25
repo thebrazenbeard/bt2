@@ -1,4 +1,4 @@
-"""Adversarial vectors for a proposed reverse drive-feedback contract, not an E2E test."""
+"""Conformance vectors for a proposed drive-feedback contract, not an E2E test."""
 
 from dataclasses import replace
 from threading import Event, Thread
