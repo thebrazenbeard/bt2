@@ -143,6 +143,7 @@ class InMemoryContractOracle:
         self.verifier = verifier
         self.trusted_observers = trusted_observers
         self._lock = RLock()
+        self._admission_active = False
         self._seen: dict[str, tuple[str, AdmissionResult]] = {}
         self._applied_attempts: set[str] = set()
         self._applied_evidence: set[str] = set()
@@ -151,7 +152,17 @@ class InMemoryContractOracle:
         # Keep the snapshot/replay/causal-effect test oracle linearizable inside
         # this process. This does NOT constitute durable cross-repository CAS.
         with self._lock:
-            return self._admit_locked(claim, now=now)
+            # RLock serializes threads but allows a verifier callback to
+            # recursively call admit() on this same thread. Such recursion
+            # would bypass the pending revision check and double-apply an
+            # outcome (or recurse forever for the same event ID).
+            if self._admission_active:
+                return AdmissionResult("HOLD", "REENTRANT_ADMISSION", self.snapshot)
+            self._admission_active = True
+            try:
+                return self._admit_locked(claim, now=now)
+            finally:
+                self._admission_active = False
 
     def _admit_locked(self, claim: OutcomeClaim, *, now: float) -> AdmissionResult:
         _time(now, "now")
