@@ -12,6 +12,7 @@ from hashlib import sha256
 import json
 import math
 import re
+from threading import Lock
 
 
 RUNTIME_INTEGRATION_STATUS = "UNWIRED_CORRELATION_ADVISORY_ONLY"
@@ -20,6 +21,20 @@ _SOURCE_KINDS = frozenset(
     {"observer", "tool_result", "operator_statement", "model_generated"}
 )
 _CLAIMED_OUTCOMES = frozenset({"SUCCESS", "FAILURE", "NO_EFFECT", "UNKNOWN"})
+_ADVISORY_REASONS = {
+    "CORRELATED_UNVERIFIED": frozenset({"CLAIMED_LINEAGE_ONLY"}),
+    "DUPLICATE_UNVERIFIED": frozenset({"REPLAY_OF_UNVERIFIED_CANDIDATE"}),
+    "HOLD": frozenset({
+        "STALE_GOAL_INSTANCE",
+        "SIGNAL_RECEIPT_MISMATCH",
+        "TARGET_MISMATCH",
+        "CANDIDATE_GOAL_MISMATCH",
+        "CANDIDATE_NOT_ACTIVE",
+        "CANDIDATE_OUTSIDE_WINDOW",
+        "MODEL_SELF_REPORT",
+        "CONFLICTING_CANDIDATE_ID",
+    }),
+}
 
 
 def _name(value: str, field: str) -> str:
@@ -149,6 +164,21 @@ class CorrelationAdvisory:
     need_id_claim: str
     correlation_sha256: str
 
+    def __post_init__(self) -> None:
+        if (
+            type(self.status) is not str
+            or type(self.reason) is not str
+            or self.reason not in _ADVISORY_REASONS.get(self.status, ())
+        ):
+            raise ValueError("unsupported correlation advisory status/reason")
+        _name(self.candidate_event_id, "candidate_event_id")
+        _name(self.need_id_claim, "need_id_claim")
+        if (
+            type(self.correlation_sha256) is not str
+            or _DIGEST.fullmatch(self.correlation_sha256) is None
+        ):
+            raise ValueError("correlation_sha256: expected lowercase SHA-256 hex")
+
     @property
     def authorization_effect(self) -> str:
         return "NONE"
@@ -231,28 +261,31 @@ class InertLineageIndex:
 
     def __init__(self) -> None:
         self._seen: dict[str, tuple[str, CorrelationAdvisory]] = {}
+        self._lock = Lock()
 
     def record(self, advisory: CorrelationAdvisory) -> CorrelationAdvisory:
         if not isinstance(advisory, CorrelationAdvisory):
             raise TypeError("typed correlation advisory required")
-        original = self._seen.get(advisory.candidate_event_id)
-        if original is not None:
-            digest, first = original
-            if digest == advisory.correlation_sha256:
-                if first.status == "HOLD":
-                    return first
+        with self._lock:
+            original = self._seen.get(advisory.candidate_event_id)
+            if original is not None:
+                digest, first = original
+                if digest == advisory.correlation_sha256:
+                    if first.status == "HOLD":
+                        return first
+                    return CorrelationAdvisory(
+                        "DUPLICATE_UNVERIFIED", "REPLAY_OF_UNVERIFIED_CANDIDATE",
+                        advisory.candidate_event_id, advisory.need_id_claim, advisory.correlation_sha256,
+                    )
                 return CorrelationAdvisory(
-                    "DUPLICATE_UNVERIFIED", "REPLAY_OF_UNVERIFIED_CANDIDATE",
+                    "HOLD", "CONFLICTING_CANDIDATE_ID",
                     advisory.candidate_event_id, advisory.need_id_claim, advisory.correlation_sha256,
                 )
-            return CorrelationAdvisory(
-                "HOLD", "CONFLICTING_CANDIDATE_ID",
-                advisory.candidate_event_id, advisory.need_id_claim, advisory.correlation_sha256,
-            )
-        # Even local rejections reserve an event ID so a modified claim cannot
-        # be retried under the same identity. No disk persistence is implied.
-        self._seen[advisory.candidate_event_id] = advisory.correlation_sha256, advisory
-        return advisory
+            # Even local rejections reserve an event ID so a modified claim cannot
+            # be retried under the same identity. No disk persistence is implied.
+            self._seen[advisory.candidate_event_id] = advisory.correlation_sha256, advisory
+            return advisory
 
     def count(self) -> int:
-        return len(self._seen)
+        with self._lock:
+            return len(self._seen)
