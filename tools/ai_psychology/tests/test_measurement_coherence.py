@@ -74,6 +74,13 @@ class MeasurementCoherenceTests(unittest.TestCase):
         self.bad(lambda x:x.update(witness_signature="forged"))
         self.bad(lambda x:x["evaluation_receipt"].update(private_note="not accepted"))
 
+    def test_member_helper_rejects_duplicate_identifiers_independently(self):
+        from tools.ai_psychology.check_measurement import _same_ids
+        with self.assertRaises(MeasurementError):
+            _same_ids(["event:1", "event:1"], ["event:1"], "test")
+        with self.assertRaises(MeasurementError):
+            _same_ids(["group:a", "group:a"], ["group:a", "group:a"], "test")
+
     def test_deterministic_under_json_roundtrip(self):
         import json
         a=check_measurement(matched())
