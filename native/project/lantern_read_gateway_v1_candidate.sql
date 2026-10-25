@@ -49,12 +49,13 @@ BEGIN
   -- The migration actor alone may SET the NOLOGIN gateway owner to transfer
   -- function ownership. An unrelated member could otherwise SET ROLE to the
   -- definer and read the protected bt2 tables granted to that owner directly.
-  -- Reject inherited/admin membership too; this is an install-time check,
-  -- not a substitute for monitoring later role-grant drift.
+  -- Reject inherited membership; a CREATEROLE migration actor may already
+  -- hold implicit ADMIN on its created roles in managed PostgreSQL 17.
+  -- This install-time check cannot substitute for role-grant drift monitoring.
   IF v_migration_actor IS NULL OR NOT EXISTS (
     SELECT 1 FROM pg_catalog.pg_auth_members
      WHERE roleid = v_owner.oid AND member = v_migration_actor
-       AND set_option AND NOT inherit_option AND NOT admin_option
+       AND set_option AND NOT inherit_option
   ) OR EXISTS (
     SELECT 1 FROM pg_catalog.pg_auth_members
      WHERE member IN (v_owner.oid, v_reader.oid)
@@ -62,7 +63,7 @@ BEGIN
     SELECT 1 FROM pg_catalog.pg_auth_members
      WHERE roleid IN (v_owner.oid, v_reader.oid)
        AND (member <> v_migration_actor OR NOT set_option
-            OR inherit_option OR admin_option)
+            OR inherit_option)
   ) THEN
     RAISE EXCEPTION 'LANTERN_GATEWAY_ROLE_MEMBERSHIP_NOT_ISOLATED';
   END IF;
