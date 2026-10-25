@@ -9,7 +9,7 @@ The input must provide four exact-shaped lowercase 40-character source-commit **
 All unknown JSON fields fail closed. Boolean/nonnumeric/nonfinite/out-of-range metrics, duplicate JSON object keys, duplicate evidence IDs, reused split digests, conflicting roles, non-`NONE` effect claims, or an assertion of independently verified label custody are rejected. Raw prompts, labels, personal/relational records, and free-form text have no schema field. The CLI performs best-effort symlink-ancestor rejection and descriptor-based regular-file and 128 KiB read bounds; it limits JSON nesting and numeric token length. This is not a trusted filesystem boundary or a guarantee against Windows reparse-point/path races.
 
 ```powershell
-python -m unittest discover -s tests -p test_ai_psychology_receipt.py -v
+python -m unittest discover -s tools/ai_psychology/tests -p test_receipt.py -v
 python -m tools.ai_psychology.validate_receipt path\to\untrusted-receipt.json
 ```
 
