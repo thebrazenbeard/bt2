@@ -100,6 +100,14 @@ python conformance/ai_psychology/lou_pole_advisory.py \
   rules.txt report.json --engine-revision 245186d6baad672460dec112b916470d8b13633e
 ```
 
+Lou-Pole's newer `--json --intent '...'` reports include a bounded
+`coverage.intent_evaluation` declaration of `not_evaluated`, naming ordered
+state transitions, cross-instance identity/credit, and external evidence
+custody as unsupported. The wrapper now accepts both that exact addition and
+legacy reports lacking it, but keeps the emitted advisory V1 schema unchanged.
+Other or purportedly evaluated intent statuses fail closed. The wrapper does
+not itself evaluate the declared intent.
+
 The example commit is Lou-Pole's inspected `main` source revision from
 2026-10-25; update it to the exact **actual** engine revision before use. The
 adapter accepts only a well-shaped SHA but **cannot verify that revision or

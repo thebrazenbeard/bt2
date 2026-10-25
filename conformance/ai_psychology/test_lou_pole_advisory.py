@@ -66,6 +66,20 @@ def sample_report() -> dict[str, object]:
     }
 
 
+def intent_report() -> dict[str, object]:
+    """Exact opt-in --intent addition from Lou-Pole main after issue #9."""
+    report = sample_report()
+    report["coverage"]["intent_evaluation"] = {
+        "status": "not_evaluated",
+        "unsupported_mechanisms": [
+            "ordered_state_transitions", "cross_instance_identity_and_credit",
+            "external_evidence_custody",
+        ],
+        "notice": "Declared intent is not evaluated or enforced.",
+    }
+    return report
+
+
 class LouPoleAdvisoryTests(unittest.TestCase):
     def test_valid_candidates_are_explicitly_not_authority(self):
         artifact = build_advisory(SOURCE, sample_report(), engine_revision=ENGINE_REVISION)
@@ -86,6 +100,31 @@ class LouPoleAdvisoryTests(unittest.TestCase):
         self.assertEqual(artifact["review_status"], "NO_DETECTED_FINDINGS_NOT_CLEARED")
         self.assertEqual(artifact["authorization_effect"], "NONE")
         self.assertEqual(artifact["runtime_verified"], False)
+
+    def test_current_lou_pole_intent_report_is_accepted_as_advisory_only(self):
+        legacy = build_advisory(SOURCE, sample_report(), engine_revision=ENGINE_REVISION)
+        current = build_advisory(SOURCE, intent_report(), engine_revision=ENGINE_REVISION)
+        self.assertEqual(current, legacy)  # V1 emitted artifact schema stays frozen.
+        self.assertEqual(current["authorization_effect"], "NONE")
+        self.assertFalse(current["coverage"]["completeness_verified"])
+
+    def test_intent_report_cannot_promote_completeness_or_change_known_limits(self):
+        for mutation in (
+            lambda r: r["coverage"]["intent_evaluation"].update(status="evaluated"),
+            lambda r: r["coverage"]["intent_evaluation"].update(status=True),
+            lambda r: r["coverage"]["intent_evaluation"].update(unsupported_mechanisms=[]),
+            lambda r: r["coverage"]["intent_evaluation"].update(unsupported_mechanisms=["other"]),
+            lambda r: r["coverage"]["intent_evaluation"].update(notice=""),
+            lambda r: r["coverage"]["intent_evaluation"].update(notice="x" * 2049),
+            lambda r: r["coverage"]["intent_evaluation"].update(verified=True),
+            lambda r: r.update(intent=None),
+            lambda r: r["coverage"].update(cleared=True),
+        ):
+            with self.subTest(mutation=mutation):
+                report = intent_report()
+                mutation(report)
+                with self.assertRaises(InvalidAdvisory):
+                    build_advisory(SOURCE, report, engine_revision=ENGINE_REVISION)
 
     def test_source_bytes_are_bound_and_swapped_input_rejected(self):
         with self.assertRaises(InvalidAdvisory):
