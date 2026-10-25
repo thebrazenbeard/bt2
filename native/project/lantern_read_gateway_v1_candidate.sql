@@ -211,6 +211,7 @@ BEGIN
        WHERE n.nspname = 'lantern_read'
          AND p.proname = 'current_cut_v1'
          AND p.pronargs = 0
+         AND p.prokind = 'f'
          AND pg_catalog.has_function_privilege(
            'bt2_lantern_gateway_reader_v1', p.oid, 'EXECUTE')
      )
@@ -221,6 +222,8 @@ BEGIN
          coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))) AS acl
        WHERE n.nspname = 'lantern_read'
          AND p.proname = 'current_cut_v1'
+         AND p.pronargs = 0
+         AND p.prokind = 'f'
          AND acl.grantee = 0 AND acl.privilege_type = 'EXECUTE'
      ) THEN
     RAISE EXCEPTION 'LANTERN_GATEWAY_ACL_POSTFLIGHT_FAILED';
