@@ -79,7 +79,7 @@ class ReceiptTests(unittest.TestCase):
         self.assert_invalid(lambda r: r["roles"].update(identity="Vera"))
 
     def test_finite_real_bounded_metrics_and_real_counts(self):
-        for bad in (float("nan"),float("inf"),-0.1,1.1,True,"0.2"):
+        for bad in (float("nan"),float("inf"),-0.1,1.1,True,"0.2",10**500):
             with self.subTest(bad=repr(bad)):
                 self.assert_invalid(lambda r: r["metrics"]["candidate"].update(brier=bad))
         for bad in (True,0,-3,1.2):
@@ -105,6 +105,12 @@ class ReceiptTests(unittest.TestCase):
             with self.assertRaises(InvalidReceipt):
                 load_receipt(path)
             path.write_text('{"metric":NaN}', encoding="utf-8")
+            with self.assertRaises(InvalidReceipt):
+                load_receipt(path)
+            path.write_text("[" * 1100 + "0" + "]" * 1100, encoding="utf-8")
+            with self.assertRaises(InvalidReceipt):
+                load_receipt(path)
+            path.write_text('{"large":' + "9" * 5200 + '}', encoding="utf-8")
             with self.assertRaises(InvalidReceipt):
                 load_receipt(path)
 
