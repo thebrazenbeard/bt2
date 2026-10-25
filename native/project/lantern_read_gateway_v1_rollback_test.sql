@@ -78,8 +78,9 @@ SELECT
 FROM bt2.materials AS m
 WHERE m.material_id = '00000000-0000-4000-8000-000000009102'::uuid;
 
--- A real separate reader is denied bt2 internals and still sees exactly the
--- one current-profile material, with source text enabling independent hashing.
+-- A restricted reader role context (SET ROLE, not a separate authenticated
+-- login/TLS session) is denied bt2 internals and sees exactly one current-
+-- profile material, with source text enabling independent hashing.
 SET LOCAL ROLE bt2_lantern_gateway_reader_v1;
 
 DO $reader$
