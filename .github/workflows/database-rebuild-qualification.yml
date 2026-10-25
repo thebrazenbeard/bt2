@@ -27,6 +27,23 @@ permissions:
   contents: read
 
 jobs:
+  native-v5-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Verify frozen V4 source package
+        run: python tools/qualification/test_lantern_postgresql_v4_source_binding.py
+      - name: Verify V5 Project-file source package
+        run: python native/project/validation/test_bt2_native_v5_source_binding.py
+      - name: Probe stale recovery pointers and protected-boundary regressions
+        run: python -m unittest discover -s native/project/tests -p 'test_bt2_native_v5_recovery_pointers.py' -v
+
   postgres16:
     runs-on: ubuntu-latest
     services:

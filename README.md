@@ -10,7 +10,17 @@ The current source tree includes modules for cognition, affect, salience/attenti
 
 This repository previously displayed a copied **Hyperconnectome Brain** README that did not identify BT2 correctly. The repository contents themselves remain the authority for what exists on `main`; this README is an orientation layer, not a claim that every module is installed or active in a runtime.
 
-The V4 package in source is an installation/runtime candidate only. Until a replacement PostgreSQL runtime is reconstructed, qualified, connected through the governed V4 interface, and installed as the active Project contract, `LANTERN_CURRENTNESS = UNKNOWN`.
+The new [V5 Project-file source package](native/project/INSTALL_V5.md)
+repairs obsolete V1 reconstruction/worker-topology pointers, while retaining
+the **V4 provider-neutral SQL Connectome/PostgreSQL runtime contract**. Its
+[manifest](native/project/PROJECT_FILES_MANIFEST_V5.json) binds exact payload
+blobs to a source ancestor. The older V4 Project-file package and V1 paths
+remain intact as historical source; they were not overwritten.
+
+V5 is **source-only, not installed**. Until a replacement PostgreSQL runtime is
+reconstructed, qualified, connected through the governed V4 interface, and
+separately installed as the active Project contract,
+`LANTERN_CURRENTNESS = UNKNOWN`.
 
 ## Repository shape
 
