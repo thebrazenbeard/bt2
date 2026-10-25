@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Disposable CI-only qualification for the uninstalled Lantern read gateway.
+# Disposable workflow-only qualification for the uninstalled Lantern read gateway.
 # Requires a freshly rebuilt BT2 PostgreSQL 16/17 service container.
 # `preflight` runs before the gateway candidate; `reader` runs after it.
 set -euo pipefail
@@ -79,17 +79,26 @@ psql "$BT2_CI_TLS_ADMIN_DSN" -v ON_ERROR_STOP=1 -c 'SELECT pg_reload_conf()'
 # A random, single-job credential is injected into the disposable reader.
 # Neither the credential nor the connection string containing it is logged.
 reader_password="$(openssl rand -hex 24)"
-psql "$BT2_CI_TLS_ADMIN_DSN" -v ON_ERROR_STOP=1 \
-  -v ci_reader_password="$reader_password" >/dev/null <<'SQL'
-ALTER ROLE bt2_lantern_gateway_reader_v1 PASSWORD :'ci_reader_password';
-SQL
+[[ "$reader_password" =~ ^[0-9a-f]{48}$ ]] || {
+  echo 'FAIL: invalid ephemeral reader-password format' >&2
+  exit 1
+}
+# Hex-only password goes over stdin, not a visible psql -v command argument.
+printf "ALTER ROLE $reader_role PASSWORD '%s';\n" "$reader_password" | \
+  psql "$BT2_CI_TLS_ADMIN_DSN" -v ON_ERROR_STOP=1 >/dev/null
 reader_dsn="postgresql://$reader_role@localhost:5432/bt2_ci?sslmode=verify-full&sslrootcert=$cert_file"
 wrong_host_dsn="postgresql://$reader_role@127.0.0.1:5432/bt2_ci?sslmode=verify-full&sslrootcert=$cert_file"
+wrong_host_ca_dsn="postgresql://$reader_role@127.0.0.1:5432/bt2_ci?sslmode=verify-ca&sslrootcert=$cert_file"
 
 # Both password and certificate hostname must be actually enforced.
 if PGPASSWORD="${reader_password}bad" psql "$reader_dsn" -v ON_ERROR_STOP=1 \
     -Atqc 'SELECT 1' >/dev/null 2>&1; then
   echo 'FAIL: reader connected with an incorrect password' >&2
+  exit 1
+fi
+if [[ "$(PGPASSWORD="$reader_password" psql "$wrong_host_ca_dsn" \
+    -v ON_ERROR_STOP=1 -Atqc 'SELECT 1')" != '1' ]]; then
+  echo 'FAIL: numeric-IP control route with certificate trust did not connect' >&2
   exit 1
 fi
 if PGPASSWORD="$reader_password" psql "$wrong_host_dsn" -v ON_ERROR_STOP=1 \
