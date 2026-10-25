@@ -12,6 +12,16 @@ This repository previously displayed a copied **Hyperconnectome Brain** README t
 
 The V4 package in source is an installation/runtime candidate only. Until a replacement PostgreSQL runtime is reconstructed, qualified, connected through the governed V4 interface, and installed as the active Project contract, `LANTERN_CURRENTNESS = UNKNOWN`.
 
+## Essential Vera AI runtime boundary (source candidate)
+
+For the operational subset of Vera and AI repositories, see the
+[exact-head essential integration graph](docs/bt2/ESSENTIAL_VERA_AI_STACK_20261025.md).
+It separates Vera Mono (runtime/effect fence), Rezon (optional reasoning),
+Intranel (typed receipts over authenticated transport), Project Runner (jobs),
+WIP (recovery), CCB (messaging), Blotter (activity), and DeepMemory (historical evidence).
+The graph deliberately excludes unrelated projects and marks unverified cross-host
+interfaces as future edges; passing source tests are not proof of an installed Vera.
+
 ## Ecosystem integration checkpoint (source candidate)
 
 The active BT2 ecosystem execution record is the
