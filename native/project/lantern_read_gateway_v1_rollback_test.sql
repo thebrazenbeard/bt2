@@ -4,6 +4,9 @@
 
 BEGIN;
 
+-- The managed migration owner intentionally cannot use lantern_read after
+-- custody transfers. Exercise gateway reads under the admitted reader role.
+SET LOCAL ROLE bt2_lantern_gateway_reader_v1;
 DO $baseline$
 DECLARE v_snapshot jsonb;
 BEGIN
@@ -17,6 +20,7 @@ BEGIN
   END IF;
 END
 $baseline$;
+RESET ROLE;
 
 -- Deliberately retain old-profile materials, then add a newer accepted profile
 -- with one material. A reader that selects solely by scope leaks old members.
@@ -163,6 +167,7 @@ SELECT
 FROM bt2.materials AS m
 WHERE m.material_id = '00000000-0000-4000-8000-000000009104'::uuid;
 
+SET LOCAL ROLE bt2_lantern_gateway_reader_v1;
 DO $oversize$
 DECLARE v_observed text;
 BEGIN
@@ -177,6 +182,7 @@ BEGIN
   END IF;
 END
 $oversize$;
+RESET ROLE;
 
 SELECT bt2.assert_internal_access_boundary_v1();
 ROLLBACK;
