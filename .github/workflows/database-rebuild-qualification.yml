@@ -101,8 +101,16 @@ jobs:
           GRANT bt2_lantern_gateway_owner_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
           GRANT bt2_lantern_gateway_reader_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
           SQL
+          BT2_CI_PG_MAJOR=16 \
+          BT2_CI_TLS_ADMIN_DSN='postgresql://postgres:postgres@localhost:5432/bt2_ci' \
+            bash tools/qualification/run_lantern_gateway_login_tls_ci.sh preflight
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_candidate.sql
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_rollback_test.sql
+      - name: PostgreSQL 16 independently authenticated TLS gateway reader
+        run: |
+          BT2_CI_PG_MAJOR=16 \
+          BT2_CI_TLS_ADMIN_DSN='postgresql://postgres:postgres@localhost:5432/bt2_ci' \
+            bash tools/qualification/run_lantern_gateway_login_tls_ci.sh reader
       - name: Evidence summary
         if: always()
         run: |
@@ -174,8 +182,16 @@ jobs:
           GRANT bt2_lantern_gateway_owner_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
           GRANT bt2_lantern_gateway_reader_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
           SQL
+          BT2_CI_PG_MAJOR=17 \
+          BT2_CI_TLS_ADMIN_DSN='postgresql://postgres:postgres@localhost:5432/bt2_ci' \
+            bash tools/qualification/run_lantern_gateway_login_tls_ci.sh preflight
           PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_candidate.sql
           PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_rollback_test.sql
+      - name: PostgreSQL 17 independently authenticated TLS gateway reader
+        run: |
+          BT2_CI_PG_MAJOR=17 \
+          BT2_CI_TLS_ADMIN_DSN='postgresql://postgres:postgres@localhost:5432/bt2_ci' \
+            bash tools/qualification/run_lantern_gateway_login_tls_ci.sh reader
       - name: Evidence summary
         if: always()
         run: |
