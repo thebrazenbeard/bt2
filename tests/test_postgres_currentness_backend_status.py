@@ -24,3 +24,10 @@ def test_v4_candidate_source_is_not_promoted_to_active_backend():
     assert data["candidate_contract_state"] == "SOURCE_ONLY_NOT_ACTIVE_CURRENTNESS_BACKEND"
     assert data["rules"]["candidate_source_presence_does_not_establish_runtime"] is True
     assert data["evidence_ceiling"] == "SOURCE_STATE_ONLY_NO_RUNTIME_READ_PERFORMED"
+
+
+def test_readme_points_at_currentness_status_instead_of_old_project_v1_files():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "docs/runtime/CURRENTNESS_BACKEND_STATUS_V1.json" in readme
+    assert "WoWSQL **retired**" in readme
+    assert "**source-only candidate**" in readme
