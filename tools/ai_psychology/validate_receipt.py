@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 from pathlib import Path
+import stat
 import re
 import sys
 from typing import Any
@@ -63,7 +65,10 @@ def _metric(value: object, scope: str) -> dict[str, object]:
         raise InvalidReceipt(f"{scope}.n: expected bounded positive integer")
     for name in ("brier", "coverage", "abstention_rate"):
         v = obj[name]
-        if type(v) not in (int, float) or not math.isfinite(v) or not 0.0 <= v <= 1.0:
+        # Range check first: math.isfinite(10**500) can raise OverflowError.
+        if type(v) not in (int, float) or not 0.0 <= v <= 1.0:
+            raise InvalidReceipt(f"{scope}.{name}: expected finite fraction")
+        if not math.isfinite(v):
             raise InvalidReceipt(f"{scope}.{name}: expected finite fraction")
     if abs(obj["coverage"] + obj["abstention_rate"] - 1.0) > 1e-8:
         raise InvalidReceipt(f"{scope}: coverage and abstention must sum to one")
@@ -132,17 +137,40 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     return result
 
 
+def _parse_number(token: str, *, integer: bool) -> int | float:
+    if len(token) > 256:
+        raise InvalidReceipt("numeric JSON token exceeds limit")
+    v = int(token) if integer else float(token)
+    if type(v) is float and not math.isfinite(v):
+        raise InvalidReceipt("nonfinite JSON number")
+    return v
+
+
 def load_receipt(path: Path) -> object:
-    if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_BYTES:
-        raise InvalidReceipt("receipt must be an ordinary bounded file")
+    # Best-effort path checks; secure opening also checks descriptor type/size.
+    # Windows path reparse races cannot be ruled out by this source-only helper.
     try:
+        if any(part.is_symlink() for part in (path, *path.parents)):
+            raise InvalidReceipt("symlinked receipt path is not accepted")
+        fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+        with os.fdopen(fd, "rb") as stream:
+            info = os.fstat(stream.fileno())
+            if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_BYTES:
+                raise InvalidReceipt("receipt must be a bounded ordinary file")
+            raw = stream.read(MAX_BYTES + 1)
+        if len(raw) > MAX_BYTES:
+            raise InvalidReceipt("receipt exceeds byte limit")
         return json.loads(
-            path.read_text(encoding="utf-8"),
+            raw.decode("utf-8"),
+            parse_int=lambda v: _parse_number(v, integer=True),
+            parse_float=lambda v: _parse_number(v, integer=False),
             parse_constant=lambda v: (_ for _ in ()).throw(InvalidReceipt(f"nonfinite JSON: {v}")),
             object_pairs_hook=_unique_object,
         )
-    except (UnicodeError, json.JSONDecodeError, OSError) as exc:
-        raise InvalidReceipt("malformed JSON input") from exc
+    except InvalidReceipt:
+        raise
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, RecursionError, OverflowError) as exc:
+        raise InvalidReceipt("invalid or excessively nested JSON receipt") from exc
 
 
 def main(argv: list[str] | None = None) -> int:
