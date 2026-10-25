@@ -44,10 +44,18 @@ def _same_numbers(a: object, b: object, path: str) -> None:
 
 def _same_ids(a: object, b: object, scope: str) -> None:
     if (type(a) is not list or type(b) is not list
+            or not all(type(v) is str for v in a)
+            or not all(type(v) is str for v in b)
             or len(a) != len(b)
             or len(set(a)) != len(a) or len(set(b)) != len(b)
             or set(a) != set(b)):
-        raise MeasurementError(scope + ": inconsistent or repeated event/source membership")
+        raise MeasurementError(scope + ": inconsistent, malformed or repeated membership")
+
+
+def _same_count(advertised: object, measured: object, scope: str) -> None:
+    if (type(advertised) is not int or type(measured) is not int
+            or advertised <= 0 or advertised != measured):
+        raise MeasurementError(scope + ": invalid or inconsistent integer case count")
 
 
 def check_measurement(document: object) -> dict[str, Any]:
@@ -92,8 +100,7 @@ def check_measurement(document: object) -> dict[str, Any]:
             raise MeasurementError(
                 name + ": answered-only Brier undefined when all abstain"
             )
-        if advertised["n"] != actual["n"]:
-            raise MeasurementError(name + ": case count mismatch")
+        _same_count(advertised["n"], actual["n"], name + ".n")
         for claim_key, score_key in (
             ("brier", "mean_brier_answered_only"),
             ("coverage", "coverage"),
