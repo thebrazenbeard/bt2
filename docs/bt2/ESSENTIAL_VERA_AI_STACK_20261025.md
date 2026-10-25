@@ -9,10 +9,10 @@ Status: **reviewable source architecture / partial live component probes**. This
 
 | Repository, pinned observed `main` | Valid responsibility | Proven boundary / missing runtime |
 | --- | --- | --- |
-| [vera-mono](https://github.com/thebrazenbeard/vera-mono) `64c4a756` | Core orchestrated Vera implementation, local packages, policy/effect fence, experimental bounded learning | Main is not the successor experimental journal patch; no installed selected Vera process qualification |
+| [vera-mono](https://github.com/thebrazenbeard/vera-mono) `625ca2ad` | Core orchestrated Vera implementation, local packages, policy/effect fence, experimental bounded learning | [PR88](https://github.com/thebrazenbeard/vera-mono/pull/88) security containment MERGED on main; successor experimental journal patch remains branch-only; no installed selected Vera process qualification |
 | [vera](https://github.com/thebrazenbeard/vera) `5f2932a7` | Cross-cutting architecture and source/evidence | Security PR222 merged and editor source checked; not live resident |
 | [rezon](https://github.com/thebrazenbeard/rezon) `d27da3ca` | Optional heterogeneous *external* multi-model deliberation; contributions are candidates | Three physical local model calls independently completed, but no authenticated persisted multi-host hearing. PR119/121 remain draft/stacked |
-| [intranel](https://github.com/thebrazenbeard/intranel) `25a2332a` | Typed intent, identity, constraints, and receipts over admitted transport | Source host-peer candidate `cf694767` passes tests; actual authenticated SSH key/account-to-peer binding and installation missing |
+| [intranel](https://github.com/thebrazenbeard/intranel) `25a2332a` | Typed intent, identity, constraints, and receipts over admitted transport | Host-peer base `cf694767`; stacked [PR15](https://github.com/thebrazenbeard/intranel/pull/15) SSH adapter `083c0581` has Ubuntu+Windows CI GREEN at exact head, but Windows incoming receiver and actual authenticated SSH host policies/install missing |
 | [ccb-core](https://github.com/thebrazenbeard/ccb-core) `9d53ce2e` | Reusable durable bus/Radar transport | Read-only Intranel codec candidate `42b6f69c` source-only; provider HTTP503 delivery not recovered |
 | [chat-communication-bus](https://github.com/thebrazenbeard/chat-communication-bus) | Private deployment overlays, topology, lane governance and receipts | Separate private runtime evidence; cannot treat GitHub comments as authenticated bus delivery |
 | [project-runner](https://github.com/thebrazenbeard/project-runner) `e0ef7ebd` | Work intake, exact-head planning/ownership, fenced attempts | Opt-in journal→Blotter exporter in development; no globally qualified scheduler |
@@ -65,6 +65,6 @@ Unrelated industrial, media/NAS, literary, gaming, finance and research repos sh
 
 ## Reproducibility and ownership
 
-- Exact live `main` SHAs above were read from GitHub branch APIs on 2026-10-25. Branch candidate commits, tests, CI, provider/host readbacks, owners and blockers appear in [the integration ledger](ECOSYSTEM_INTEGRATION_LEDGER_20261024.md).
+- Exact `main` SHAs above were read from GitHub branch APIs on 2026-10-25; Vera Mono was refreshed after the concurrent PR88 merge. Branch candidate commits, tests, CI, provider/host readbacks, owners and blockers appear in [the integration ledger](ECOSYSTEM_INTEGRATION_LEDGER_20261024.md).
 - Repository-local CLA, draft PR, legal provenance, E0 governance and credential policies override a generic merge preference. No first-person CLA statement may be attributed to Patrick without his own authorized acceptance.
 - The acceptance condition is **a real resident Vera process crossing source-pinned reasoning, authenticated transport, durable recovery and independently read-back effect**. This has **not** been observed at the date of this file.
