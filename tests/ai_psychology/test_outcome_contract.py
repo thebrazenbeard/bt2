@@ -191,6 +191,8 @@ class OutcomeContractAdversarialTests(unittest.TestCase):
 
     def test_concurrent_revision_competitors_cannot_both_apply(self):
         first_entered_verifier = Event()
+        second_attempt_started = Event()
+        second_entered_verifier = Event()
         release_first = Event()
         results = []
 
@@ -199,6 +201,8 @@ class OutcomeContractAdversarialTests(unittest.TestCase):
                 first_entered_verifier.set()
                 if not release_first.wait(timeout=2):
                     raise AssertionError("concurrency fixture timed out")
+            else:
+                second_entered_verifier.set()
             return witness(
                 event_id=event.event_id,
                 attempt_id=event.attempt_id,
@@ -213,6 +217,8 @@ class OutcomeContractAdversarialTests(unittest.TestCase):
         )
 
         def apply(event):
+            if event.event_id == "event-2":
+                second_attempt_started.set()
             results.append(contract.admit(event, now=110))
 
         first = Thread(target=apply, args=(claim(),))
@@ -220,7 +226,15 @@ class OutcomeContractAdversarialTests(unittest.TestCase):
         first.start()
         self.assertTrue(first_entered_verifier.wait(timeout=2))
         second.start()
-        release_first.set()
+        self.assertTrue(second_attempt_started.wait(timeout=2))
+        # A second verifier must NOT begin while the first revision's
+        # commitment is unresolved. Without the admission lock this event is
+        # set before release_first and the test fails (real race falsifier).
+        try:
+            self.assertFalse(second_entered_verifier.wait(timeout=0.2))
+            self.assertTrue(second.is_alive())
+        finally:
+            release_first.set()
         first.join(timeout=2)
         second.join(timeout=2)
         self.assertFalse(first.is_alive() or second.is_alive())
