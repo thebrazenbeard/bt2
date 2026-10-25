@@ -1,0 +1,29 @@
+name: AI psychology receipt source tests
+on:
+  pull_request:
+    paths:
+      - 'tools/ai_psychology/**'
+      - 'docs/bt2/AI_PSYCHOLOGY_EVALUATION_RECEIPT_V1.md'
+      - '.github/workflows/ai-psychology-receipt.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/ai_psychology/**'
+      - 'docs/bt2/AI_PSYCHOLOGY_EVALUATION_RECEIPT_V1.md'
+      - '.github/workflows/ai-psychology-receipt.yml'
+jobs:
+  receipt:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify research-only receipt format
+        run: python -m unittest discover -s tools/ai_psychology/tests -p test_receipt.py -v
+      - name: Syntax validation
+        run: python -m compileall -q tools/ai_psychology
