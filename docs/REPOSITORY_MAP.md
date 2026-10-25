@@ -1,5 +1,7 @@
 # Hyperconnectome Brain Repository Map
 
+> **Scope — HC-series provenance map, not the BT2 project map.** This document describes Hyperconnectome Brain template/source-lineage material retained in the `bt2` repository. Its HC-specific Noëtarch/Four/Vera roles are not the operating roles for Build Team Two. For current BT2 source, One/Two integration authority, and the SQL Connectome V4 migration state, use the root `README.md` and `native/project/PROJECT_INSTRUCTIONS_V4.md`. References below are source pointers, not proof that a component is installed, running, or qualified.
+
 ## Purpose
 
 This repository defines the reusable HC-series Hyperconnectome Brain template. Core architecture is identity-neutral. Named identities belong only in clearly labeled governance, source-history, research, case-study, comparison, or provenance material where the identity itself is relevant.
