@@ -62,7 +62,7 @@ flowchart TD
 
 ## Deliberate isolation
 
-No automatic production dependency on `noema`, `god-brain`, `hc-brain`, `transcendence`, `meso-crct`, `orgasm`, `self`, or other speculative cognition/identity repositories. They can contribute reviewable bounded experiments, not authority or installed resident identity by association. `noema/main` remains source-exposed to editor-open until its concealed folder-open task payload containment is merged; a tested isolated candidate and Draft PR50 exist. `unbound-sol/main@f8671071` is source-contained; no installed-host proof.
+No automatic production dependency on `noema`, `god-brain`, `hc-brain`, `transcendence`, `meso-crct`, `orgasm`, `self`, or other speculative cognition/identity repositories. They can contribute reviewable bounded experiments, not authority or installed resident identity by association. [Noema PR50](https://github.com/thebrazenbeard/noema/pull/50) is now source-contained on `main@8f81e4ff`, with no implied qualified cognition runtime. `unbound-sol/main@31eae3cc` is source-contained and README-corrected; no installed-host proof.
 
 Unrelated industrial, media/NAS, literary, gaming, finance and research repos should remain outside this AI runtime deployment graph unless an actual needed interface is specified and proven.
 
