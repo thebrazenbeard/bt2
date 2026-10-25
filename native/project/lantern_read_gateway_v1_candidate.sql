@@ -202,9 +202,18 @@ BEGIN
        'bt2_lantern_gateway_reader_v1', 'bt2_legacy', 'USAGE')
      OR NOT pg_catalog.has_schema_privilege(
        'bt2_lantern_gateway_reader_v1', 'lantern_read', 'USAGE')
-     OR NOT pg_catalog.has_function_privilege(
-       'bt2_lantern_gateway_reader_v1',
-       'lantern_read.current_cut_v1()', 'EXECUTE')
+     -- Resolve by catalog OID: the managed migration caller intentionally
+     -- loses lantern_read USAGE after ownership handoff, so text-to-
+     -- regprocedure resolution here would fail before checking the reader.
+     OR NOT EXISTS (
+       SELECT 1 FROM pg_catalog.pg_proc AS p
+       JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
+       WHERE n.nspname = 'lantern_read'
+         AND p.proname = 'current_cut_v1'
+         AND p.pronargs = 0
+         AND pg_catalog.has_function_privilege(
+           'bt2_lantern_gateway_reader_v1', p.oid, 'EXECUTE')
+     )
      OR EXISTS (
        SELECT 1 FROM pg_catalog.pg_proc AS p
        JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
