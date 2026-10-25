@@ -132,7 +132,8 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
         if key in result:
-            raise InvalidReceipt(f"duplicate JSON key: {key}")
+            # Keys are untrusted input and may contain secrets; never echo them.
+            raise InvalidReceipt("duplicate JSON key")
         result[key] = value
     return result
 
