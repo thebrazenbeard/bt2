@@ -94,5 +94,36 @@ class ReceiptTests(unittest.TestCase):
         self.assert_invalid(lambda r: r["evidence"].update(event_ids=["a",42]))
         self.assert_invalid(lambda r: r["source_heads"].update(meta=123))
 
+
+    def test_strict_json_rejects_duplicate_keys_and_special_numbers(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from tools.ai_psychology.validate_receipt import load_receipt
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "candidate.json"
+            path.write_text('{"schema":"a","schema":"b"}', encoding="utf-8")
+            with self.assertRaises(InvalidReceipt):
+                load_receipt(path)
+            path.write_text('{"metric":NaN}', encoding="utf-8")
+            with self.assertRaises(InvalidReceipt):
+                load_receipt(path)
+
+    def test_cli_never_claims_quality_or_authority(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import json
+        import subprocess
+        import sys
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "case.json"
+            path.write_text(json.dumps(valid()), encoding="utf-8")
+            command = [sys.executable, "-m", "tools.ai_psychology.validate_receipt", str(path)]
+            done = subprocess.run(command, capture_output=True, text=True, timeout=10)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            result = json.loads(done.stdout)
+            self.assertEqual(result["validation"], "FORMAT_VALID_EVIDENCE_UNVERIFIED")
+            self.assertEqual(result["authorization_effect"], "NONE")
+            self.assertNotIn("deployment_qualified", result)
+
 if __name__ == "__main__":
     unittest.main()
