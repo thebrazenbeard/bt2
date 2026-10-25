@@ -27,3 +27,9 @@ Major working areas include:
 ## Evidence boundary
 
 Source availability, passing tests, installation, runtime selection, runtime consumption, and behavioral effect are separate claims. Treat branch-local or historical artifacts as evidence for their own scope rather than automatic current runtime authority.
+
+## AI psychology coordination (source-only)
+
+[Issue #61](https://github.com/thebrazenbeard/bt2/issues/61) is the active hostile gap map for the functional emotion/motivation architecture. The [AI-psychology conformance harness](conformance/ai_psychology/) tests bounded source contracts; [Draft PR #62](https://github.com/thebrazenbeard/bt2/pull/62) tracks cross-repository coordination.
+
+MESO-CRCT → Volition → Pre-Active forward bridges and a durable, **untrusted** outcome-candidate ledger exist in source. They are **not** a qualified installed feedback loop. Independent outcome-witness custody, causal action attribution, one-use goal/need revision binding, and crash-safe MESO/Volition state application remain unverified. Signed model responses, caller-asserted observer identities, and evidence hashes alone cannot establish action success, permit external effects, or justify need/satiation changes. Treat passing in-memory oracle tests separately from real observer, persistence, and behavioral evidence.
