@@ -93,6 +93,16 @@ jobs:
             --database-url "$DATABASE_URL" \
             --postgres-container-id "$POSTGRES_CONTAINER_ID" \
             --evidence-out /tmp/bt2_lantern_concurrency_evidence.json
+      - name: PostgreSQL 16 opt-in Lantern reader gateway candidate
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE bt2_lantern_gateway_owner_v1 NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+          CREATE ROLE bt2_lantern_gateway_reader_v1 LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+          GRANT bt2_lantern_gateway_owner_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
+          GRANT bt2_lantern_gateway_reader_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
+          SQL
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_candidate.sql
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_rollback_test.sql
       - name: Evidence summary
         if: always()
         run: |
@@ -156,6 +166,16 @@ jobs:
             --database-url "$DATABASE_URL" \
             --postgres-container-id "$POSTGRES_CONTAINER_ID" \
             --evidence-out /tmp/bt2_pg17_lantern_concurrency_evidence.json
+      - name: PostgreSQL 17 managed-owner opt-in Lantern reader gateway candidate
+        run: |
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE bt2_lantern_gateway_owner_v1 NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+          CREATE ROLE bt2_lantern_gateway_reader_v1 LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+          GRANT bt2_lantern_gateway_owner_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
+          GRANT bt2_lantern_gateway_reader_v1 TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
+          SQL
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_candidate.sql
+          PGPASSWORD=bt2admin psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f native/project/lantern_read_gateway_v1_rollback_test.sql
       - name: Evidence summary
         if: always()
         run: |
