@@ -80,6 +80,16 @@ class MeasurementCoherenceTests(unittest.TestCase):
             _same_ids(["event:1", "event:1"], ["event:1"], "test")
         with self.assertRaises(MeasurementError):
             _same_ids(["group:a", "group:a"], ["group:a", "group:a"], "test")
+        with self.assertRaises(MeasurementError):
+            _same_ids(["group:a", 42], ["group:a", 42], "test")
+
+    def test_count_helper_denies_bool_and_fractional_values(self):
+        from tools.ai_psychology.check_measurement import _same_count
+        for wrong in (True, 1.0, -1, "1"):
+            with self.subTest(wrong=repr(wrong)):
+                with self.assertRaises(MeasurementError):
+                    _same_count(wrong, 1, "count")
+        _same_count(1, 1, "count")
 
     def test_deterministic_under_json_roundtrip(self):
         import json
