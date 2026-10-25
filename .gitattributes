@@ -1,0 +1,3 @@
+# The archived Hephaestus V1 training package has canonical LF checksums.
+# Windows core.autocrlf must not rewrite these hash-bound source artifacts.
+/archive/training-sources/build-team-2.0/hephaestus/v1.0.0/** text eol=lf

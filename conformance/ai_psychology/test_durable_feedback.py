@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -59,7 +60,7 @@ class DurableFeedbackTests(unittest.TestCase):
 
     def test_crash_after_need_update_rolls_back_goal_and_receipt(self) -> None:
         journal = self.fixture(self.observation)
-        with sqlite3.connect(self.db) as db:
+        with closing(sqlite3.connect(self.db)) as db, db:
             db.execute("""CREATE TRIGGER abort_goal BEFORE UPDATE ON goals
                           BEGIN SELECT RAISE(ABORT, 'injected crash after need write'); END""")
         with self.assertRaises(sqlite3.IntegrityError):
@@ -70,7 +71,7 @@ class DurableFeedbackTests(unittest.TestCase):
         need, goal = fresh.state()
         self.assertEqual((need.revision, need.current_level), (0, 0.2))
         self.assertFalse(goal.completed)
-        with sqlite3.connect(self.db) as db:
+        with closing(sqlite3.connect(self.db)) as db, db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM receipts").fetchone()[0], 0)
             db.execute("DROP TRIGGER abort_goal")
         eventual = self.fixture(self.observation).admit(self.claim, now=21)
