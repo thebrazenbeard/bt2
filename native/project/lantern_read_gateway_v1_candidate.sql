@@ -50,7 +50,10 @@ BEGIN
   -- function ownership. An unrelated member could otherwise SET ROLE to the
   -- definer and read the protected bt2 tables granted to that owner directly.
   -- Reject inherited membership; a CREATEROLE migration actor may already
-  -- hold implicit ADMIN on its created roles in managed PostgreSQL 17.
+  -- hold an implicit ADMIN/SET FALSE grant from the bootstrap superuser in
+  -- PostgreSQL 17 alongside its explicit SET TRUE grant from itself.
+  -- Require one effective SET TRUE grant without requiring every grantor's
+  -- independently stored row to confer SET.
   -- This install-time check cannot substitute for role-grant drift monitoring.
   IF v_migration_actor IS NULL OR NOT EXISTS (
     SELECT 1 FROM pg_catalog.pg_auth_members
@@ -62,8 +65,7 @@ BEGIN
   ) OR EXISTS (
     SELECT 1 FROM pg_catalog.pg_auth_members
      WHERE roleid IN (v_owner.oid, v_reader.oid)
-       AND (member <> v_migration_actor OR NOT set_option
-            OR inherit_option)
+       AND (member <> v_migration_actor OR inherit_option)
   ) THEN
     RAISE EXCEPTION 'LANTERN_GATEWAY_ROLE_MEMBERSHIP_NOT_ISOLATED';
   END IF;
