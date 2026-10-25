@@ -391,3 +391,8 @@ Fresh authoritative GitHub [DriftGuard main](https://github.com/thebrazenbeard/d
 ## 2026-10-25 Noema PR50 main merge
 
 - Concurrent authorized BT2 Two thread [merged Noema PR50](https://github.com/thebrazenbeard/noema/pull/50) reviewed exact head `ee7eefe2d6b44eac058834f09ff37468fcbc7bbe` after hosted [source tests 40159530572](https://github.com/thebrazenbeard/noema/actions/runs/40159530572) SUCCESS, [Noema I1 40159530576](https://github.com/thebrazenbeard/noema/actions/runs/40159530576) SUCCESS, local 110 test report, and attributed owner CLA. Root independently verified `noema/main@8f81e4ffac444c016c05ff9a477a790da9e403e5`, tree `699556117c7a236ede9cd9a4991960d7569194c4`; `.vscode/tasks.json` absent; `.vscode/settings.json` blob `a1942445...` sets auto tasks `off` with no nested tasks; disguised font payload absent; `tests/test_editor_source_safety.py` present and README source changed. Editor-open source containment MAIN PASS, no Noema cognition runtime qualification.
+
+
+## 2026-10-25 Unbound Sol README main follow-up
+
+- `unbound-sol/main@f8671071...` containment is no longer the latest main. Two subsequently merged [README-only PR45](https://github.com/thebrazenbeard/unbound-sol/pull/45) with hosted [continuity CI 40159616165](https://github.com/thebrazenbeard/unbound-sol/actions/runs/40159616165) SUCCESS and CLA; root independently read current `unbound-sol/main@31eae3cc28567b41242cdc29b6ac462f18f3a929`, tree `ade994e8c43e7a6b291866abbfc8e90af4b59a1c`, README blob `9ec59835ba18cb521f7e5ede640e4126370ea0ab` with editor/source/runtime caveat. This source main supersedes older pin; installed/runtime effects remain unknown.
