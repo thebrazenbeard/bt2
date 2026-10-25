@@ -67,6 +67,14 @@ class V5RecoveryPointersTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "chat continuity"):
             verify_recovery_pointers(self.instructions, self.reconstruction, bad)
 
+    def test_v2_keeps_worker_roles_and_authority_from_v1(self):
+        frozen = json.loads((ROOT / "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json").read_text())
+        self.assertEqual(self.topology["workers"], frozen["workers"])
+        self.assertEqual(self.topology["active_organizational_topology"],
+                         frozen["active_organizational_topology"])
+        self.assertEqual(self.topology["authority_rule"], frozen["authority_rule"])
+        self.assertEqual(self.topology["execution_terminal_rule"], frozen["execution_terminal_rule"])
+
 
 if __name__ == "__main__":
     unittest.main()

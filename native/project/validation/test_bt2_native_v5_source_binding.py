@@ -94,7 +94,13 @@ def main() -> int:
         "lantern_currentness": "UNKNOWN",
     }:
         raise SystemExit("V5 source must preserve unverified runtime-currentness ceiling")
-    if not all(manifest["protected_effects"].values()):
+    protected = manifest["protected_effects"]
+    if protected != {
+        "merge_deploy_not_granted": True,
+        "project_installation_not_granted": True,
+        "producer_enablement_not_granted": True,
+        "historical_provider_deletion_not_granted": True,
+    }:
         raise SystemExit("V5 must preserve protected-effect fences")
     ancestor = manifest["payload_source_commit"]
     if _git("rev-parse", f"{ancestor}^{{tree}}") != manifest["payload_source_tree"]:

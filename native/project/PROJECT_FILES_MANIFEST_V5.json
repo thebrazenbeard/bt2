@@ -1,0 +1,81 @@
+{
+  "schema": "BT2_NATIVE_PROJECT_FILES_MANIFEST_V5",
+  "project": "Build Team Two",
+  "canonical_repository": "thebrazenbeard/bt2",
+  "canonical_branch": "main",
+  "runtime_contract": "POSTGRESQL_SQL_CONNECTOME_V4",
+  "installation_state": "SOURCE_CANDIDATE_NOT_INSTALLED",
+  "payload_source_commit": "b5d391d1301bcc5efe0e33d5adc2f38a83fa36db",
+  "payload_source_tree": "858eb2e1157fb05b322131fb3d1d63cd513e86d0",
+  "binding_algorithm": "exact ancestral source commit/tree plus payload-commit Git blob identity, checked against live file bytes",
+  "project_instructions": {
+    "path": "native/project/PROJECT_INSTRUCTIONS_V5.md",
+    "git_blob": "c4ca48e2b151af372db9f51fd020d759dd39cc55"
+  },
+  "required_project_files": [
+    {
+      "path": "native/project/BT2_NATIVE_RUNTIME_V2.md",
+      "git_blob": "3d543c1c471f8ab29fbad2ed3df3c78de29e2905"
+    },
+    {
+      "path": "native/project/BT2_CODING_OPERATIONS_V2.md",
+      "git_blob": "22ccd20bf841e233cc7bc495262cbed2c54dbf06"
+    },
+    {
+      "path": "native/project/BT2_RECOVERY_AND_STATE_V2.md",
+      "git_blob": "9fc31cc2e6cba277ed6df54c2d01af05825803e0"
+    },
+    {
+      "path": "native/project/BT2_ADVERSARIAL_COLLABORATION_POSTURE_V1.md",
+      "git_blob": "297fbe3631c360b0cdac49ffc043c207fee74330"
+    },
+    {
+      "path": "native/project/BT2_COORDINATOR_RECONSTRUCTION_V2.md",
+      "git_blob": "b6693578972d0e033838d10f91218399c9bb2cd1"
+    },
+    {
+      "path": "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V2.json",
+      "git_blob": "d7251d5f8c192e314d7de247e72b5a9e71171c1b"
+    },
+    {
+      "path": "native/project/BT2_PERSISTENT_INTERFACE_TOPOLOGY_V1.json",
+      "git_blob": "3825f51a67d736879d9d998e42bd4d1c802aab78"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_OPERATOR_HANDSHAKE_V4.md",
+      "git_blob": "1b7d4dc591acef360217d6527595a783db86512a"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_READ_QUERIES_V4.md",
+      "git_blob": "a77f323249aedd299b8e9919e16975e8b08cd78e"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_RUNTIME_CONTRACT_V4.md",
+      "git_blob": "3516c5cdec29b803bc6223208c9cf1dd47a842e6"
+    },
+    {
+      "path": "docs/runtime/LANTERN_POSTGRESQL_ACCEPTANCE_V4.md",
+      "git_blob": "0355bb92e5f5a2415d9f8d78181f7c93bb9289af"
+    }
+  ],
+  "installation_packet": {
+    "path": "native/project/INSTALL_V5.md",
+    "git_blob": "d79978f17471679fa967ce291b9c86a52149941c"
+  },
+  "retained_historical_package_manifest": "native/project/PROJECT_FILES_MANIFEST_V4.json",
+  "historical_retention_rule": "Keep V1-V4 packages immutable; V5 Project file package supersedes only if separately installed and qualified.",
+  "runtime_state_at_source_binding": {
+    "bt2_runtime_reconstruction": "NOT_ESTABLISHED",
+    "lantern_state_reconstruction": "NOT_ESTABLISHED",
+    "v4_runtime_qualification": "NOT_ESTABLISHED",
+    "lantern_currentness": "UNKNOWN"
+  },
+  "provider_semantics": "Provider-neutral PostgreSQL through SQL Connectome; provider/cloud/region are infrastructure metadata.",
+  "installation_rule": "Source is not installation; install V5 Project file package only after V4 runtime qualification and separate live authorization.",
+  "protected_effects": {
+    "merge_deploy_not_granted": true,
+    "project_installation_not_granted": true,
+    "producer_enablement_not_granted": true,
+    "historical_provider_deletion_not_granted": true
+  }
+}
