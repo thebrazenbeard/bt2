@@ -4,16 +4,16 @@ Event: `bt2_coordination_ai_psychology`. This contract is a **bounded format bri
 
 `tools/ai_psychology/validate_receipt.py` accepts one strict JSON receipt and returns **FORMAT_VALID_EVIDENCE_UNVERIFIED**. It uses the Python standard library only; it never imports, invokes, downloads, or authorizes `meta`, `humility`, `driftguard`, or `vera-mono`.
 
-The input must pin exact 40-character lowercase Git source hashes for those four research components, identify a method proposer distinct from an evaluator, bind disjoint training/heldout/shift dataset digests, supply distinct event and source-dependence-group IDs, and provide nonempty method-execution *claim* references. It requires PREQUENTIAL observation ordering and separate baseline/candidate Brier, coverage, abstention, and case counts on heldout and shift sets. Different counts for a pair fail validation.
+The input must provide four exact-shaped lowercase 40-character source-commit **claims** (without resolving their repositories), differently spelled proposer/evaluator IDs (without authenticating their principals), distinct but **unverified** training/heldout/shift digest claims (without checking data overlap), unique opaque event and dependence-group IDs (without event-to-group mappings), and method-execution *claim* references (without execution attestation). It requires PREQUENTIAL observation ordering and separate baseline/candidate Brier, coverage, abstention, and case counts on heldout and shift sets. Different counts for a pair fail validation.
 
-All unknown JSON fields fail closed. Boolean/nonnumeric/nonfinite/out-of-range metrics, duplicate JSON object keys, duplicate evidence IDs, reused split digests, conflicting roles, non-`NONE` effect claims, or an assertion of independently verified label custody are rejected. Raw prompts, labels, personal/relational records, and free-form text have no schema field. The CLI refuses symlinked input and files exceeding 128 KiB.
+All unknown JSON fields fail closed. Boolean/nonnumeric/nonfinite/out-of-range metrics, duplicate JSON object keys, duplicate evidence IDs, reused split digests, conflicting roles, non-`NONE` effect claims, or an assertion of independently verified label custody are rejected. Raw prompts, labels, personal/relational records, and free-form text have no schema field. The CLI performs best-effort symlink-ancestor rejection and descriptor-based regular-file and 128 KiB read bounds; it limits JSON nesting and numeric token length. This is not a trusted filesystem boundary or a guarantee against Windows reparse-point/path races.
 
 ```powershell
 python -m unittest discover -s tests -p test_ai_psychology_receipt.py -v
 python -m tools.ai_psychology.validate_receipt path\to\untrusted-receipt.json
 ```
 
-The output contains a candidate-minus-baseline Brier difference and a separate shift Brier difference. Negative delta is a lower Brier score; positive is a higher one. **Neither sign proves improvement or causal learning.** The script does not accept or emit a deployment, policy, identity, training, or behavioral promotion decision.
+The output contains a candidate-minus-baseline Brier difference and a separate shift Brier difference. Negative delta is a lower *caller-reported* Brier score; positive is a higher one. Different coverage/abstention can also make aggregated scores noncomparable. The code neither recomputes scores from observations nor verifies whether method choices actually occurred. **Neither sign proves improvement or causal learning.** The script does not authenticate identity or accept or emit a deployment, policy, training, or behavioral promotion decision.
 
 ### Missing qualification and next owner tasks
 
@@ -25,3 +25,5 @@ The output contains a candidate-minus-baseline Brier difference and a separate s
 6. External protection for private history: `deepmemorystorage` and `conations` do not become generic evaluation/training material.
 
 Do not interpret a successful format check as evidence of calibrated epistemic humility, an autonomous new learning rule, personhood, or an operational integration link. `vera-mono` remains self-contained, and sibling repositories are research/provenance candidates rather than implicit runtime dependencies.
+
+**Verification scope:** The bundled tests may write disposable JSON fixtures and start a child Python CLI process. The production validator itself only reads a nominated receipt; this distinction is intentional.
