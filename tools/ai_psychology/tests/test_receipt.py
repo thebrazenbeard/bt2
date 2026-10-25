@@ -131,5 +131,27 @@ class ReceiptTests(unittest.TestCase):
             self.assertEqual(result["authorization_effect"], "NONE")
             self.assertNotIn("deployment_qualified", result)
 
+    def test_cli_duplicate_key_diagnostic_does_not_echo_untrusted_key(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import json
+        import subprocess
+        import sys
+
+        marker = "private-key-DO-NOT-LOG-927"
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "untrusted.json"
+            path.write_text(
+                json.dumps({marker: "first"})[:-1] + "," +
+                json.dumps({marker: "second"})[1:],
+                encoding="utf-8",
+            )
+            command = [sys.executable, "-m", "tools.ai_psychology.validate_receipt", str(path)]
+            done = subprocess.run(command, capture_output=True, text=True, timeout=10)
+            self.assertEqual(done.returncode, 2)
+            error = json.loads(done.stderr)
+            self.assertEqual(error, {"validation": "INVALID_RECEIPT", "reason": "duplicate JSON key"})
+            self.assertNotIn(marker, done.stdout + done.stderr)
+
 if __name__ == "__main__":
     unittest.main()
