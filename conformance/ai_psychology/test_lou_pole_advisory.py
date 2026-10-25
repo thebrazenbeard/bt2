@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -137,9 +138,30 @@ class LouPoleAdvisoryTests(unittest.TestCase):
             link.symlink_to(source)
             with self.assertRaises(InvalidAdvisory):
                 load_bounded(link, 65536)
+            directory_link = Path(directory) / "linked-parent"
+            directory_link.symlink_to(Path(directory), target_is_directory=True)
+            with self.assertRaises(InvalidAdvisory):
+                load_bounded(directory_link / "source.txt", 65536)
             source.write_bytes(b'x' * 65537)
             with self.assertRaises(InvalidAdvisory):
                 load_bounded(source, 65536)
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO test needs POSIX mkfifo")
+    def test_fifo_input_is_rejected_without_blocking_for_writer(self):
+        # Opening a FIFO with O_RDONLY alone blocks before fstat can reject it.
+        # A subprocess timeout makes this regression safe even when reintroduced.
+        with TemporaryDirectory() as directory:
+            fifo = Path(directory) / "source.fifo"
+            os.mkfifo(fifo)
+            dummy_report = Path(directory) / "report.json"
+            dummy_report.write_bytes(b"{}")
+            run = subprocess.run(
+                [sys.executable, str(Path(__file__).with_name("lou_pole_advisory.py")),
+                 str(fifo), str(dummy_report), "--engine-revision", ENGINE_REVISION],
+                check=False, capture_output=True, timeout=2,
+            )
+            self.assertEqual(run.returncode, 2)
+            self.assertIn(b"bounded ordinary file", run.stderr)
 
     def test_serialized_artifact_is_bounded(self):
         artifact = build_advisory(SOURCE, sample_report(), engine_revision=ENGINE_REVISION)

@@ -267,7 +267,13 @@ def load_bounded(path: Path, limit: int) -> bytes:
     try:
         if any(p.is_symlink() for p in (path, *path.parents)):
             raise InvalidAdvisory("symlinked input is forbidden")
-        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+        # Nonblocking open matters *before* fstat: a FIFO opened read-only
+        # otherwise waits indefinitely for a writer and evades size limits.
+        descriptor = os.open(
+            path,
+            os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_NONBLOCK", 0),
+        )
         with os.fdopen(descriptor, "rb") as stream:
             info = os.fstat(stream.fileno())
             if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
