@@ -68,3 +68,37 @@ python -m tools.ai_psychology.score_forecasts paired-claims.json
 ```
 
 The first command remains under an independent Windows/Ubuntu research CI workflow outside BT2's manifest-bound database tests. Source verification cannot qualify a running psychology feedback loop or a trained model.
+
+## Aggregate coherence bridge (research only)
+
+A separate source-only checker now connects this per-event scorer to the existing
+`BT2_AI_PSYCHOLOGY_EVAL_RECEIPT_V1` aggregate receipt **without inventing
+authenticated external evidence**:
+
+```shell
+python -m tools.ai_psychology.check_measurement combined-claims.json
+```
+
+The file is an exact-shape JSON object containing two keys:
+`score_claims` (the scorer input documented above) and `evaluation_receipt`
+(the V1 receipt documented in
+`docs/bt2/AI_PSYCHOLOGY_EVALUATION_RECEIPT_V1.md`). The checker reruns both
+source-format validators and recomputes the row-based scores. It requires
+exact agreement on run/subject ID, all source-hash *claims*, role names,
+all train/heldout/shift digest *claims*, event-ID membership and distinct
+dependence-group membership. For each of the four paired aggregates, it
+checks `n`, `coverage`, `abstention_rate`, and answered-only `brier`
+against independently recalculated rows. Fully abstaining arms are refused
+because answered-only Brier is undefined. The scorer's fixed abstention-aware
+`mean_fixed_loss` is **not silently mislabeled Brier** in the old receipt.
+
+Successful output is `MEASUREMENT_COHERENT_EVIDENCE_UNVERIFIED` with
+`independent_custody_verified=false`,
+`admission_eligible=false`, and `authorization_effect=NONE`, plus hashes
+binding the two caller-provided claim views. Those hashes and claimed source
+identities do not authenticate GitHub revisions, observers, timestamps,
+private outcomes, real-world actions, behavioral adaptations, or evaluator
+independence. A colluding generator can forge both internally matching views.
+No `DRIFTGUARD_CI_REPORT_V1` is produced, no baseline is promoted, and no
+training/runtime/production effect occurs. This seam is intentionally
+distinct from the Issue #61 witnessed outcome-to-goal work.
