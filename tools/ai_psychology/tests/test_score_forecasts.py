@@ -120,5 +120,32 @@ class PairedScoreTests(unittest.TestCase):
         self.assertNotIn("deployment_qualified", a)
 
 
+
+    def test_brier_on_answered_events_is_separate_from_abstention(self):
+        held = score_events(example())["splits"]["heldout"]
+        self.assertAlmostEqual(held["baseline"]["mean_brier_answered_only"], .36)
+        self.assertAlmostEqual(held["candidate"]["mean_brier_answered_only"], .025)
+        self.assertRegex(score_events(example())["input_claim_sha256"], r"^[a-f0-9]{64}$")
+
+    def test_cli_is_nonadmitting_and_malformed_input_fails(self):
+        import json
+        import subprocess
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as directory:
+            file = Path(directory) / "claims.json"
+            run = [sys.executable, "-m", "tools.ai_psychology.score_forecasts", str(file)]
+            file.write_text(json.dumps(example()), encoding="utf-8")
+            done = subprocess.run(run, text=True, capture_output=True, timeout=15)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            response = json.loads(done.stdout)
+            self.assertEqual(response["status"], "RECOMPUTED_FROM_UNVERIFIED_CLAIMS")
+            self.assertFalse(response["driftguard_preview"]["admission_eligible"])
+            file.write_text('{"schema":"x","schema":"y"}', encoding="utf-8")
+            failed = subprocess.run(run, text=True, capture_output=True, timeout=15)
+            self.assertEqual(failed.returncode, 2)
+            self.assertIn("INVALID_CLAIMS", failed.stderr)
+
 if __name__ == "__main__":
     unittest.main()
