@@ -21,7 +21,10 @@ DO $preflight$
 DECLARE
   v_owner record;
   v_reader record;
+  v_migration_actor oid;
 BEGIN
+  SELECT oid INTO v_migration_actor
+    FROM pg_catalog.pg_roles WHERE rolname = CURRENT_USER;
   SELECT oid, rolcanlogin, rolinherit, rolsuper, rolcreatedb, rolcreaterole,
          rolreplication, rolbypassrls
     INTO v_owner
@@ -43,9 +46,23 @@ BEGIN
      OR v_reader.rolreplication OR v_reader.rolbypassrls THEN
     RAISE EXCEPTION 'LANTERN_GATEWAY_READER_ROLE_NOT_RESTRICTED';
   END IF;
-  IF EXISTS (
+  -- The migration actor alone may SET the NOLOGIN gateway owner to transfer
+  -- function ownership. An unrelated member could otherwise SET ROLE to the
+  -- definer and read the protected bt2 tables granted to that owner directly.
+  -- Reject inherited/admin membership too; this is an install-time check,
+  -- not a substitute for monitoring later role-grant drift.
+  IF v_migration_actor IS NULL OR NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_auth_members
+     WHERE roleid = v_owner.oid AND member = v_migration_actor
+       AND set_option AND NOT inherit_option AND NOT admin_option
+  ) OR EXISTS (
     SELECT 1 FROM pg_catalog.pg_auth_members
      WHERE member IN (v_owner.oid, v_reader.oid)
+  ) OR EXISTS (
+    SELECT 1 FROM pg_catalog.pg_auth_members
+     WHERE roleid IN (v_owner.oid, v_reader.oid)
+       AND (member <> v_migration_actor OR NOT set_option
+            OR inherit_option OR admin_option)
   ) THEN
     RAISE EXCEPTION 'LANTERN_GATEWAY_ROLE_MEMBERSHIP_NOT_ISOLATED';
   END IF;
