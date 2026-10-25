@@ -1,0 +1,28 @@
+name: AI Psychology Source Conformance
+
+on:
+  pull_request:
+    paths:
+      - 'tests/ai_psychology/**'
+      - '.github/workflows/ai-psychology-conformance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tests/ai_psychology/**'
+      - '.github/workflows/ai-psychology-conformance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inert-contract:
+    name: inert-source-only-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run source-only negative conformance tests (not runtime qualification)
+        run: python -m unittest discover -s tests/ai_psychology -p 'test_*.py' -v
