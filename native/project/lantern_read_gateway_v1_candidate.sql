@@ -175,9 +175,16 @@ BEGIN
 END
 $gateway$;
 
-ALTER SCHEMA lantern_read OWNER TO bt2_lantern_gateway_owner_v1;
+-- Function owner transfer requires schema CREATE for the *new* owner and
+-- schema ownership/CREATE for the migration caller. Keep the caller as schema
+-- owner, grant the restricted target role CREATE only inside this transaction,
+-- transfer the function, revoke the temporary grant, then transfer the schema.
+-- Moving ALTER SCHEMA first fails for managed nonsuperuser callers (PG17).
+GRANT CREATE ON SCHEMA lantern_read TO bt2_lantern_gateway_owner_v1;
 ALTER FUNCTION lantern_read.current_cut_v1()
   OWNER TO bt2_lantern_gateway_owner_v1;
+REVOKE CREATE ON SCHEMA lantern_read FROM bt2_lantern_gateway_owner_v1;
+ALTER SCHEMA lantern_read OWNER TO bt2_lantern_gateway_owner_v1;
 REVOKE ALL ON FUNCTION lantern_read.current_cut_v1() FROM PUBLIC;
 GRANT USAGE ON SCHEMA lantern_read TO bt2_lantern_gateway_reader_v1;
 GRANT EXECUTE ON FUNCTION lantern_read.current_cut_v1()
