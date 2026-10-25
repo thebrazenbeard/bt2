@@ -10,6 +10,15 @@ The current source tree includes modules for cognition, affect, salience/attenti
 
 This repository previously displayed a copied **Hyperconnectome Brain** README that did not identify BT2 correctly. The repository contents themselves remain the authority for what exists on `main`; this README is an orientation layer, not a claim that every module is installed or active in a runtime.
 
+**Runtime-currentness guard:** Consult the
+[source status record](docs/runtime/CURRENTNESS_BACKEND_STATUS_V1.json) before
+selecting a database/currentness provider. That record marks WoWSQL **retired**,
+names **no active currentness backend**, and records SQL Connectome/PostgreSQL
+V4 as a **source-only candidate**. In particular, old native Project V1–V3
+files (including copies attached to a chat) cannot reactivate WoWSQL or
+Lantern, and ordinary source/engineering work does not require querying either.
+This source record is not a live probe of any replacement runtime.
+
 The new [V5 Project-file source package](native/project/INSTALL_V5.md)
 repairs obsolete V1 reconstruction/worker-topology pointers, while retaining
 the **V4 provider-neutral SQL Connectome/PostgreSQL runtime contract**. Its
