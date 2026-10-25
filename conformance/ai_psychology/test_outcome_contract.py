@@ -241,6 +241,68 @@ class OutcomeContractAdversarialTests(unittest.TestCase):
         self.assertEqual(sorted(result.status for result in results), ["APPLIED", "HOLD"])
         self.assertEqual(contract.snapshot.revision, 5)
 
+    def test_reentrant_verifier_cannot_apply_competing_revision(self):
+        competing = claim(
+            event_id="event-2", attempt_id="attempt-2", evidence_ref="witness-record-2"
+        )
+        nested = []
+
+        def verified(event):
+            if event.event_id == "event-1":
+                nested.append(contract.admit(competing, now=110))
+            return witness(
+                event_id=event.event_id,
+                attempt_id=event.attempt_id,
+                evidence_ref=event.evidence_ref,
+                measured_level=0.7 if event.event_id == "event-1" else 0.4,
+            )
+
+        contract = oracle(verifier=verified)
+        outer = contract.admit(claim(), now=110)
+        self.assertEqual((outer.status, outer.snapshot.revision), ("APPLIED", 5))
+        self.assertEqual(len(nested), 1)
+        self.assertEqual((nested[0].status, nested[0].reason), ("HOLD", "REENTRANT_ADMISSION"))
+        self.assertEqual(contract.snapshot.revision, 5)
+
+    def test_reentrant_verifier_cannot_admit_same_event_twice(self):
+        nested = []
+
+        def verified(event):
+            if not nested:
+                # One guarded recursion avoids an unbounded recursion in the
+                # prior implementation while still exposing double-apply.
+                nested.append("entered")
+                nested[0] = contract.admit(event, now=110)
+            return witness()
+
+        contract = oracle(verifier=verified)
+        outer = contract.admit(claim(), now=110)
+        self.assertEqual((outer.status, outer.snapshot.revision), ("APPLIED", 5))
+        self.assertEqual((nested[0].status, nested[0].reason), ("HOLD", "REENTRANT_ADMISSION"))
+        self.assertEqual(contract.snapshot.revision, 5)
+
+    def test_verifier_exception_does_not_poison_future_admission(self):
+        calls = []
+
+        def verified(event):
+            calls.append(event.event_id)
+            if len(calls) == 1:
+                raise RuntimeError("temporary verifier fault")
+            return witness(
+                event_id=event.event_id,
+                attempt_id=event.attempt_id,
+                evidence_ref=event.evidence_ref,
+            )
+
+        contract = oracle(verifier=verified)
+        with self.assertRaisesRegex(RuntimeError, "temporary verifier fault"):
+            contract.admit(claim(), now=110)
+        # Recover the local admission guard on a distinct test claim; this
+        # does not authorize retrying an ambiguous real-world effect.
+        fresh = claim(event_id="event-2", attempt_id="attempt-2", evidence_ref="witness-record-2")
+        self.assertEqual(contract.admit(fresh, now=111).status, "APPLIED")
+        self.assertEqual(contract.snapshot.revision, 5)
+
     @unittest.expectedFailure
     def test_process_restart_preserves_replay_receipt(self):
         # Expected RED: volatile in-memory oracle cannot restore an outcome
