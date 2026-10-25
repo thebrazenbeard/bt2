@@ -146,6 +146,31 @@ def _parse_number(token: str, *, integer: bool) -> int | float:
     return v
 
 
+def _check_nesting(raw: bytes, *, max_depth: int = 64) -> None:
+    # A lexical upper bound before the JSON parser allocates nested arrays/objects.
+    depth = 0
+    quoted = False
+    escaped = False
+    for code in raw:
+        if quoted:
+            if escaped:
+                escaped = False
+            elif code == 92:  # backslash
+                escaped = True
+            elif code == 34:  # quote
+                quoted = False
+        elif code == 34:
+            quoted = True
+        elif code in (91, 123):  # [ {
+            depth += 1
+            if depth > max_depth:
+                raise InvalidReceipt("JSON nesting exceeds limit")
+        elif code in (93, 125):  # ] }
+            depth -= 1
+            if depth < 0:
+                raise InvalidReceipt("malformed JSON structure")
+
+
 def load_receipt(path: Path) -> object:
     # Best-effort path checks; secure opening also checks descriptor type/size.
     # Windows path reparse races cannot be ruled out by this source-only helper.
@@ -160,6 +185,7 @@ def load_receipt(path: Path) -> object:
             raw = stream.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise InvalidReceipt("receipt exceeds byte limit")
+        _check_nesting(raw)
         return json.loads(
             raw.decode("utf-8"),
             parse_int=lambda v: _parse_number(v, integer=True),
