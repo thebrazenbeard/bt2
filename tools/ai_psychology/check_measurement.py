@@ -43,8 +43,11 @@ def _same_numbers(a: object, b: object, path: str) -> None:
 
 
 def _same_ids(a: object, b: object, scope: str) -> None:
-    if type(a) is not list or type(b) is not list or set(a) != set(b):
-        raise MeasurementError(scope + ": inconsistent event/source membership")
+    if (type(a) is not list or type(b) is not list
+            or len(a) != len(b)
+            or len(set(a)) != len(a) or len(set(b)) != len(b)
+            or set(a) != set(b)):
+        raise MeasurementError(scope + ": inconsistent or repeated event/source membership")
 
 
 def check_measurement(document: object) -> dict[str, Any]:
