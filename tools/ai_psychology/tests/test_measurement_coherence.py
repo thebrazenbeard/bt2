@@ -80,5 +80,32 @@ class MeasurementCoherenceTests(unittest.TestCase):
         b=check_measurement(json.loads(json.dumps(matched())))
         self.assertEqual(a,b)
 
+
+    def test_cli_rejects_cross_view_disagreement_and_duplicate_json_keys(self):
+        import json
+        from pathlib import Path
+        import subprocess
+        import sys
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as directory:
+            path=Path(directory)/"combined.json"
+            cmd=[sys.executable,"-m","tools.ai_psychology.check_measurement",str(path)]
+            path.write_text(json.dumps(matched()),encoding="utf-8")
+            ok=subprocess.run(cmd,capture_output=True,text=True,timeout=12)
+            self.assertEqual(ok.returncode,0,ok.stderr)
+            obj=json.loads(ok.stdout)
+            self.assertEqual(obj["status"],"MEASUREMENT_COHERENT_EVIDENCE_UNVERIFIED")
+            self.assertFalse(obj["independent_custody_verified"])
+            self.assertFalse(obj["admission_eligible"])
+            changed=matched()
+            changed["evaluation_receipt"]["metrics"]["candidate"]["brier"]=0.75
+            path.write_text(json.dumps(changed),encoding="utf-8")
+            bad=subprocess.run(cmd,capture_output=True,text=True,timeout=12)
+            self.assertEqual(bad.returncode,2)
+            self.assertIn("INVALID_MEASUREMENT_CLAIMS",bad.stderr)
+            path.write_text('{"score_claims":{},"score_claims":{},"evaluation_receipt":{}}',encoding="utf-8")
+            duplicate=subprocess.run(cmd,capture_output=True,text=True,timeout=12)
+            self.assertEqual(duplicate.returncode,2)
+
 if __name__=="__main__":
     unittest.main()
