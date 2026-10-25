@@ -1,10 +1,12 @@
 """Inert source-only correlation tests; never evaluate real action success."""
 
 from dataclasses import replace
+from threading import Barrier, BrokenBarrierError, Thread
 import unittest
 
 from lineage_envelope import (
     CandidateTrace,
+    CorrelationAdvisory,
     CurrentGoalBinding,
     ForwardTrace,
     InertLineageIndex,
@@ -189,6 +191,59 @@ class LineageEnvelopeTests(unittest.TestCase):
         self.assertEqual(new_process.count(), 0)
         self.assertEqual(new_process.record(result).status, "CORRELATED_UNVERIFIED")
         self.assertFalse(new_process.is_durable)
+
+    def test_advisory_cannot_be_constructed_with_forged_status_or_receipt(self):
+        valid = correlate_candidate(forward(), candidate(), current(), now=110)
+        for changes in (
+            {"status": "VERIFIED"},
+            {"status": "PASS"},
+            {"status": "DUPLICATE_UNVERIFIED", "reason": "CLAIMED_LINEAGE_ONLY"},
+            {"reason": "FAKE"},
+            {"correlation_sha256": "not-a-digest"},
+            {"candidate_event_id": ""},
+            {"need_id_claim": "\ncontrol"},
+        ):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                replace(valid, **changes)
+        self.assertEqual(InertLineageIndex().record(valid).status, "CORRELATED_UNVERIFIED")
+
+    def test_conflicting_concurrent_candidate_ids_have_single_first_writer(self):
+        """Two get() snapshots can race unless the index serializes the transaction."""
+        class BarrierDictionary(dict):
+            def __init__(self):
+                super().__init__()
+                self.barrier = Barrier(2)
+
+            def get(self, key, default=None):
+                snapshot = super().get(key, default)
+                try:
+                    self.barrier.wait(timeout=0.4)
+                except BrokenBarrierError:
+                    # A serialized implementation legitimately permits only one
+                    # reader before the first writer commits.
+                    pass
+                return snapshot
+
+        index = InertLineageIndex()
+        index._seen = BarrierDictionary()
+        first = correlate_candidate(forward(), candidate(evidence_sha256="a" * 64), current(), now=110)
+        second = correlate_candidate(forward(), candidate(evidence_sha256="b" * 64), current(), now=110)
+        statuses = []
+        start = Barrier(3)
+
+        def submit(advisory):
+            start.wait(timeout=2)
+            statuses.append(index.record(advisory).status)
+
+        threads = [Thread(target=submit, args=(receipt,)) for receipt in (first, second)]
+        for thread in threads:
+            thread.start()
+        start.wait(timeout=2)
+        for thread in threads:
+            thread.join(timeout=3)
+            self.assertFalse(thread.is_alive(), "deadlock in in-process replay guard")
+        self.assertEqual(sorted(statuses), ["CORRELATED_UNVERIFIED", "HOLD"])
+        self.assertEqual(index.count(), 1)
 
 
 if __name__ == "__main__":
