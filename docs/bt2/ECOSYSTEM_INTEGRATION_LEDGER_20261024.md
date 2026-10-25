@@ -396,3 +396,9 @@ Fresh authoritative GitHub [DriftGuard main](https://github.com/thebrazenbeard/d
 ## 2026-10-25 Unbound Sol README main follow-up
 
 - `unbound-sol/main@f8671071...` containment is no longer the latest main. Two subsequently merged [README-only PR45](https://github.com/thebrazenbeard/unbound-sol/pull/45) with hosted [continuity CI 40159616165](https://github.com/thebrazenbeard/unbound-sol/actions/runs/40159616165) SUCCESS and CLA; root independently read current `unbound-sol/main@31eae3cc28567b41242cdc29b6ac462f18f3a929`, tree `ade994e8c43e7a6b291866abbfc8e90af4b59a1c`, README blob `9ec59835ba18cb521f7e5ede640e4126370ea0ab` with editor/source/runtime caveat. This source main supersedes older pin; installed/runtime effects remain unknown.
+
+
+## 2026-10-25 Lappy installed Project Runner stale-binding handoff
+
+- After [Project Runner PR92](https://github.com/thebrazenbeard/project-runner/pull/92) merged to `project-runner/main@03a362d8102d044dcc606ceba6dcdbac19ddfd39`, a **real Lappy host readback** found existing `project-runner` Windows command at `C:\\Users\\patri\\.local\\bin\\project-runner.cmd`. Its `--help` omitted `blotter-export`; hence installed CLI is STALE relative to canonical source and no export installation/effect may be claimed.
+- Python package metadata on Lappy reports `project-runner 0.1.0` as **editable** from `D:\\VERA\\portal`, not an isolated canonical Project Runner checkout. Read-only `git -C D:\\VERA\\portal` reported `main@fa125a74bd42bc2bdabf3f8f9ef677b225db6f76` with untracked `project_runner.egg-info/` and `runner/__pycache__/`; existing user state untouched. Blotter loopback port19083 listening and authenticated actor readbacks through seq1367. Do **not** blindly `pip install` over this Portal-owned editable environment; first source-bind the host layout, preserve state, and choose isolated install/compatibility migration with rollback. No installation mutation performed.
