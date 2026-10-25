@@ -20,8 +20,10 @@ consumer privilege boundaries. Its absence of superuser/createdb flags does
 not prove that it is a narrowly granted reader; object ownership and ordinary
 ACLs must be independently checked.
 
-`database/tests/0012_lantern_read_role_conflict_rollback_v1.sql` is the
+`native/project/lantern_read_role_conflict_rollback_v1.sql` is the
 rollback-only, opt-in PostgreSQL falsifier for the current condition.
+It deliberately lives outside the frozen V4 `database/tests` source tree;
+it must never be folded into historical database package manifests.
 
 ## Proposed resolution; forward-only after review
 

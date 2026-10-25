@@ -1,4 +1,5 @@
 -- PostgreSQL 16+ / opt-in / isolated database only.
+-- Kept OUTSIDE the frozen historical V4 database/tests manifest subtree.
 -- Run AFTER the canonical BT2 V4 migration through 0024 as its migration
 -- owner, with CREATEROLE (and authority to SET ROLE) in a disposable cluster.
 -- The script intentionally demonstrates that the existing direct `bt2` reader
