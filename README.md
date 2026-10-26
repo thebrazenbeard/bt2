@@ -47,6 +47,18 @@ Major working areas include:
 
 Source availability, passing tests, installation, runtime selection, runtime consumption, and behavioral effect are separate claims. Treat branch-local or historical artifacts as evidence for their own scope rather than automatic current runtime authority.
 
+## Experimental LGCM / SPM / WeKnora interoperability (source-only)
+
+The [learning-stack conformance probe](conformance/learning_stack/README.md)
+records real LGCM numerical prequential predictions, saved-state restart
+equivalence, source pinning, and a persistence baseline. The
+[WeKnora adapter](integrations/weknora/README.md) exercises scoped read-only
+hybrid retrieval through a local HTTP fixture and derives an SPM memory-adapter
+activation decision without promoting retrieved text into trusted HC memory.
+Mosaic and Noema remain independently owned experimental/review subsystems.
+The SPM hardened neural specialist, live WeKnora ingestion, shared neural
+learning, and combined behavioral improvement are **not qualified here**.
+
 ## AI psychology coordination (source-only)
 
 [Issue #61](https://github.com/thebrazenbeard/bt2/issues/61) is the active hostile gap map for the functional emotion/motivation architecture. The [AI-psychology conformance harness](conformance/ai_psychology/) tests bounded source contracts; [Draft PR #62](https://github.com/thebrazenbeard/bt2/pull/62) tracks cross-repository coordination.
