@@ -43,6 +43,10 @@ Major working areas include:
 - routing, neuroplasticity, kinesis, optics, and somatics;
 - native/project qualification artifacts, specifications, tools, and database work.
 
+## Five-system research integration (source-only)
+
+The [LGCM / Mosaic / SPM / Noema / WeKnora evidence seam](portfolio/integration/five_systems/README.md) includes an offline scoped retrieval reference, a read-only WeKnora adapter, frozen learning-baseline output and a repeatable local pretrained inference pilot. It is **not** a merged neural model, installed WeKnora server, activated SPM adapter, qualified Noema E0 learner, or proof of shared neural parameters. SPM is the confirmed canonical project, not SGM.
+
 ## Evidence boundary
 
 Source availability, passing tests, installation, runtime selection, runtime consumption, and behavioral effect are separate claims. Treat branch-local or historical artifacts as evidence for their own scope rather than automatic current runtime authority.
