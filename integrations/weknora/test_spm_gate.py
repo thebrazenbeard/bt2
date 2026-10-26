@@ -76,6 +76,27 @@ class SPMGateContractTests(unittest.TestCase):
         self.assertTrue(first.adapter_active and second.adapter_active)
         # No document text is passed to the SPM view's activation function.
 
+    def test_public_dataclass_forgery_cannot_bypass_retrieval_parser_checks(self):
+        valid = example_hit()
+        bad = (
+            replace(valid, score=float("nan")),
+            replace(valid, score=True),
+            replace(valid, score=10 ** 400),
+            replace(valid, match_type=True),
+            replace(valid, metadata=[]),
+            replace(valid, metadata={"invalid": float("nan")}),
+            replace(valid, start_at=-1),
+            replace(valid, start_at=18, end_at=12),
+            replace(valid, source=None),
+        )
+        for hit in bad:
+            with self.subTest(hit=hit), self.assertRaises(ValueError):
+                gate_from_retrieval(batch_with(hit), expected_knowledge_base_id="kb-1")
+        alternative = replace(valid, score=0.028)
+        a = gate_from_retrieval(batch_with(valid), expected_knowledge_base_id="kb-1")
+        b = gate_from_retrieval(batch_with(alternative), expected_knowledge_base_id="kb-1")
+        self.assertNotEqual(a.evidence_digest, b.evidence_digest)
+
 
 if __name__ == "__main__":
     unittest.main()
