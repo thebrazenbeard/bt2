@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: thebrazenbeard/lgcm
-          ref: 6bc748f3b1687f70eea6866bdd28a471465db473
+          ref: 96d584b4e68686ed2ae20a8a05b05ad5bdd0075b
           path: lgcm-under-test
       - name: Checkout exact SPM test dependency
         uses: actions/checkout@v4
