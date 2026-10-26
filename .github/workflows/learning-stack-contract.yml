@@ -1,0 +1,44 @@
+name: learning-stack-source-contract
+
+on:
+  pull_request:
+    paths:
+      - 'conformance/learning_stack/**'
+      - 'integrations/weknora/**'
+      - '.github/workflows/learning-stack-contract.yml'
+  push:
+    paths:
+      - 'conformance/learning_stack/**'
+      - 'integrations/weknora/**'
+      - '.github/workflows/learning-stack-contract.yml'
+
+jobs:
+  isolated-source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Checkout exact LGCM test dependency
+        uses: actions/checkout@v4
+        with:
+          repository: thebrazenbeard/lgcm
+          ref: 96d584b4e68686ed2ae20a8a05b05ad5bdd0075b
+          path: lgcm-under-test
+      - name: Checkout exact SPM test dependency
+        uses: actions/checkout@v4
+        with:
+          repository: thebrazenbeard/spm
+          ref: 64e41c0f1a95cb563051680d46f78287e875ede5
+          path: spm-under-test
+      - name: Install numerical dependency
+        run: python -m pip install 'numpy==2.3.5'
+      - name: Test prequential persistence contract
+        run: python -m unittest discover -s conformance/learning_stack -p 'test_*.py' -v
+        env:
+          PYTHONPATH: lgcm-under-test/src
+      - name: Test read-only WeKnora HTTP contract
+        run: python -m unittest discover -s integrations/weknora -p 'test_*.py' -v
+        env:
+          PYTHONPATH: spm-under-test/src
