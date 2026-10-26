@@ -16,7 +16,8 @@ NumPy >=2):
 
 ```bash
 git clone https://github.com/thebrazenbeard/lgcm.git /tmp/lgcm-for-bt2-probe
-git -C /tmp/lgcm-for-bt2-probe rev-parse HEAD  # record exact revision
+git -C /tmp/lgcm-for-bt2-probe checkout 96d584b4e68686ed2ae20a8a05b05ad5bdd0075b
+git -C /tmp/lgcm-for-bt2-probe rev-parse HEAD  # verify exact revision
 PYTHONPATH=/tmp/lgcm-for-bt2-probe/src python -m unittest discover \
   -s conformance/learning_stack -p 'test_*.py' -v
 PYTHONPATH=/tmp/lgcm-for-bt2-probe/src:conformance/learning_stack python -c \
@@ -38,7 +39,7 @@ it does **not** create a competing HC global state schema.
 
 Pinned Linux regression output, including every prequential prediction:
 [`results/LGCM_PREQUENTIAL_REGRESSION_20261026.json`](results/LGCM_PREQUENTIAL_REGRESSION_20261026.json).
-The reference source is LGCM `6bc748f3b1687f70eea6866bdd28a471465db473`;
+The reference source is LGCM `96d584b4e68686ed2ae20a8a05b05ad5bdd0075b`;
 the BT2 workflow checks out that exact commit. This fixture's observed mean
 squared error was `0.0540731` versus `0.3600000` for zero-delta persistence.
 This is a reused simulator case, not an unseen holdout or a neural result.
@@ -46,6 +47,8 @@ This is a reused simulator case, not an unseen holdout or a neural result.
 From PowerShell on Lappy after cloning the pinned source and installing NumPy:
 
 ```powershell
+$lgcmRoot = 'C:\path\to\lgcm'
+git -C $lgcmRoot checkout 96d584b4e68686ed2ae20a8a05b05ad5bdd0075b
 $env:PYTHONPATH = 'C:\path\to\lgcm\src'
 py -m unittest discover -s conformance/learning_stack -p 'test_*.py' -v
 ```
