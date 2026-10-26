@@ -22,7 +22,8 @@ readback before the retrieved data can participate in a qualified experiment.
 `spm_gate.py` consumes a structurally valid WeKnora retrieval batch, checks
 the requested KB and unique document/chunk identities, and derives the exact
 SPM `memory_adapter_active(count)` source-level decision. `select_spm_view`
-calls SPM's real `view_for_retrieval(count)` method. An empty batch selects
+revalidates the batch at activation time and calls SPM's real
+`view_for_retrieval(count)` method. An empty batch selects
 the base view; a nonempty batch selects the gated adapter view.
 
 This **does not** transfer retrieved text into SPM memory, execute the Qwen
