@@ -5,7 +5,7 @@
   "evaluation_role": "REGRESSION",
   "final_manifest_sha256": "03805d2818b5a9203b73546b53a4303dd08799dbdb7f063c6c7ebd9ccb0cbc7e",
   "generation": 60,
-  "lgcm_source_commit": "6bc748f3b1687f70eea6866bdd28a471465db473",
+  "lgcm_source_commit": "96d584b4e68686ed2ae20a8a05b05ad5bdd0075b",
   "lgcm_source_dirty": false,
   "mean_squared_error": 0.05407309270091359,
   "model_config_sha256": "fb7f7976c8a916be5d3ac98ad1d69a356f66a7a7cdc6786b5e116168efb82657",
