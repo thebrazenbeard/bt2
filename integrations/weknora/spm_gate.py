@@ -77,11 +77,10 @@ def gate_from_retrieval(batch: RetrievalBatch, *, expected_knowledge_base_id: st
     )
 
 
-def select_spm_view(runtime, decision: SPMGateDecision):
-    """Select the actual SPM runtime's gated view, never a training update."""
-    if not isinstance(decision, SPMGateDecision):
-        raise TypeError("typed SPM gate decision required")
+def select_spm_view(runtime, batch: RetrievalBatch, *, expected_knowledge_base_id: str):
+    """Revalidate retrieval data at the activation boundary; never train."""
+    decision = gate_from_retrieval(batch, expected_knowledge_base_id=expected_knowledge_base_id)
     view = runtime.view_for_retrieval(decision.retrieved_count)
     if view.memory_active is not decision.adapter_active:
         raise RuntimeError("SPM runtime disagrees with retrieval-derived gate")
-    return view
+    return view, decision
