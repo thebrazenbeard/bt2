@@ -34,6 +34,11 @@ chronological memory observation. The source-bound SPM adapter's historical
 behavioral result and noisy-memory failure must be requalified before a live
 effectful integration.
 
+The gate additionally verifies the imported SPM activation module's exact
+SHA-256 source bytes against the inspected commit. This is a local software
+compatibility check, **not** an attestation of the runtime's model weights,
+index state, or source observation custody.
+
 To test this adapter with the pinned `thebrazenbeard/spm` checkout:
 
 ```bash
