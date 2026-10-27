@@ -4,6 +4,29 @@ Upstream source contract: [Tencent/WeKnora at `26fe2a08`](https://github.com/Ten
 
 This standalone standard-library Python adapter calls `POST /api/v1/knowledge-bases/:id/hybrid-search` without reranking. It requires an explicit local knowledge-base ID allowlist, validates every returned hit's KB, preserves source/document/chunk identity, and returns raw WeKnora score rather than a fabricated similarity percentage. It makes no training, neural-weight persistence or shared-representation claim.
 
+## Read-only ingestion-state readback
+
+After a retrieval, `document_ingestion_state(knowledge_base_id=..., knowledge_id=...)`
+calls upstream `GET /api/v1/knowledge/:id`, a document-parent-KB read-guarded
+route in Tencent/WeKnora source at the pin above. It checks returned document
+identity and KB against the caller's configured allowlist and exposes WeKnora's
+`parse_status`, `enable_status`, `embedding_model_id`, and `file_hash` fields.
+
+`verify_batch_ingestion_ready(batch)` re-reads each distinct retrieved document
+and fails on an **empty result** or if any is not **completed** and **enabled**.
+No hits means no document-ingestion evidence, not successful verification.
+WeKnora considers
+`finalizing` queryable, but it still has outstanding enrichment subtasks; this
+experiment deliberately requires the stronger terminal `completed` state.
+
+These GETs cannot prove atomicity between search and readback. The server's
+`file_hash` is an opaque declared value, **not** a verified digest of a returned
+chunk, and the status endpoint does not attest the index generation or ACL
+epoch. Neither method ingests files, writes the KB, authenticates caller-made
+`RetrievalBatch` objects, activates a neural adapter, or admits observations
+to persistent memory. They are diagnostic and fail-closed precondition checks
+for future experiments, not source-custody qualification.
+
 ```bash
 python -m unittest discover -s integrations/weknora -p 'test_*.py' -v
 ```

@@ -69,6 +69,25 @@ class RetrievalBatch:
     hits: tuple[SearchHit, ...]
 
 
+@dataclass(frozen=True)
+class DocumentIngestionState:
+    """Document status independently read back from WeKnora, not an index epoch."""
+
+    knowledge_base_id: str
+    knowledge_id: str
+    parse_status: str
+    enable_status: str
+    embedding_model_id: str
+    file_hash: str
+    checked_at_utc: str
+
+    @property
+    def ready(self) -> bool:
+        # Upstream finalizing documents are searchable, but enrichment is
+        # incomplete. This conservative gate admits completed entries only.
+        return self.parse_status == "completed" and self.enable_status == "enabled"
+
+
 class WeKnoraRetrievalAdapter:
     """Single-KB hybrid search via WeKnora's scoped REST endpoint.
 
@@ -128,6 +147,21 @@ class WeKnoraRetrievalAdapter:
             "Content-Type": "application/json",
             "Accept": "application/json",
         })
+        obj = self._request_json(request)
+        if not isinstance(obj, dict) or obj.get("success") is not True or not isinstance(obj.get("data"), list):
+            raise RetrievalError("WeKnora returned an unsuccessful or malformed result")
+        if len(obj["data"]) > match_count:
+            raise RetrievalError("WeKnora returned more hits than the requested context budget")
+        hits = tuple(self._parse_hit(item, knowledge_base_id) for item in obj["data"])
+        return RetrievalBatch(
+            knowledge_base_id=knowledge_base_id,
+            query=query.strip(),
+            retrieved_at_utc=datetime.now(timezone.utc).isoformat(),
+            hits=hits,
+        )
+
+    def _request_json(self, request: Request) -> Any:
+        """Shared bounded transport with no redirect of the bearer token."""
         try:
             with self._opener.open(request, timeout=self._timeout) as response:
                 raw = response.read(_RESPONSE_MAX_BYTES + 1)
@@ -140,20 +174,84 @@ class WeKnoraRetrievalAdapter:
         if len(raw) > _RESPONSE_MAX_BYTES:
             raise RetrievalError("WeKnora response exceeds safety size limit")
         try:
-            obj = json.loads(raw)
+            return json.loads(raw)
         except (ValueError, UnicodeDecodeError):
             raise RetrievalError("WeKnora returned invalid JSON") from None
-        if not isinstance(obj, dict) or obj.get("success") is not True or not isinstance(obj.get("data"), list):
-            raise RetrievalError("WeKnora returned an unsuccessful or malformed result")
-        if len(obj["data"]) > match_count:
-            raise RetrievalError("WeKnora returned more hits than the requested context budget")
-        hits = tuple(self._parse_hit(item, knowledge_base_id) for item in obj["data"])
-        return RetrievalBatch(
-            knowledge_base_id=knowledge_base_id,
-            query=query.strip(),
-            retrieved_at_utc=datetime.now(timezone.utc).isoformat(),
-            hits=hits,
+
+    def document_ingestion_state(self, *, knowledge_base_id: str,
+                                 knowledge_id: str) -> DocumentIngestionState:
+        """Read GET /knowledge/:id after ingestion; never trigger ingestion.
+
+        Upstream enforces document-parent KB read access. The returned KB ID is
+        also checked locally against the explicitly configured KB allowlist.
+        A successful status read does not prove that the search index and the
+        document row belong to one atomic snapshot.
+        """
+        if knowledge_base_id not in self._allow:
+            raise ScopeError("knowledge base is not in the configured allowlist")
+        if (not isinstance(knowledge_id, str) or not _KB_ID.fullmatch(knowledge_id)
+                or knowledge_id in (".", "..")):
+            raise ValueError("knowledge_id must be a valid single path segment")
+        request = Request(
+            self._origin + "/api/v1/knowledge/" + quote(knowledge_id, safe=""),
+            method="GET",
+            headers={"Authorization": "Bearer " + self._api_key, "Accept": "application/json"},
         )
+        obj = self._request_json(request)
+        if not isinstance(obj, dict) or obj.get("success") is not True:
+            raise RetrievalError("WeKnora returned unsuccessful document readback")
+        data = obj.get("data")
+        if not isinstance(data, dict):
+            raise RetrievalError("WeKnora returned malformed document readback")
+        if data.get("knowledge_base_id") != knowledge_base_id:
+            raise ScopeError("document readback is outside the requested knowledge base")
+        if data.get("id") != knowledge_id:
+            raise RetrievalError("document readback identity mismatch")
+        if (data.get("parse_status") not in (
+                "pending", "processing", "finalizing", "completed", "failed", "deleting", "cancelled")
+                or data.get("enable_status") not in ("enabled", "disabled")
+                or not isinstance(data.get("embedding_model_id"), str)
+                or not isinstance(data.get("file_hash"), str)):
+            raise RetrievalError("document readback has malformed ingestion fields")
+        return DocumentIngestionState(
+            knowledge_base_id=knowledge_base_id,
+            knowledge_id=knowledge_id,
+            parse_status=data["parse_status"],
+            enable_status=data["enable_status"],
+            embedding_model_id=data["embedding_model_id"],
+            file_hash=data["file_hash"],
+            checked_at_utc=datetime.now(timezone.utc).isoformat(),
+        )
+
+    def verify_batch_ingestion_ready(self, batch: RetrievalBatch) -> tuple[DocumentIngestionState, ...]:
+        """Read back each distinct hit's ingest status before experimental use.
+
+        This checks server-reported terminal state, *not* content/hash custody,
+        caller authenticity of a constructed batch, ACL revision or index epoch.
+        Call immediately after ``search`` and do not use as memory admission.
+        """
+        if not isinstance(batch, RetrievalBatch) or batch.knowledge_base_id not in self._allow:
+            raise ScopeError("retrieval batch is outside the configured knowledge-base scope")
+        if type(batch.hits) is not tuple or len(batch.hits) > 30:
+            raise RetrievalError("invalid retrieval batch context budget")
+        if not batch.hits:
+            raise RetrievalError("empty retrieval batch has no ingestion evidence")
+        knowledge_ids = []
+        seen = set()
+        for hit in batch.hits:
+            if not isinstance(hit, SearchHit) or hit.knowledge_base_id != batch.knowledge_base_id:
+                raise ScopeError("retrieval hit is outside the requested knowledge base")
+            if not isinstance(hit.knowledge_id, str) or not _KB_ID.fullmatch(hit.knowledge_id):
+                raise RetrievalError("retrieval hit has invalid document identity")
+            if hit.knowledge_id not in seen:
+                seen.add(hit.knowledge_id)
+                knowledge_ids.append(hit.knowledge_id)
+        states = tuple(self.document_ingestion_state(
+            knowledge_base_id=batch.knowledge_base_id, knowledge_id=knowledge_id,
+        ) for knowledge_id in knowledge_ids)
+        if any(not state.ready for state in states):
+            raise RetrievalError("retrieval batch references incomplete or disabled ingestion")
+        return states
 
     @staticmethod
     def _parse_hit(item: Any, expected_kb: str) -> SearchHit:
