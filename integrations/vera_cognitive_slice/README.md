@@ -35,3 +35,7 @@ The check does not write or install anything into D:\VERA.
 Production activation, real model behavior, cross-host state persistence,
 source authentication, and rollout to VN1/VN2 remain separate qualification
 gates. Re-run with new exact source pins when a participating main changes.
+
+The BT2-only DurableEventIssuer uses SQLite BEGIN IMMEDIATE to serialize
+local MESO event issuance across transactions and survive host restarts.
+It does not replace the immutable MESO core or qualify network/SMB locking.

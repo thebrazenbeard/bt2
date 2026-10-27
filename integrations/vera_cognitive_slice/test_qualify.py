@@ -23,6 +23,7 @@ class CognitiveVerticalSliceTests(unittest.TestCase):
             output = json.loads(result.stdout)
             self.assertTrue(output["source_heads_verified"])
             self.assertTrue(output["observed_want_survived_restart"])
+            self.assertTrue(output["meso_local_sequence_persisted"])
             self.assertTrue(output["tool_free_model_turn"])
             self.assertTrue(output["model_text_not_completion"])
             self.assertTrue(output["stale_completion_rejected"])

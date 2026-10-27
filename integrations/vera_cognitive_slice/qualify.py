@@ -42,6 +42,8 @@ def _verify_sources(repos: Path) -> dict[str, str]:
 
 def run_slice(repos: Path, state: Path) -> dict[str, object]:
     source_pins = _verify_sources(repos)
+    # The eight inputs are read-only source snapshots, not Python cache targets.
+    sys.dont_write_bytecode = True
     for name in ("volition", "pre-active", "meso-crct", "semiotics", "personification"):
         sys.path.insert(0, str(repos / name / "src"))
     for name in ("humility", "meta"):
@@ -49,7 +51,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
 
     from humility.core import EvidenceItem, revise_distinct
     from meta.core import choose, evaluate
-    from meso_crct import EventSequencer
+    from durable_meso import DurableEventIssuer
     from semiotics import load_registry
     from personification import (
         ActorProfile, Interaction, InteractionKind, Register, plan_interaction,
@@ -96,8 +98,14 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     active = atlas.active_adjudications(atlas_objects)
     assert [item["id"] for item in active] == [adjudication_id]
 
-    event_sequence, observation_id = EventSequencer("bt2-lappy-fixture").issue()
-    _, second_event = event_sequence.issue()
+    issuer = DurableEventIssuer(state / "meso-events.sqlite")
+    observation_id = issuer.issue("bt2-lappy-fixture")
+    # Recreate the owner from its SQLite path to demonstrate persisted
+    # sequence advancement rather than reissuing from a stale reference.
+    second_event = DurableEventIssuer(state / "meso-events.sqlite").issue(
+        "bt2-lappy-fixture"
+    )
+    assert observation_id.sequence == 1 and second_event.sequence == 2
     assert observation_id.event_id != second_event.event_id
 
     method = choose([(0, 0), (1, 1), (2, 0), (3, 1)])
@@ -247,12 +255,14 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     assert not cleared.wants and cleared.engine.active_goal is None
     store.close()
 
+    _verify_sources(repos)  # confirm the run did not mutate checked source
     return {
         "source_heads_verified": True,
         "source_heads": source_pins,
         "synthetic_studio_sign_selected": True,
         "synthetic_atlas_adjudication_selected": True,
         "meso_event_ids_distinct_on_successor": True,
+        "meso_local_sequence_persisted": True,
         "meta_heldout_toy_score": heldout_accuracy,
         "duplicate_trials_rejected": duplicate_trials_rejected,
         "duplicate_evidence_rejected": duplicate_evidence_rejected,
