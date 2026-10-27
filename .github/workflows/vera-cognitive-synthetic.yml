@@ -1,0 +1,38 @@
+﻿name: Vera Cognitive Synthetic Slice
+
+on:
+  pull_request:
+    paths:
+      - 'integrations/vera_cognitive_slice/**'
+      - '.github/workflows/vera-cognitive-synthetic.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'integrations/vera_cognitive_slice/**'
+      - '.github/workflows/vera-cognitive-synthetic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-bound-fixture:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch exact-pinned source (no branch tips)
+        shell: bash
+        run: python integrations/vera_cognitive_slice/prepare_sources.py --out ../bt2-cognitive-sources
+      - name: Verify source APIs in a no-tool synthetic fixture
+        shell: bash
+        env:
+          BT2_VERA_COGNITIVE_REPOS: ${{ github.workspace }}/../bt2-cognitive-sources
+        run: python -m unittest discover -s integrations/vera_cognitive_slice -p test_qualify.py -v
