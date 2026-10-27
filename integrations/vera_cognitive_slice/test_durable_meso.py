@@ -10,8 +10,8 @@ import unittest
 ROOT = os.environ.get("BT2_VERA_COGNITIVE_REPOS")
 
 class DurableMesoTests(unittest.TestCase):
-    @unittest.skipUnless(ROOT, "requires explicit source-pinned repo set")
     def test_concurrent_issuer_and_restart_do_not_repeat_id(self):
+        self.assertTrue(ROOT, "BT2_VERA_COGNITIVE_REPOS must be set")
         sys.dont_write_bytecode = True
         sys.path.insert(0,str(Path(ROOT)/"meso-crct"/"src"))
         from durable_meso import DurableEventIssuer

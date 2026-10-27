@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -37,11 +38,74 @@ def _verify_sources(repos: Path) -> dict[str, str]:
         ).stdout.strip()
         if dirty:
             raise ValueError(f"dirty source checkout: {name}")
+
+        # Authenticate executable Python bytes against HEAD, not only
+        # index/worktree status. Assume-unchanged and ignored paths do not
+        # provide a trustworthy code-identity guarantee.
+        tree = subprocess.run(
+            ["git", "-C", str(checkout), "ls-tree", "-r", "-z", "HEAD"],
+            stdout=subprocess.PIPE, check=True,
+        ).stdout
+        tracked_python = set()
+        for entry in tree.split(b"\0"):
+            if not entry:
+                continue
+            header, relraw = entry.split(b"\t", 1)
+            mode, kind, blob = header.split()
+            rel = relraw.decode("utf-8")
+            if not rel.endswith(".py"):
+                continue
+            tracked_python.add(rel.replace("\\", "/"))
+            file = checkout / rel
+            if mode != b"100644" and mode != b"100755":
+                raise ValueError(f"linked or unusual source mode: {name}/{rel}")
+            if not file.is_file() or file.is_symlink():
+                raise ValueError(f"missing or linked source: {name}/{rel}")
+            data = file.read_bytes()
+            actual = hashlib.sha1(
+                b"blob " + str(len(data)).encode("ascii") + b"\0" + data
+            ).hexdigest()
+            if actual != blob.decode("ascii"):
+                raise ValueError(f"source blob changed: {name}/{rel}")
+        for file in checkout.rglob("*.py"):
+            rel = file.relative_to(checkout)
+            if ".git" in rel.parts:
+                continue
+            if rel.as_posix() not in tracked_python:
+                raise ValueError(f"untracked executable source: {name}/{rel}")
+        if any(".git" not in f.relative_to(checkout).parts
+               for f in checkout.rglob("*.pyc")):
+            raise ValueError(f"untrusted Python bytecode: {name}")
     return pins
 
 
+def _admit_state_dir(repos: Path, state: Path) -> Path:
+    """Require a fresh, empty fixture directory before any destructive write."""
+    if not state.is_dir():
+        raise ValueError("state directory must exist and be empty")
+    if state.is_symlink() or getattr(state, "is_junction", lambda: False)():
+        raise ValueError("linked state directories are not admitted")
+    target = state.resolve(strict=True)
+    sources = repos.resolve(strict=True)
+    if target.is_relative_to(sources):
+        raise ValueError("state cannot be inside a source checkout")
+    if any(state.iterdir()):
+        raise ValueError("state directory must be empty")
+    return target
+
+
 def run_slice(repos: Path, state: Path) -> dict[str, object]:
+    if sys.flags.optimize:
+        raise ValueError("Python optimization disables qualification assertions")
+    guarded_modules = (
+        "volition", "pre_active", "meso_crct", "semiotics",
+        "personification", "humility", "meta",
+    )
+    if any(name == prefix or name.startswith(prefix + ".")
+           for name in sys.modules for prefix in guarded_modules):
+        raise ValueError("preloaded unverified cognitive module")
     source_pins = _verify_sources(repos)
+    state = _admit_state_dir(repos, state)
     # The eight inputs are read-only source snapshots, not Python cache targets.
     sys.dont_write_bytecode = True
     for name in ("volition", "pre-active", "meso-crct", "semiotics", "personification"):
@@ -69,12 +133,28 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         OperationalMotivation,
     )
 
+    import importlib
+    for module, repo, subpath in (
+        ("volition", "volition", "src"),
+        ("pre_active", "pre-active", "src"),
+        ("meso_crct", "meso-crct", "src"),
+        ("semiotics", "semiotics", "src"),
+        ("personification", "personification", "src"),
+        ("humility", "humility", ""),
+        ("meta", "meta", ""),
+    ):
+        loaded = importlib.import_module(module)
+        origin = Path(loaded.__file__).resolve(strict=True)
+        permitted = (repos / repo / subpath).resolve(strict=True)
+        if not origin.is_relative_to(permitted):
+            raise ValueError(f"unverified module import origin: {module}")
+
     atlas_path = repos / "semanticatlas" / "build" / "build_current_view.py"
     spec = importlib.util.spec_from_file_location("verified_atlas_builder", atlas_path)
     atlas = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(atlas)
 
-    state.mkdir(parents=True, exist_ok=True)
+    # The state directory was checked empty before any file was opened.
     fixture = state / "evidence.txt"
     fixture.write_text("needs examination\n", encoding="utf-8")
     original_bytes = fixture.read_bytes()
@@ -188,7 +268,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         def respond(self, *, messages, tools):
             assert tools == [], f"model unexpectedly offered tool(s): {tools!r}"
             self.called += 1
-            return ModelResponse(final_text="Inspected report; no repair was performed")
+            return ModelResponse(final_text="I repaired the fixture successfully")
 
     model = NoToolReasoner()
     engine = Engine(
@@ -210,7 +290,8 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     assert goal is not None and len(persisted.wants) == 1
     assert all(not want.effect_authority for want in persisted.wants)
 
-    # A stale, even verifier-admitted receipt cannot retire a revised goal.
+    # A mismatched FUTURE revision must not retire the current goal.
+    # This is not yet a test of an old receipt after a real goal revision.
     def completion(event_id: str, revision: int):
         return GoalCompletionClaim(
             outcome_event_id=event_id,
@@ -221,17 +302,17 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
             provenance=ProvenanceClass.CURRENT_OBSERVATION,
         )
 
-    stale = completion("stale", goal.revision + 1)
-    stale_admitted = GoalCompletionVerifier(
-        [stale], verifier_id="bt2-fixture-verifier"
-    ).admit(stale)
+    future = completion("future-revision", goal.revision + 1)
+    future_admitted = GoalCompletionVerifier(
+        [future], verifier_id="bt2-fixture-verifier"
+    ).admit(future)
     snapshot_before = store.get_operational_motivation_state()
     try:
-        bridge.record_operational_goal_completion(admitted=stale_admitted, now=5.0)
+        bridge.record_operational_goal_completion(admitted=future_admitted, now=5.0)
     except ValueError:
-        stale_completion_rejected = True
+        mismatched_revision_rejected = True
     else:
-        raise AssertionError("stale completion accepted")
+        raise AssertionError("future revision completion accepted")
     assert store.get_operational_motivation_state() == snapshot_before
 
     # Host-controlled fixture mutation is NOT a repair performed by the model.
@@ -259,6 +340,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     return {
         "source_heads_verified": True,
         "source_heads": source_pins,
+        "harness_file_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "synthetic_studio_sign_selected": True,
         "synthetic_atlas_adjudication_selected": True,
         "meso_event_ids_distinct_on_successor": True,
@@ -270,7 +352,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         "observed_want_survived_restart": True,
         "tool_free_model_turn": True,
         "model_text_not_completion": True,
-        "stale_completion_rejected": stale_completion_rejected,
+        "mismatched_completion_revision_rejected": mismatched_revision_rejected,
         "independently_admitted_completion": True,
         "idempotent_replay": True,
         "effect_authority_granted": False,

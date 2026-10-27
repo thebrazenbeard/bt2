@@ -18,8 +18,9 @@ Then set BT2_VERA_COGNITIVE_REPOS to that folder and execute:
 
 The run uses an ephemeral SQLite Store and a deterministic no-tool model
 adapter. It exercises actual VolitionBridge, Store and Engine, including
-persistence, restart, duplicate evidence admission, stale completion,
-host-observed completion, and idempotent replay.
+persistence, restart, duplicate evidence admission, rejection of a future-revision completion receipt, host-observed completion,
+and idempotent replay. This does not simulate an older receipt after a real goal
+revision; that separate future behavior still requires qualification.
 
 Semiotics, Semantic Atlas, Humility, Meta, MESO-CRCT and Personification
 are called through their exact source APIs on explicitly synthetic inputs.
@@ -39,3 +40,26 @@ gates. Re-run with new exact source pins when a participating main changes.
 The BT2-only DurableEventIssuer uses SQLite BEGIN IMMEDIATE to serialize
 local MESO event issuance across transactions and survive host restarts.
 It does not replace the immutable MESO core or qualify network/SMB locking.
+
+
+## Hostile review qualification boundaries
+
+A source-bound hosted run rejects Python optimization, preloaded cognitive
+modules, source HEAD drift, modified tracked Python blobs, unexpected untracked
+Python files, Python bytecode, and a nonempty or directly linked state directory.
+The trusted runner/Git executable and operating-system path ancestry are part
+of the host trust boundary; these checks do not authenticate a malicious
+operator who replaces Git or the source while it is executing.
+
+The synthetic model response deliberately claims that the file was repaired
+even though it never wrote it. The want remains active until the fixture host
+changes the file and supplies a separately admitted completion. This tests
+claim-vs-state separation, NOT independently authenticated verifier custody.
+The test checks a FUTURE revision mismatch, not an old revision after a real
+goal revision. No real model serving, protected tool execution or production
+routing is qualified.
+
+Durable MESO SQLite issuance serializes cooperating local writers using
+BEGIN IMMEDIATE. Ambiguous responses after a successful commit may consume
+a sequence without giving the caller its event; this is not request-keyed
+exactly-once retry or a distributed database contract.

@@ -7,6 +7,12 @@ import subprocess
 
 def fetch(root: Path) -> None:
     pins = json.loads(Path(__file__).with_name("source_pins.json").read_text(encoding="utf-8"))
+    allowed = {
+        "volition", "pre-active", "meso-crct", "humility", "meta",
+        "semiotics", "semanticatlas", "personification",
+    }
+    if set(pins) != allowed:
+        raise ValueError("unexpected source names")
     if root.exists():
         raise ValueError("source destination exists; refusing to overwrite")
     root.mkdir(parents=True)
@@ -17,6 +23,7 @@ def fetch(root: Path) -> None:
         p.mkdir()
         for args in (
             ["git", "init", "-q", str(p)],
+            ["git", "-C", str(p), "config", "core.autocrlf", "false"],
             ["git", "-C", str(p), "remote", "add", "origin",
              f"https://github.com/thebrazenbeard/{name}.git"],
             ["git", "-C", str(p), "fetch", "-q", "--depth=1", "origin", sha],
