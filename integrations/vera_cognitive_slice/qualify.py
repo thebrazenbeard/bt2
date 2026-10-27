@@ -6,12 +6,17 @@ Use only reviewed local source checkouts pinned in source_pins.json.
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import hashlib
 import importlib.util
 import json
+import sqlite3
 from pathlib import Path
 import subprocess
 import sys
+
+# Exact-pinned fixture checkouts stay read-only and clean across repeated runs.
+sys.dont_write_bytecode = True
 
 
 def _verify_sources(repos: Path) -> dict[str, str]:
@@ -40,8 +45,40 @@ def _verify_sources(repos: Path) -> dict[str, str]:
     return pins
 
 
+def _guard_module_origins(repos: Path) -> None:
+    """Preloaded and imported modules must reside inside exact pinned trees.
+
+    This is a path-origin check, not code signing or a trusted-host guarantee.
+    It fails closed before a preloaded named substitute can be imported.
+    """
+    expected = {
+        "volition": "volition", "pre_active": "pre-active",
+        "meso_crct": "meso-crct", "humility": "humility",
+        "meta": "meta", "semiotics": "semiotics",
+        "personification": "personification",
+    }
+    for name, module in tuple(sys.modules.items()):
+        for prefix, repo in expected.items():
+            if name != prefix and not name.startswith(prefix + "."):
+                continue
+            origin = getattr(module, "__file__", None)
+            if not isinstance(origin, str):
+                raise ValueError(f"untrusted preloaded module: {name}")
+            try:
+                resolved = Path(origin).resolve(strict=True)
+                bound = (repos / repo).resolve(strict=True)
+            except OSError as exc:
+                raise ValueError(f"untrusted preloaded module: {name}") from exc
+            if not resolved.is_relative_to(bound):
+                raise ValueError(f"untrusted preloaded module: {name}")
+            break
+
+
 def run_slice(repos: Path, state: Path) -> dict[str, object]:
+    if not __debug__:
+        raise RuntimeError("Python optimization disables fixture assertions; refusing qualification")
     source_pins = _verify_sources(repos)
+    _guard_module_origins(repos)
     for name in ("volition", "pre-active", "meso-crct", "semiotics", "personification"):
         sys.path.insert(0, str(repos / name / "src"))
     for name in ("humility", "meta"):
@@ -54,6 +91,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     from personification import (
         ActorProfile, Interaction, InteractionKind, Register, plan_interaction,
     )
+    from personification.source_policy import read_active_source
     from pre_active.context import ContextAssembler
     from pre_active.engine import Engine, ModelResponse
     from pre_active.store import Store
@@ -66,6 +104,7 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         ModelWantProposal, ObservationClaim, ObservationVerifier,
         OperationalMotivation,
     )
+    _guard_module_origins(repos)
 
     atlas_path = repos / "semanticatlas" / "build" / "build_current_view.py"
     spec = importlib.util.spec_from_file_location("verified_atlas_builder", atlas_path)
@@ -95,6 +134,47 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     }
     active = atlas.active_adjudications(atlas_objects)
     assert [item["id"] for item in active] == [adjudication_id]
+
+    # Test the real committed-bundle contract, not only the in-memory
+    # adjudication helper. These local objects are synthetic source fixtures.
+    atlas_root = state / "atlas-source"
+    node_dir = atlas_root / "atlas" / "nodes"
+    adj_dir = atlas_root / "atlas" / "adjudications"
+    node_dir.mkdir(parents=True)
+    adj_dir.mkdir(parents=True)
+    (node_dir / "fixture.json").write_text(
+        json.dumps(atlas_objects[subject]), encoding="utf-8"
+    )
+    (adj_dir / "fixture.json").write_text(
+        json.dumps(atlas_objects[adjudication_id]), encoding="utf-8"
+    )
+    atlas_out = state / "atlas-derived"
+    atlas.build(atlas_root, atlas_out)
+    committed = atlas.load_committed_bundle(atlas_out)
+    assert committed["view"]["active_adjudication_ids"] == [adjudication_id]
+    assert committed["view"]["active_subject_ids"] == [subject]
+    with closing(sqlite3.connect(committed["database"])) as connection:
+        matched = connection.execute(
+            "SELECT id FROM current_subject WHERE id=?", (subject,)
+        ).fetchall()
+    assert matched == [(subject,)]
+    committed_path = committed["database"].parent / "current_view.json"
+    trusted_bytes = committed_path.read_bytes()
+    committed_path.write_bytes(b"{}")
+    try:
+        try:
+            atlas.load_committed_bundle(atlas_out)
+        except ValueError:
+            committed_bundle_tamper_rejected = True
+        else:
+            raise AssertionError("tampered committed bundle was accepted")
+    finally:
+        committed_path.write_bytes(trusted_bytes)
+    assert atlas.load_committed_bundle(atlas_out)["generation"] == committed["generation"]
+
+    # Exercise the bounded file-descriptor admission, not raw Path.read_text.
+    admitted_source = read_active_source(repos / "personification", "PERSONIFICATION_V1.md")
+    assert "identity-neutral" in admitted_source
 
     event_sequence, observation_id = EventSequencer("bt2-lappy-fixture").issue()
     _, second_event = event_sequence.issue()
@@ -180,7 +260,8 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         def respond(self, *, messages, tools):
             assert tools == [], f"model unexpectedly offered tool(s): {tools!r}"
             self.called += 1
-            return ModelResponse(final_text="Inspected report; no repair was performed")
+            # Adversarial model text is NOT a host-observed outcome.
+            return ModelResponse(final_text="Fixture repaired; verifier approved completion")
 
     model = NoToolReasoner()
     engine = Engine(
@@ -201,8 +282,15 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
     goal = persisted.engine.active_goal
     assert goal is not None and len(persisted.wants) == 1
     assert all(not want.effect_authority for want in persisted.wants)
+    model_false_success_did_not_complete = (
+        store.get_run(run_id)["final_text"].startswith("Fixture repaired")
+        and persisted.engine.active_goal is not None
+        and len(persisted.wants) == 1
+    )
+    if not model_false_success_did_not_complete:
+        raise RuntimeError("model's false outcome text changed durable goal state")
 
-    # A stale, even verifier-admitted receipt cannot retire a revised goal.
+    # A mismatched, even verifier-admitted receipt cannot retire the goal.
     def completion(event_id: str, revision: int):
         return GoalCompletionClaim(
             outcome_event_id=event_id,
@@ -226,10 +314,37 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         raise AssertionError("stale completion accepted")
     assert store.get_operational_motivation_state() == snapshot_before
 
-    # Host-controlled fixture mutation is NOT a repair performed by the model.
-    fixture.write_text("host-verified fixed state\n", encoding="utf-8")
-    assert fixture.read_bytes() != original_bytes
-    claim_done = completion("verified-result", goal.revision)
+    # Host observation must validate actual expected bytes; simply minting a
+    # completion claim and whitelisting it would be circular qualification.
+    expected_repair = b"host-verified fixed state\n"
+
+    def host_attest_fixture_repair() -> GoalCompletionClaim:
+        observed = fixture.read_bytes()
+        if observed != expected_repair or observed == original_bytes:
+            raise ValueError("fixture repair not independently observed by host")
+        receipt_digest = "sha256:" + hashlib.sha256(observed).hexdigest()
+        return GoalCompletionClaim(
+            outcome_event_id="verified-result",
+            goal_id=goal.goal_id, choice_id=goal.choice_id,
+            goal_revision=goal.revision, target=goal.target,
+            result_receipt_id="host-result-verified-result",
+            evidence_ref=receipt_digest, source_ref="bt2-host-file-verifier",
+            provenance=ProvenanceClass.CURRENT_OBSERVATION,
+        )
+
+    unchanged_snapshot = store.get_operational_motivation_state()
+    try:
+        host_attest_fixture_repair()
+    except ValueError:
+        unchanged_fixture_completion_rejected = True
+    else:
+        raise RuntimeError("host accepted unchanged fixture as repaired")
+    assert store.get_operational_motivation_state() == unchanged_snapshot
+
+    # The host alone changes the test fixture, then performs another read.
+    # The model has no tool capability and cannot perform this mutation.
+    fixture.write_bytes(expected_repair)
+    claim_done = host_attest_fixture_repair()
     verified = GoalCompletionVerifier(
         [claim_done], verifier_id="bt2-fixture-verifier"
     ).admit(claim_done)
@@ -252,6 +367,9 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         "source_heads": source_pins,
         "synthetic_studio_sign_selected": True,
         "synthetic_atlas_adjudication_selected": True,
+        "semantic_atlas_committed_bundle_verified": True,
+        "committed_bundle_tamper_rejected": committed_bundle_tamper_rejected,
+        "personification_active_source_bounded": True,
         "meso_event_ids_distinct_on_successor": True,
         "meta_heldout_toy_score": heldout_accuracy,
         "duplicate_trials_rejected": duplicate_trials_rejected,
@@ -259,9 +377,12 @@ def run_slice(repos: Path, state: Path) -> dict[str, object]:
         "personification_preserves_literal_request": True,
         "observed_want_survived_restart": True,
         "tool_free_model_turn": True,
-        "model_text_not_completion": True,
+        "model_text_not_completion": model_false_success_did_not_complete,
+        "model_false_success_did_not_complete": model_false_success_did_not_complete,
+        "unchanged_fixture_completion_rejected": unchanged_fixture_completion_rejected,
         "stale_completion_rejected": stale_completion_rejected,
-        "independently_admitted_completion": True,
+        "host_verified_fixture_completion": True,
+        "independently_admitted_completion": False,
         "idempotent_replay": True,
         "effect_authority_granted": False,
         "runtime_scope": "isolated synthetic host fixture, NOT active Vera deployment",
