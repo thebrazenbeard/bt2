@@ -17,7 +17,7 @@ Older WoWSQL and superseded BT2/Lantern reference copies were detached from the 
 - **WoWSQL:** retired as a current backend; its historical Project source packages are not authority for active reads.
 - **SQL Connectome:** source work exists, but no current PostgreSQL service, credential, or live projection was qualified by this review.
 - **BT2 V5:** source candidate, **not installed or runtime-qualified**. Do not interpret this status note as activation. Keep existing installation and proof gates intact.
-- **Blotter:** source hardening under review in its own repository. A disconnected local WorkBridge tunnel blocked the live host readback, the last-20-events check, and a verified append. A tunnel error does not prove a Blotter server outage.
+- **Blotter:** source hardening under review in its own repository. A later independent connection through Executor reached the Lappy host. An authenticated loopback API health check passed (schema 1), the latest 20 events (seq 2616–2635) were read, and an audit event was appended as seq 2636 and read back. This is Blotter service/ledger evidence, not deployment of the draft hardening patch. The separate WorkBridge connector remained disconnected.
 
 ## Recovery and change discipline
 
@@ -29,4 +29,4 @@ Older WoWSQL and superseded BT2/Lantern reference copies were detached from the 
 
 This note is intentionally informational. It authorizes no merge, service deployment, database migration, material append, provider resurrection, or change to protected effects.
 
-Source context at preparation: `thebrazenbeard/bt2@81dc5c0ccda28e1f627ad49c2f81bcb56ff21e6b`. Status evidence: Project UI inspection plus source review; no live SQL/Blotter qualification.
+Source context at preparation: `thebrazenbeard/bt2@81dc5c0ccda28e1f627ad49c2f81bcb56ff21e6b`. Status evidence: Project UI inspection, source review, and 2026-10-28 authenticated Blotter loopback health/read/append readback; no live SQL Connectome or V5 installation qualification.
