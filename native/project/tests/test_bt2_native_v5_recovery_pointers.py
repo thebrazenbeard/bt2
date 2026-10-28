@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
+from native.project.validation import test_bt2_native_v5_source_binding as source_binding
 from native.project.validation.test_bt2_native_v5_source_binding import verify_recovery_pointers
 
 
@@ -74,6 +76,23 @@ class V5RecoveryPointersTests(unittest.TestCase):
                          frozen["active_organizational_topology"])
         self.assertEqual(self.topology["authority_rule"], frozen["authority_rule"])
         self.assertEqual(self.topology["execution_terminal_rule"], frozen["execution_terminal_rule"])
+
+    def test_retained_v4_bytes_match_the_immutable_v5_ancestor(self):
+        manifest = json.loads((ROOT / "native/project/PROJECT_FILES_MANIFEST_V5.json").read_text())
+        source_binding.verify_retained_historical_payload(manifest["payload_source_commit"])
+
+    def test_historical_manifest_byte_drift_fails_closed(self):
+        manifest = json.loads((ROOT / "native/project/PROJECT_FILES_MANIFEST_V5.json").read_text())
+        real_git = source_binding._git
+
+        def forged_current_blob(*args):
+            if args == ("hash-object", "native/project/PROJECT_FILES_MANIFEST_V4.json"):
+                return "0" * 40
+            return real_git(*args)
+
+        with mock.patch.object(source_binding, "_git", side_effect=forged_current_blob):
+            with self.assertRaisesRegex(ValueError, "retained V4 source changed"):
+                source_binding.verify_retained_historical_payload(manifest["payload_source_commit"])
 
 
 if __name__ == "__main__":
