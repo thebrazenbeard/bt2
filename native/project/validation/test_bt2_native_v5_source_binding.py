@@ -79,6 +79,17 @@ def verify_recovery_pointers(instructions: str, reconstruction: str, topology: d
         raise ValueError("worker topology cannot require chat continuity")
 
 
+def verify_retained_historical_payload(ancestor: str) -> None:
+    """Prevent source-passing V5 checks after silently rewriting frozen V4 bytes."""
+    for path in ("native/project/PROJECT_FILES_MANIFEST_V4.json",
+                 "native/project/BT2_COORDINATOR_RECONSTRUCTION_V1.md",
+                 "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"):
+        if not (ROOT / path).is_file():
+            raise ValueError(f"retained V4 source missing: {path}")
+        if _git("hash-object", path) != _git("rev-parse", f"{ancestor}:{path}"):
+            raise ValueError(f"retained V4 source changed after V5 binding: {path}")
+
+
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     if manifest["schema"] != "BT2_NATIVE_PROJECT_FILES_MANIFEST_V5":
@@ -134,12 +145,8 @@ def main() -> int:
         (ROOT / "native/project/BT2_COORDINATOR_RECONSTRUCTION_V2.md").read_text(encoding="utf-8"),
         json.loads((ROOT / "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V2.json").read_text(encoding="utf-8")),
     )
-    # Preserve preexisting V4 package source without a spurious rebinding.
-    for path in ("native/project/PROJECT_FILES_MANIFEST_V4.json",
-                 "native/project/BT2_COORDINATOR_RECONSTRUCTION_V1.md",
-                 "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"):
-        if not (ROOT / path).is_file():
-            raise SystemExit(f"frozen V4 source missing: {path}")
+    # Preserve historical V4 bytes, not merely historical path presence.
+    verify_retained_historical_payload(ancestor)
     print(f"BT2_NATIVE_V5_SOURCE_PACKAGE_PASS payload_commit={ancestor} "
           "runtime=NOT_ESTABLISHED installation=NOT_INSTALLED")
     return 0
