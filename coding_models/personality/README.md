@@ -41,7 +41,8 @@ The development split is public and cannot function as a sealed holdout.
 ## Labyrinth scheduling and actual PEFT training — opt-in
 
 The separate `tools/train_personality_lora.py` does real CPU PEFT LoRA gradient
-updates using these role cases, while importing the **ungraded deterministic
+updates using these role cases and each profile's positive/negative behavioral
+guidance, while importing the **ungraded deterministic
 schedule** from pinned Labyrinth source. The scheduler neither grades role
 performance nor promotes a curriculum; this is distinct from Labyrinth's
 numerical `train-hf` command, which rejects this 3.09 GB donor and only trains
@@ -71,6 +72,9 @@ require **separate output paths** and equivalent case exposure. Running the
 candidate alone is not a matched controlled study. Training updates a
 separate adapter, not the previously produced Q8_0 GGUFs; a fresh, verified
 merge/conversion and runtime check is needed for a new combined model file.
+The opt-in trainer checks untouched frozen neural weights, persistent buffers,
+the HF donor, and the exact pinned source checkouts after optimization before
+saving the adapter; those checks do not demonstrate behavioral improvement.
 
 **Evidence ceiling:** LoRA tensor updates/reloads and training loss are
 mechanism evidence only. Before declaring faithful personality conditioning,

@@ -73,11 +73,13 @@ def build_schedule(cases: list[dict], *, labyrinth_dir: Path, seed: int, steps: 
 
 def persona_instruction(profile: dict, traits: list[dict]) -> str:
     behaviors = "; ".join(t["observable_behavior"] for t in traits)
+    counterexamples = "; ".join(t["anti_pattern"] for t in traits)
     return (
         f"Act as an ephemeral BT2 coding specialist configured for {profile['display_name']}. "
         f"Role: {profile['role']}. Objective: {profile['objective']}. "
         f"Use these source-grounded *operational response tendencies*, not claims of "
         f"subjective emotion or identity continuity: {behaviors}. "
+        f"Avoid the paired counterexamples: {counterexamples}. "
         "Respond concretely and in natural first-person working language. "
         "Distinguish facts, uncertainty, code source, authority and runtime effect; "
         "never fabricate test results, permission, personal experience or acceptance."
@@ -95,6 +97,12 @@ def encode_case(tokenizer, instruction: str, case: dict, answer: str, max_length
     require(bool(target) and len(prefix) + len(target) <= max_length,
             f"persona example {case['id']} exceeds {max_length} tokens or lacks target")
     return prefix + target, [-100] * len(prefix) + target
+
+
+def require_isolated_output(output: Path, *protected: Path) -> None:
+    for root in protected:
+        require(output != root and root not in output.parents and output not in root.parents,
+                "run path overlaps immutable donor or pinned source checkout")
 
 
 def preflight(args) -> dict:
@@ -120,8 +128,7 @@ def preflight(args) -> dict:
     output = Path(args.run_dir).resolve(strict=False)
     require(not output.exists() and not output.is_symlink() and output.parent.is_dir(),
             "run directory must be new under existing parent")
-    require(base not in output.parents and output not in base.parents and output != base,
-            "run path overlaps immutable donor")
+    require_isolated_output(output, base, bt2, labyrinth)
     cases = dossier["cases"]
     schedule = build_schedule(cases, labyrinth_dir=labyrinth, seed=args.seed, steps=args.steps)
     return {"bt2": bt2, "labyrinth": labyrinth, "base": base, "dossier": dossier,
@@ -135,6 +142,9 @@ def run_training(args) -> dict:
     import torch
     import transformers
     import peft
+    from labyrinth.hf_pilot import (
+        _frozen_parameter_digest, _buffer_digest, _assert_frozen_state,
+    )
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from peft import LoraConfig, TaskType, get_peft_model
 
@@ -143,6 +153,14 @@ def run_training(args) -> dict:
     random.seed(args.seed)
     begun = time.monotonic()
     tokenizer = AutoTokenizer.from_pretrained(str(info["base"]), local_files_only=True)
+    instruction = persona_instruction(info["profile"], info["dossier"]["traits"])
+    chosen = [info["cases_by_id"][item["case_id"]] for item in info["schedule"]]
+    targets = [case["ideal_response"] for case in chosen]
+    if args.arm == "corrupt":
+        targets = targets[1:] + targets[:1]
+    # Check the *entire* selected supervision budget before loading 3 GB weights.
+    encoded = [encode_case(tokenizer, instruction, case, target, args.max_length)
+               for case, target in zip(chosen, targets)]
     base_model = AutoModelForCausalLM.from_pretrained(
         str(info["base"]), local_files_only=True, dtype=torch.float32,
         low_cpu_mem_usage=True,
@@ -154,17 +172,14 @@ def run_training(args) -> dict:
     ))
     model.train()
     before = trainable_digest(model, torch)
-    instruction = persona_instruction(info["profile"], info["dossier"]["traits"])
-    chosen = [info["cases_by_id"][item["case_id"]] for item in info["schedule"]]
-    targets = [case["ideal_response"] for case in chosen]
-    if args.arm == "corrupt":
-        targets = targets[1:] + targets[:1]
+    frozen_before = _frozen_parameter_digest(model, torch)
+    buffers_before = _buffer_digest(model, torch)
     learning_rate = 0.0 if args.arm == "sham" else 0.0002
     optimizer = torch.optim.AdamW((p for p in model.parameters() if p.requires_grad),
                                   lr=learning_rate)
     losses = []
-    for step, (case, target) in enumerate(zip(chosen, targets)):
-        ids, labels = encode_case(tokenizer, instruction, case, target, args.max_length)
+    for step, (case, pair) in enumerate(zip(chosen, encoded)):
+        ids, labels = pair
         output = model(input_ids=torch.tensor([ids], dtype=torch.long),
                        labels=torch.tensor([labels], dtype=torch.long))
         loss = output.loss
@@ -178,6 +193,11 @@ def run_training(args) -> dict:
                        "loss": float(loss.detach().cpu())})
         print(f"persona step {step+1}/{args.steps} case={case['id']} loss={losses[-1]['loss']:.6f}", flush=True)
     after = trainable_digest(model, torch)
+    _assert_frozen_state(model, torch, frozen_before, buffers_before, "persona training")
+    require(sha256_file(info["base"] / "model.safetensors") == args.base_sha256,
+            "HF donor changed during persona run")
+    checked_checkout(info["bt2"], args.source_commit, "tools/train_personality_lora.py")
+    checked_checkout(info["labyrinth"], args.labyrinth_commit, "labyrinth/curriculum.py")
     require((after != before) == (args.arm != "sham"),
             "trainable LoRA tensor update contradicts control arm")
 
@@ -193,6 +213,7 @@ def run_training(args) -> dict:
         "bt2_source_commit": args.source_commit,
         "labyrinth_scheduler_commit": args.labyrinth_commit,
         "labyrinth_role": "ungraded deterministic training-case schedule",
+        "labyrinth_case_seeds": "recorded for schedule provenance; not PyTorch RNG reseeds",
         "gradient_engine": "BT2/PyTorch/PEFT LoRA, not Labyrinth numeric train-hf",
         "personality_dataset_sha256": info["dataset_sha256"],
         "persona_instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest(),
@@ -204,6 +225,9 @@ def run_training(args) -> dict:
         "learning_rate": learning_rate, "losses": losses,
         "trainable_tensor_sha256_before": before,
         "trainable_tensor_sha256_after": after,
+        "frozen_parameter_sha256_unchanged": frozen_before,
+        "persistent_buffer_sha256_unchanged": buffers_before,
+        "frozen_parameters_and_buffers_verified_unchanged": True,
         "adapter_safetensors_sha256": sha256_file(adapter),
         "duration_seconds": round(time.monotonic() - begun, 3),
         "versions": {"torch": torch.__version__, "transformers": transformers.__version__,

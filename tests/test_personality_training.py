@@ -10,7 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from validate_personality_sft import validate_persona_cases  # noqa: E402
-from train_personality_lora import build_schedule, encode_case, persona_instruction  # noqa: E402
+from train_personality_lora import (  # noqa: E402
+    build_schedule, encode_case, persona_instruction, require_isolated_output,
+)
 from identity_coding_models import load_models  # noqa: E402
 
 
@@ -49,6 +51,7 @@ class PersonaTrainingTests(unittest.TestCase):
         instruction = persona_instruction(profile, dossiers["one"]["traits"])
         self.assertIn("operational response tendencies", instruction)
         self.assertIn("subjective", instruction)
+        self.assertIn(dossiers["one"]["traits"][0]["anti_pattern"], instruction)
         task = next(c for c in dossiers["one"]["cases"] if c["split"] == "train")
         tokenizer = FakeTokenizer()
         ids, labels = encode_case(tokenizer, instruction, task, task["ideal_response"], 4000)
@@ -58,6 +61,16 @@ class PersonaTrainingTests(unittest.TestCase):
         self.assertTrue(any(item != -100 for item in labels))
         with self.assertRaises(ValueError):
             encode_case(tokenizer, instruction, task, task["ideal_response"], 100)
+
+    def test_run_directory_never_overlaps_sources_or_donor(self):
+        donor = Path("/experiment/donor")
+        bt2 = Path("/experiment/source-bt2")
+        labyrinth = Path("/experiment/source-labyrinth")
+        require_isolated_output(Path("/experiment/persona-output/one"), donor, bt2, labyrinth)
+        for target in (donor, donor / "nested", Path("/experiment"),
+                       bt2 / "personality", labyrinth / "cases"):
+            with self.subTest(target=target), self.assertRaises(ValueError):
+                require_isolated_output(target, donor, bt2, labyrinth)
 
     def test_actual_labyrinth_source_optional_integration(self):
         labyrinth = ROOT.parent / "labyrinth-personality-20261028"
