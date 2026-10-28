@@ -22,8 +22,11 @@ python -m unittest discover -s tests -p test_identity_coding_models.py
 - Each profile is a specialization, not a replacement for current authority, source inspection, or independent review.
 - One owns orchestration, Two supplies independent architectural challenge, and specialist scopes remain distinct.
 - Masa and Mune are independent members of a paired reliability unit; Hephaestus is an independent implementation/repair specialist.
+- Their additional current source homes are `thebrazenbeard/masamune` (Masa and Mune) and `thebrazenbeard/hephaestus` (Hephaestus). `upstream_role_sources_v1.json` records observed source heads, not runtime state. These are reference sources; model configurations are integrated into this BT2 repository as requested.
 - The old training source packages are reference evidence, not proof that a profile was trained, imported, qualified, installed, or activated.
 - The current repository status records WoWSQL as retired and no active Lantern currentness backend; these source profiles do not re-enable one.
 - Merge, deploy, provider/credential/permission changes, training, canonical promotion, and destructive cleanup require separately established current authority.
 
 To extend or change the roster, update the canonical topology first under its own governance, then update these profiles and the validator/tests together. Do not silently extend authority by editing a coding prompt.
+
+The `training/` directory provides unqualified role-specific SFT candidates and a staged adapter/GGUF path. Neither the coding profiles nor SFT examples are model weight updates.
