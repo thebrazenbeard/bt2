@@ -13,6 +13,22 @@ python -m unittest discover -s tests -p test_identity_sft_candidates.py
 
 Export writes to standard output only. Redirect the output to a *new*, separately managed training-artifact directory if a reviewed training run is authorized. The output is intended for a later Hugging Face/PEFT SFT pipeline, not for direct use as Labyrinth's current `train-hf` arithmetic-answer dataset.
 
+## Experimental CPU LoRA mechanism pilot
+
+`tools/train_identity_lora_pilot.py` implements an intentionally bounded CPU-only PEFT LoRA mechanism test against a **separately obtained, locally verified** HF safetensors donor. It refuses missing/mismatched base weights, existing run directories, missing role profiles, and unbounded steps. Only assistant-response tokens receive supervised labels; instruction tokens are masked. The main `train` command saves a separate safetensors adapter and a source/evidence report. Run the `verify-reload` command in a **fresh Python process** to compare numerical LoRA tensor values.
+
+```sh
+python tools/train_identity_lora_pilot.py train \
+  --identity one --base-dir LOCAL_PINNED_HF_BASE \
+  --base-sha256 VERIFIED_64_HEX_SHA256 \
+  --source-commit EXACT_BT2_GIT_SHA \
+  --run-dir NEW_EMPTY_PARENT/one-candidate --arm candidate --steps 2 --threads 2
+python tools/train_identity_lora_pilot.py verify-reload \
+  --run-dir NEW_EMPTY_PARENT/one-candidate --threads 2
+```
+
+Separate `--arm sham` (same-exposure zero learning rate) and `--arm corrupt` (rotated target responses) runs are available for later matched controls. These are **not** completed by the candidate run. Even if the saved/reloaded LoRA tensors match, there is no code-correctness or role-behavior improvement claim without independent evaluation. `train` does not create GGUF, install an Ollama tag, merge weights, mutate the base donor, or train all identities. The current small synthetic cases exist only to establish bounded plumbing before any source-reviewed larger curriculum.
+
 ## Actual weights and GGUF sequence
 
 The identified Lappy inference donor is `qwen2.5-coder:1.5b-instruct-q8_0` (~1.6 GB) under Ollama. The source Qwen/Qwen2.5-Coder-1.5B-Instruct HF checkpoint is about 3.09 GB in safetensors; it is **not interchangeable** with a Q8_0 GGUF for gradient training. Neither the presence of an Ollama blob nor these JSON files establishes a compatible local HF checkpoint or any trained LoRA.
