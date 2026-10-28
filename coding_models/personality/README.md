@@ -75,6 +75,11 @@ merge/conversion and runtime check is needed for a new combined model file.
 The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
+For new runs, training report schema V2 also pins the required HF configuration
+and tokenizer files plus recognized optional tokenizer metadata. Reload and
+merge reject content changes or new metadata files. Historical V1 receipts
+remain archival evidence, but are not accepted by the stricter V2 merge path
+and must not be silently rewritten or upgraded.
 
 ## Separate merged GGUF artifacts (experimental)
 
