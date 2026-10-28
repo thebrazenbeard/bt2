@@ -40,6 +40,25 @@ class TestIdentityGgufInventory(unittest.TestCase):
         self.assertEqual(one["gguf_filename"], receipt["gguf"]["filename"])
         self.assertEqual(one["source_commit"], receipt["training"]["bt2_source_commit"])
 
+    def test_remaining_models_bind_to_per_role_receipts(self):
+        inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+        for model in inventory["models"]:
+            if model["identity"] == "one":
+                continue
+            with self.subTest(identity=model["identity"]):
+                path = INVENTORY.parent / model["source_receipt"]
+                receipt = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual(receipt["identity_id"], model["identity"])
+                self.assertEqual(receipt["gguf_name"], model["gguf_filename"])
+                self.assertEqual(receipt["gguf_bytes"], model["gguf_bytes"])
+                self.assertEqual(receipt["gguf_sha256"], model["gguf_sha256"])
+                self.assertEqual(receipt["source_commit"], model["source_commit"])
+                self.assertEqual(receipt["training_steps"], 2)
+                self.assertNotEqual(receipt["tensor_sha256_before"], receipt["tensor_sha256_after"])
+                self.assertEqual(receipt["smoke_exit_code"], 0)
+                self.assertFalse(receipt["installed"])
+                self.assertFalse(receipt["qualified"])
+
 
 if __name__ == "__main__":
     unittest.main()

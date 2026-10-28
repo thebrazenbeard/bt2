@@ -1,0 +1,20 @@
+{
+  "schema_version": "BT2_IDENTITY_GGUF_BATCH_RECEIPT_V1",
+  "identity_id": "two",
+  "claim_ceiling": "EXPERIMENTAL_BUILD_AND_SMOKE_NOT_QUALIFIED",
+  "training_report_sha256": "79ab9350b95b7d981db9a0988dfcfa6d922b7fb03d35dc8cbc5a403f3ab4f205",
+  "merged_hf_receipt_sha256": "71778bdbd3d237681dcb3ec2fb8697cb36f050e614181c202ff4521363ef1c6a",
+  "adapter_sha256": "a0b88eb17f00f574eb8d16c91ca2556a07fb5abde8cb98481f748864f5c7777c",
+  "tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+  "tensor_sha256_after": "796c6fa2056b33621d2cdff63f8ef004a553922396e320e7d75e983a216c9699",
+  "training_steps": 2,
+  "base_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+  "source_commit": "683900a9a1151236ee1e3629d2dfb8a203553c5e",
+  "gguf_name": "bt2-two-qwen25coder-cpu-lora-q8_0.gguf",
+  "gguf_bytes": 1646572736,
+  "gguf_sha256": "8e9d02b6b0ad8d4892f7ac45825263f94e267af59b0465afacc5b3285c6be51b",
+  "smoke_exit_code": 0,
+  "smoke_kind": "GENERATION_PROCESS_EXIT_ONLY_NOT_CORRECTNESS",
+  "installed": false,
+  "qualified": false
+}

@@ -43,7 +43,7 @@
       "gguf_filename": "bt2-two-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "8e9d02b6b0ad8d4892f7ac45825263f94e267af59b0465afacc5b3285c6be51b",
-      "source_receipt": "Lappy batch/two/receipt.json",
+      "source_receipt": "receipts/two.json",
       "smoke_exit_code": 0,
       "source_commit": "683900a9a1151236ee1e3629d2dfb8a203553c5e"
     },
@@ -52,7 +52,7 @@
       "gguf_filename": "bt2-three-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "f3754fa92800e5cfbae08ebd18adcd5420b04cd269a18dca2828d04d6bac987b",
-      "source_receipt": "Lappy batch/three/receipt.json",
+      "source_receipt": "receipts/three.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -61,7 +61,7 @@
       "gguf_filename": "bt2-four-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "8673c4c7e3d10a874d0e758904977069cd46598c43b33c7b27b84794fa305e2b",
-      "source_receipt": "Lappy batch/four/receipt.json",
+      "source_receipt": "receipts/four.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -70,7 +70,7 @@
       "gguf_filename": "bt2-five-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "479b6b90c5a89816421b6c279a2d67bb03c0bea56ce6d43d89f75a201a176c94",
-      "source_receipt": "Lappy batch/five/receipt.json",
+      "source_receipt": "receipts/five.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -79,7 +79,7 @@
       "gguf_filename": "bt2-six-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "f5596f3ae2ab5bd9734edd843edba85ab781d62aefe6079c5489d58f16a92638",
-      "source_receipt": "Lappy batch/six/receipt.json",
+      "source_receipt": "receipts/six.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -88,7 +88,7 @@
       "gguf_filename": "bt2-seven-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "ee7cc8dcc4202c07542672151627fa5dfb76627f1fd5775f6ae0c732312a23ca",
-      "source_receipt": "Lappy batch/seven/receipt.json",
+      "source_receipt": "receipts/seven.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -97,7 +97,7 @@
       "gguf_filename": "bt2-eight-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "687bf339e202e98de7fd41798332f264e25bf0af9fb62536c8fb4bea9ca6f65f",
-      "source_receipt": "Lappy batch/eight/receipt.json",
+      "source_receipt": "receipts/eight.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -106,7 +106,7 @@
       "gguf_filename": "bt2-nine-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "c924c2a0bbe0e4db1daf4a803706fa9830b28c2ff6af8337a56c35400292dd5d",
-      "source_receipt": "Lappy batch/nine/receipt.json",
+      "source_receipt": "receipts/nine.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -115,7 +115,7 @@
       "gguf_filename": "bt2-thirteen-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "666bb02b5363e47bee5cd23f644dfa93618b3218c733551404b77196b59e1f95",
-      "source_receipt": "Lappy batch/thirteen/receipt.json",
+      "source_receipt": "receipts/thirteen.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -124,7 +124,7 @@
       "gguf_filename": "bt2-masa-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "de0b982b8fbb8a95db15af1795a6cdb6e01a9250987cfad56ee3202f9aafb1b2",
-      "source_receipt": "Lappy batch/masa/receipt.json",
+      "source_receipt": "receipts/masa.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -133,7 +133,7 @@
       "gguf_filename": "bt2-mune-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "ab655bca8ac7f93c8e7ddc4d6a01715e2fab550f4c7dce70f79707db30096577",
-      "source_receipt": "Lappy batch/mune/receipt.json",
+      "source_receipt": "receipts/mune.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     },
@@ -142,7 +142,7 @@
       "gguf_filename": "bt2-hephaestus-qwen25coder-cpu-lora-q8_0.gguf",
       "gguf_bytes": 1646572736,
       "gguf_sha256": "2690f86d10c89fe194a18b2040efe51a1e00a337ae397c6be50f3a21d3d9b9f5",
-      "source_receipt": "Lappy batch/hephaestus/receipt.json",
+      "source_receipt": "receipts/hephaestus.json",
       "smoke_exit_code": 0,
       "source_commit": "77ba563f1763a7707672499fc4c57289e1916518"
     }
