@@ -23,17 +23,23 @@ def validate_evaluation_file(path: Path, identity: str, repo_root: Path = ROOT) 
     require(doc["status"] == STATUS, f"{identity}: case set must remain author draft")
     refs = doc["source_refs"]
     require(isinstance(refs, list) and refs, f"{identity}: no source refs")
+    root_resolved = repo_root.resolve(strict=True)
     for ref in refs:
         require(isinstance(ref, str) and ref and "\\" not in ref,
                 f"{identity}: source path must be repository-relative")
         relative = Path(ref)
         require(not relative.is_absolute() and ".." not in relative.parts,
                 f"{identity}: unsafe source path")
-        require((repo_root / relative).is_file(), f"{identity}: source missing: {ref}")
+        source = (repo_root / relative).resolve(strict=True)
+        require(root_resolved in source.parents and source.is_file(),
+                f"{identity}: source escapes repository or is not a file: {ref}")
     cases = doc["cases"]
     require(isinstance(cases, list) and len(cases) == 3,
             f"{identity}: expected exactly three author-draft evaluations")
     seen = set()
+    training = json.loads((repo_root / "coding_models/training/cases" / f"{identity}.json")
+                          .read_text(encoding="utf-8"))["cases"]
+    exposed_training_tasks = {" ".join(c["task"].lower().split()) for c in training}
     for case in cases:
         require(isinstance(case, dict) and set(case) == CASE_FIELDS,
                 f"{identity}: missing/extra case fields")
@@ -43,6 +49,8 @@ def validate_evaluation_file(path: Path, identity: str, repo_root: Path = ROOT) 
         seen.add(cid)
         require(isinstance(case["prompt"], str) and len(case["prompt"].strip()) >= 80,
                 f"{cid}: prompt not specific enough")
+        require(" ".join(case["prompt"].lower().split()) not in exposed_training_tasks,
+                f"{cid}: exact overlap with already-public train/dev prompt")
         require(isinstance(case["rationale"], str) and
                 len(case["rationale"].strip()) >= 25, f"{cid}: rationale missing")
         for field in ("expected_properties", "failure_signals"):

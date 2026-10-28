@@ -28,6 +28,16 @@ class BatchSafetyTests(unittest.TestCase):
             self.assertEqual(module.sha256_file(artifact),
                              "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
 
+    def test_single_workspace_exclusive_lock(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with module.exclusive_batch_lock(root):
+                with self.assertRaisesRegex(ValueError, "exclusive resource lock"):
+                    with module.exclusive_batch_lock(root):
+                        self.fail("second batch unexpectedly acquired same lock")
+            with module.exclusive_batch_lock(root):
+                pass  # Released OS lock can be reacquired; no stale-file bypass.
+
     def test_stage_fails_closed_and_preserves_log(self):
         with tempfile.TemporaryDirectory() as temp:
             log = Path(temp) / "failure.log"
