@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tempfile
 import unittest
+from unittest import mock
 
+from native.project.validation import test_bt2_native_v5_source_binding as source_binding
 from native.project.validation.test_bt2_native_v5_source_binding import verify_recovery_pointers
 
 
@@ -74,6 +77,63 @@ class V5RecoveryPointersTests(unittest.TestCase):
                          frozen["active_organizational_topology"])
         self.assertEqual(self.topology["authority_rule"], frozen["authority_rule"])
         self.assertEqual(self.topology["execution_terminal_rule"], frozen["execution_terminal_rule"])
+
+    def test_retained_v4_bytes_match_the_immutable_v5_ancestor(self):
+        manifest = json.loads((ROOT / "native/project/PROJECT_FILES_MANIFEST_V5.json").read_text())
+        source_binding.verify_retained_historical_payload(manifest["payload_source_commit"])
+
+    def test_historical_manifest_byte_drift_fails_closed(self):
+        manifest = json.loads((ROOT / "native/project/PROJECT_FILES_MANIFEST_V5.json").read_text())
+        real_git = source_binding._git
+
+        def forged_current_blob(*args):
+            if args == ("hash-object", "native/project/PROJECT_FILES_MANIFEST_V4.json"):
+                return "0" * 40
+            return real_git(*args)
+
+        with mock.patch.object(source_binding, "_git", side_effect=forged_current_blob):
+            with self.assertRaisesRegex(ValueError, "retained V4 source changed"):
+                source_binding.verify_retained_historical_payload(manifest["payload_source_commit"])
+
+    def test_same_byte_external_symlink_is_not_retained_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            sandbox = Path(directory)
+            source = ROOT / "native/project/PROJECT_FILES_MANIFEST_V4.json"
+            external = sandbox / "external_copy.json"
+            external.write_bytes(source.read_bytes())
+            link = sandbox / "native/project/PROJECT_FILES_MANIFEST_V4.json"
+            link.parent.mkdir(parents=True)
+            link.symlink_to(external)
+            with mock.patch.object(source_binding, "ROOT", sandbox):
+                with self.assertRaisesRegex(ValueError, "retained V4 source uses symlink"):
+                    source_binding.verify_retained_historical_payload("unused")
+
+    def test_same_byte_parent_directory_symlink_is_not_retained_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            sandbox = Path(directory)
+            external_parent = sandbox / "external_project"
+            external_parent.mkdir()
+            source = ROOT / "native/project/PROJECT_FILES_MANIFEST_V4.json"
+            (external_parent / "PROJECT_FILES_MANIFEST_V4.json").write_bytes(source.read_bytes())
+            native = sandbox / "native"
+            native.mkdir()
+            (native / "project").symlink_to(external_parent, target_is_directory=True)
+            with mock.patch.object(source_binding, "ROOT", sandbox):
+                with self.assertRaisesRegex(ValueError, "retained V4 source uses symlink"):
+                    source_binding.verify_retained_historical_payload("unused")
+
+    def test_same_byte_v5_install_packet_symlink_is_not_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            sandbox = Path(directory)
+            source = ROOT / "native/project/INSTALL_V5.md"
+            external = sandbox / "external_install.md"
+            external.write_bytes(source.read_bytes())
+            link = sandbox / "native/project/INSTALL_V5.md"
+            link.parent.mkdir(parents=True)
+            link.symlink_to(external)
+            with mock.patch.object(source_binding, "ROOT", sandbox):
+                with self.assertRaisesRegex(ValueError, "V5 payload source uses symlink"):
+                    source_binding.verify_direct_checkout_path("native/project/INSTALL_V5.md", "V5 payload")
 
 
 if __name__ == "__main__":
