@@ -76,6 +76,37 @@ The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
 
+## Separate merged GGUF artifacts (experimental)
+
+`tools/merge_personality_lora_hf.py` accepts only a source-pinned candidate
+adapter whose trainable tensors changed and frozen parameters/buffers did not.
+It rechecks the donor, adapter, dataset, receipt, and source checkouts and
+merges with `PEFT merge_and_unload(safe_merge=True)` into a *new* Hugging Face
+directory; no existing model is overwritten.
+
+`tools/build_personality_gguf_batch.py` sequentially runs training, a fresh
+adapter reload, that source-checked merge, `llama.cpp` Q8_0 conversion, and a
+simple offline coding smoke for an explicitly selected identity roster. It
+requires clean exact BT2, Labyrinth, and converter Git checkouts, a verified
+local donor, free-space reserve, and new isolated output directories. Example
+argument shape (replace placeholders with verified local paths and digests):
+
+```sh
+python tools/build_personality_gguf_batch.py \
+  --bt2-dir CLEAN_PINNED_BT2 --source-commit EXACT_BT2_PERSONA_SOURCE_COMMIT \
+  --labyrinth-dir CLEAN_PINNED_LABYRINTH \
+  --labyrinth-commit d9df0210761089549daeaed0cacd24181b8db962 \
+  --base-dir VERIFIED_HF_BASE --base-sha256 VERIFIED_DONOR_SHA256 \
+  --llama-cpp-dir CLEAN_PINNED_CONVERTER --converter-commit EXACT_CONVERTER_COMMIT \
+  --llama-cli VERIFIED_LLAMA_CLI --output-root NEW_PERSONA_BATCH_ROOT \
+  --identities one two three four five six seven eight nine thirteen masa mune hephaestus \
+  --steps 4 --max-length 2048 --threads 2 --min-free-gib 20
+```
+
+These are experiment-building commands, not installation or personality
+qualification commands. A generated GGUF is a distinct combined weight file,
+but that alone does not establish behavioral role fidelity or model quality.
+
 **Evidence ceiling:** LoRA tensor updates/reloads and training loss are
 mechanism evidence only. Before declaring faithful personality conditioning,
 compare exact candidate GGUFs to the old coding GGUFs, the donor, and a
