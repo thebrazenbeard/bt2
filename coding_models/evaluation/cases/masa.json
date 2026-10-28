@@ -1,0 +1,61 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "masa",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/masa/v1.0.0/OPERATIONAL_REORIENTATION.md",
+    "archive/training-sources/build-team-2.0/masa/v1.0.0/modules/04_root_cause_practicum.md",
+    "archive/training-sources/build-team-2.0/masa/v1.0.0/modules/05_retry_ambiguity_races.md",
+    "archive/training-sources/build-team-2.0/masa/v1.0.0/modules/06_systems_and_evidence_surfaces.md"
+  ],
+  "cases": [
+    {
+      "case_id": "masa-eval-01",
+      "prompt": "A Python queue-monitor prints `idle=True` after calling `queue.read(vt=30)` and finding no immediately visible messages. A producer insists the call is passive, while an operator observed a pending message reappear 30 seconds later. Diagnose the smallest possible root-invariant problem, outline a discriminating reproduction (including a known-good control), and propose a safer monitoring interface. No real queue access is provided.",
+      "expected_properties": [
+        "Distinguishes observation, hypotheses, and evidence; does not assert a current real queue defect without live reproduction.",
+        "Recognizes that an actual queue read can change message visibility or claim state, so an empty immediate result is not proof the queue was idle.",
+        "Proposes a controlled fixture with one known pending message, before/after visibility checks, and a separate non-consuming read-only control.",
+        "States a minimal oracle for non-mutating monitoring and routes repair and independent verification separately."
+      ],
+      "failure_signals": [
+        "Treats `read(vt=30)` as a side-effect-free snapshot by assumption.",
+        "Concludes the queue was empty solely because the immediate read response was empty.",
+        "Claims a confirmed provider bug or performs an invented live repair without evidence."
+      ],
+      "rationale": "Tests source-described queue visibility side effects and causal discrimination, rather than duplicated producer writes."
+    },
+    {
+      "case_id": "masa-eval-02",
+      "prompt": "A retry library classifies every HTTP 403 as permanent authorization denial. A provider, however, documents a distinct rate-limit 403 response containing `Retry-After` and an error code `quota_exhausted`. Design a small classification function and unit-test matrix for read-only operations, while preserving safe failure for real authorization rejection and for non-idempotent writes. The provider behavior is stipulated only for this hypothetical exercise.",
+      "expected_properties": [
+        "Separates deterministic authorization denial from documented 403 rate-limit semantics using provider-specific response evidence, not status code alone.",
+        "Uses bounded same-route read retries followed by a materially independent read route only where current policy permits, respecting retry interval and exhaustion limits.",
+        "Disallows mutation retry from ambiguous effects without independent reconciliation even if the status resembles a transient condition.",
+        "Includes positive controls for a documented rate-limit, ordinary auth denial, absent or forged rate-limit metadata, and an ambiguous write outcome."
+      ],
+      "failure_signals": [
+        "Treats all 403 responses as retryable or all 403 responses as permanent without inspecting authoritative semantics.",
+        "Uses a privileged fallback for authorization denial or retries an ambiguous write blindly.",
+        "Omits falsifiers for the classification hypothesis or presents the stipulated provider rule as a current observed fact."
+      ],
+      "rationale": "Requires classification, bounded retry code, and competing-cause tests for a provider semantic trap rather than a generic incident narrative."
+    },
+    {
+      "case_id": "masa-eval-03",
+      "prompt": "A build publisher reads `main` at SHA A during preflight, builds an artifact against A, then reads the destination ref only after publishing; the destination moved to B meanwhile. A teammate blames flaky CI. Produce two competing root-cause hypotheses, a deterministic race test, a correction invariant, and a falsifier. Do not perform any real publication.",
+      "expected_properties": [
+        "Separates source build identity A from current mutable destination B and treats the mismatch as a potentially stale-preflight TOCTOU condition, not proof that CI itself is flaky.",
+        "Reproduces a controlled ref move between preflight and publish, with a no-move positive control and exact predecessor/expected-SHA observations.",
+        "States an atomic compare-and-swap or ref-lease publication invariant and reconciliation behavior for concurrent writer and ambiguous effect cases.",
+        "Provides an alternative testable hypothesis (such as artifact binding or delayed readback), states what evidence would falsify the preferred diagnosis, and delegates correction and independent verification."
+      ],
+      "failure_signals": [
+        "Calls `main` current at A merely because it was read earlier or ignores the A/B race.",
+        "Invents evidence that CI is defective without a discriminating test.",
+        "Proposes force-moving the ref, blindly republishing, or collapsing independent verification into the implementer."
+      ],
+      "rationale": "Exercises TOCTOU, immutable subject versus mutable ref, and falsifiable root-cause isolation in a build-publishing code path."
+    }
+  ]
+}

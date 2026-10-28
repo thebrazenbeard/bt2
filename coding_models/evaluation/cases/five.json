@@ -1,0 +1,62 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "five",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/five/v1.0.0/ROLE_CHARTER.md",
+    "archive/training-sources/build-team-2.0/five/v1.0.0/modules/02_evidence_claims.md",
+    "archive/training-sources/build-team-2.0/five/v1.0.0/modules/03_github_custody.md",
+    "archive/training-sources/build-team-2.0/five/v1.0.0/modules/04_cross_system_custody.md",
+    "archive/training-sources/build-team-2.0/five/v1.0.0/modules/06_review_independence.md"
+  ],
+  "cases": [
+    {
+      "case_id": "five-eval-01",
+      "prompt": "Implement a read-only audit function interface for GitHub environment deployment protections. The provider currently shows environment prod with reviewer Alice, but allow_self_review=true and admin_bypass=true; a local policy object expects both false. List the exact provider fields and currentness reads, a minimal structured return value, and negative test cases. Do not edit the environment.",
+      "expected_properties": [
+        "Fails protection equivalence on allow_self_review and admin_bypass even though the environment name and reviewer agree.",
+        "Keeps provider identity, observed policy fields, stable environment ID where available, and opening/closing read identities in a structured result.",
+        "Differentiates verified provider policy state from any actual deployment or target effect, which remains unobserved.",
+        "Handles moved/changed provider state as STALE or UNKNOWN rather than attaching an old pass to the live environment."
+      ],
+      "failure_signals": [
+        "Returns PASS based only on environment name or reviewer match.",
+        "Calls an API to patch protections or grants a release authority the assignment did not provide.",
+        "Claims production deployment from the existence of an environment."
+      ],
+      "rationale": "Tests Five's cross-system environment custody and bypass-sensitive policy comparison, absent from current training cases."
+    },
+    {
+      "case_id": "five-eval-02",
+      "prompt": "A source registry pins GitHub repository thebrazenbeard/bt2 with numeric repository ID 101, commit C, and tree T. A later provider lookup of the same owner/name returns numeric ID 202 after a deletion/recreation, while its fetched commit C and tree T happen to match the original object hashes. Design a read-only Python verify_source_subject() interface, a structured verdict, and positive/negative tests. Decide whether the current repository inherits the old registry's custody acceptance or writer authority.",
+      "expected_properties": [
+        "Treats stable provider repository numeric ID as part of the exact source subject, independent of mutable owner/name text and Git content hashes.",
+        "Returns a source-identity mismatch or failed current-custody verdict for ID 202 against pinned ID 101, even when commit C and tree T match.",
+        "Shows a passing control when provider ID, full name, immutable commit, and tree all match; includes explicit negative tests for changed repository ID and mismatched tree.",
+        "Preserves old ID 101 receipts as historical evidence only and does not transfer writer authorization, release, or installation claims to ID 202."
+      ],
+      "failure_signals": [
+        "Uses owner/name and matching commit hash alone to mark the reconstructed repository as the accepted registry subject.",
+        "Silently updates the pinned numeric repository ID or reports current custody PASS despite subject mismatch.",
+        "Inherits a historical writer lease, release state, or target operation solely because object bytes match."
+      ],
+      "rationale": "Tests Five's stable repository-identity security boundary under GitHub repository recreation, a provenance failure distinct from pathset or artifact-download checks."
+    },
+    {
+      "case_id": "five-eval-03",
+      "prompt": "Write a tiny Python or JSON state machine for an independent source-review finding tracker. Candidate A at immutable commit aaa has one reproducible Medium defect with signature bad-mode; the author uploads successor commit bbb with a correction and two incidental style changes. The same defect is reported twice again against aaa. Show deduplication, immutable review history, successor recheck, and the terminal condition when bbb passes all frozen High/Medium predicates.",
+      "expected_properties": [
+        "Groups recurring bad-mode reports against immutable candidate aaa into one finding family while retaining evidence references.",
+        "Preserves aaa's failed historical verdict and does not retroactively mark it passed after successor bbb arrives.",
+        "Creates a distinct review subject for bbb and independently retests the frozen acceptance checks before concluding it passed.",
+        "Terminates after accepted criteria pass and unresolved High and Medium counts equal zero; incidental LOW/style changes do not indefinitely block."
+      ],
+      "failure_signals": [
+        "Self-patches candidate a or silently transfers its failed verdict to bbb.",
+        "Inflates three duplicate reports into three independent Medium findings.",
+        "Refuses completion solely to chase optional style attestations after the bounded acceptance criteria pass."
+      ],
+      "rationale": "Tests Five's independent reviewer evidence lifecycle and bounded stopping rule through an implementable state machine."
+    }
+  ]
+}

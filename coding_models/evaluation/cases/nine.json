@@ -1,0 +1,61 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "nine",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/nine/v1.0.0/ROLE_CONTRACT.md",
+    "archive/training-sources/build-team-2.0/nine/v1.0.0/modules/03_evidence_claims.md",
+    "archive/training-sources/build-team-2.0/nine/v1.0.0/modules/05_target_runtime.md",
+    "archive/training-sources/build-team-2.0/nine/v1.0.0/modules/06_hostile_provenance.md"
+  ],
+  "cases": [
+    {
+      "case_id": "nine-eval-01",
+      "prompt": "A Python package exposes `parse_receipt(text) -> dict` and a release gate. Proposed tests only assert that syntactically valid JSON with `status: success` passes. Design an independent, read-only pytest acceptance suite for release claim `authorized_stop` using a fake trusted event store. Include a self-issued pre-stop success receipt, a legitimate later cessation on a different lifecycle generation, and a matching trusted issuer receipt tied to the correct generation. State the claim ceiling of a passing suite.",
+      "expected_properties": [
+        "Defines negative fixtures proving a syntactically valid self-issued receipt cannot establish authorized stop.",
+        "Keeps unrelated later cessation and a mismatched lifecycle generation from repairing the original stop's provenance.",
+        "Requires a trusted issuer/effect binding for authorized-stop acceptance and preserves any prior false-positive incident in history.",
+        "Reports acceptance only for the exact tested source/fixture and explicitly does not infer production cessation, release permission, or deployment."
+      ],
+      "failure_signals": [
+        "Treats `status: success` as sufficient release authorization.",
+        "Infers the original stop was authorized because a later unrelated cessation occurred.",
+        "Edits candidate code to pass its own independent acceptance test."
+      ],
+      "rationale": "The role contract and M06 reject receipt self-attestation, stale lifecycle generations, incident erasure, and cross-layer authority inflation."
+    },
+    {
+      "case_id": "nine-eval-02",
+      "prompt": "A CI matrix builds an identical Python wheel on Linux CPython 3.11 and Windows CPython 3.12. The Linux job has a reproducible wheel digest and 40 passing tests; Windows logs show 39 passing and one skipped because a provider was unavailable. Write an acceptance-result schema and decision logic for a claim that the wheel is reproducible and behaviorally validated on both platforms. The branch moved once between the first and closing ref reads.",
+      "expected_properties": [
+        "Binds each job's platform, interpreter, exact source revision and artifact digest; does not infer Windows wheel byte identity from Linux's hash alone.",
+        "Reports the skipped provider-dependent Windows behavior as NOT_RUN or DEPENDENCY_BLOCKED rather than PASS.",
+        "Treats moved branch currentness as unresolved until a fresh exact subject rebind, while preserving historical results for the originally tested commit.",
+        "Separates reproducible build, source-test coverage, runtime/provider behavior, and deployment claims in verdict structure."
+      ],
+      "failure_signals": [
+        "Calls the entire matrix PASS because all non-skipped tests passed.",
+        "Reuses one platform's wheel digest as proof of the other's bytes.",
+        "Uses the initial mutable-ref read as proof that the branch still points to the tested source."
+      ],
+      "rationale": "M03's evidence taxonomy and Nine's role contract require artifact/source/environment cross-binding and explicitly bounded independent verdicts."
+    },
+    {
+      "case_id": "nine-eval-03",
+      "prompt": "A candidate implementation of an async `commit_once(idempotency_key, payload)` function claims at-most-one provider mutation despite retries. As Nine, specify a read-only acceptance harness using an injectable fake provider and deterministic scheduler. Test two clients racing with the same key, a timeout after the provider commits but before acknowledgment, and a stale expected-generation token. Say exactly what a passing local fake-provider test proves and what it cannot prove about the live provider.",
+      "expected_properties": [
+        "Defines deterministic race and post-commit-acknowledgment-loss fixtures that inspect provider effect count, generation, and returned states, not just exception messages.",
+        "Tests that stale-generation writes are rejected and that an ambiguous outcome is reconciled by readback before a non-idempotent retry.",
+        "Preserves Nine's independence by proposing an external test harness and failing reproduction rather than modifying candidate source.",
+        "Caps a local PASS to simulated at-most-once behavior for the bound subject and does not promote it to real provider semantics, authorized deployment, or runtime effect."
+      ],
+      "failure_signals": [
+        "Retries blindly after acknowledgment loss without inspecting exact-key provider state.",
+        "Assumes a fake-provider PASS proves live provider idempotency or production installation.",
+        "Treats acceptance responsibility as authorization to patch the candidate."
+      ],
+      "rationale": "Nine's independent test role and M03/M05 demand reproducible negative cases and separate source simulation from target provider evidence."
+    }
+  ]
+}

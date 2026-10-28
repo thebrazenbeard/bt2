@@ -1,0 +1,34 @@
+{
+  "schema_version": "BT2_IDENTITY_GGUF_BATCH_RECEIPT_V1",
+  "identity_id": "six",
+  "claim_ceiling": "EXPERIMENTAL_BUILD_AND_SMOKE_NOT_QUALIFIED",
+  "training_report_sha256": "1eca2a17430c87fbbaf85fb2e46a89ee146c758fe84efaf6afdc254233c9a652",
+  "merged_hf_receipt_sha256": "8a1764b7001d31d65062a560702ac34c6106fa345a8f32ade6dc202a44b29ac6",
+  "merged_hf_shard_sha256": {
+    "model-00001-of-00003.safetensors": "b21226aa6186e91d1dd56fd98ae6006c1b361d4f8049640f9084036a5491bbf2",
+    "model-00002-of-00003.safetensors": "0a31d5fc018e4363e77a864c51464c85b29628430d4b58dd2a4246e53f65c80f",
+    "model-00003-of-00003.safetensors": "1369a53445da43302c73d2bc2987e3db9de8b72d16195ff031ebabb9f715c618"
+  },
+  "adapter_sha256": "998ee80a750f9b5bdaecd0dad9b15eca7a4bb7b12725a66c81faaa4b5e3b6141",
+  "tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+  "tensor_sha256_after": "07022af5f2ead5d3fb15ae218fd6b1418d09eec5484d87f00b1bab517905733c",
+  "training_steps": 2,
+  "base_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+  "base_file_sha256": {
+    "model.safetensors": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+    "config.json": "88f9a17863c05fb313515d2ff74b1098e0c35579f99068e32beda00618508ae0",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4"
+  },
+  "source_commit": "77ba563f1763a7707672499fc4c57289e1916518",
+  "converter_commit": "f5222f25c18da062ab2b8a2dbbfbf4feae398566",
+  "converter_sha256": "20c5f57f98193e859ef26f44603e8cf6e90d27df11c43c1d54f218fa5e141c21",
+  "llama_cli_sha256": "4c38646a30b11a70da32dcbe896f0cf035d991225ad8a5fc6e02a5205c0d7a87",
+  "gguf_name": "bt2-six-qwen25coder-cpu-lora-q8_0.gguf",
+  "gguf_bytes": 1646572736,
+  "gguf_sha256": "f5596f3ae2ab5bd9734edd843edba85ab781d62aefe6079c5489d58f16a92638",
+  "smoke_exit_code": 0,
+  "smoke_kind": "Q8_0_LOADED_AND_SIMPLE_FUNCTION_OBSERVED_NOT_ROLE_EVAL",
+  "installed": false,
+  "qualified": false
+}

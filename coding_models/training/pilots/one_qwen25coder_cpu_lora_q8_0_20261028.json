@@ -1,0 +1,91 @@
+{
+  "schema_version": "BT2_IDENTITY_LORA_GGUF_EXPERIMENT_RECEIPT_V1",
+  "observed_date_utc": "2026-10-28",
+  "identity_id": "one",
+  "artifact_state": "EXPERIMENTAL_MODEL_BUILT_UNQUALIFIED_NOT_INSTALLED",
+  "claim_ceiling": "MECHANISM_AND_LOCAL_INFERENCE_SMOKE_ONLY",
+  "artifact_location": "Lappy isolated D: training workspace; no weights committed to Git",
+  "base": {
+    "hf_repo": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "hf_revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a",
+    "model_safetensors_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+    "model_safetensors_bytes": 3087467144,
+    "existing_ollama_reference": "qwen2.5-coder:1.5b-instruct-q8_0",
+    "existing_ollama_blob_sha256": "58db9b8722fe2dec6918b842b05de814dd56c6a8bc55f35c5e8b66812206398e"
+  },
+  "training": {
+    "bt2_source_commit": "45cc1ac394f6dabcb881237dbc087868fcea0a78",
+    "entrypoint": "tools/train_identity_lora_pilot.py",
+    "candidate_dataset_sha256": "b5070c1c7e97a5d0b634b2a0a5c5eca799896efd0aca99efe4156a77053a396c",
+    "device": "cpu",
+    "threads": 2,
+    "seed": 74413,
+    "max_length": 768,
+    "steps": 2,
+    "candidate": {
+      "learning_rate": 0.0002,
+      "trainable_tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+      "trainable_tensor_sha256_after": "edfdc1ffd9f25002fc8a63a12d62d03a0264fbea2655c1bc3eb5035e9ac93c61",
+      "adapter_safetensors_sha256": "352897320b199bdf6e02f15e8f53f225f7e6ddaea1c2b515946436f865d83bff",
+      "training_report_sha256": "3f19d304e42c43977c23da9f07ce7f09e9f532c96f4afa568b528c62335fa64e",
+      "losses": [4.211645126342773, 4.562398433685303],
+      "training_elapsed_seconds": 50.609,
+      "fresh_process_adapter_reload_tensor_digest_match": true
+    },
+    "sham_zero_learning_rate": {
+      "trainable_tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+      "trainable_tensor_sha256_after": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+      "adapter_safetensors_sha256": "1a41f43982716b19df8eed7bf079d6244f5d09b266d3553074d470b40b8a91d7",
+      "losses": [4.211645126342773, 4.565613269805908]
+    },
+    "corrupted_rotated_labels": {
+      "trainable_tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+      "trainable_tensor_sha256_after": "974daf8d6e8384203e5cff53172fe6d2a02ee282183033774d4d999397985bbd",
+      "adapter_safetensors_sha256": "7c89706d5331774d8b7e3a60d41297cfc877a5557f860b4f06b7d4bf1dd32c2e",
+      "losses": [4.938828945159912, 5.00181770324707]
+    },
+    "software_versions": {
+      "torch": "2.9.1+cu128",
+      "transformers": "5.14.1",
+      "peft": "0.19.1"
+    }
+  },
+  "merge": {
+    "entrypoint": "tools/merge_identity_lora_hf.py",
+    "merged_hf_safetensors_sha256": {
+      "model-00001-of-00003.safetensors": "878706eb307f68e0a1f3a7e5ea4a07960a012396ffb5e6ed18acbf30cdfda058",
+      "model-00002-of-00003.safetensors": "445e0f22be61805e52f99f264348388af5d7e01e0cd78bc654fe17e7f2ac24dc",
+      "model-00003-of-00003.safetensors": "866a6135380d754f3a84d2890930a5b1d315fd1782d083739b98ed47391f5dbc"
+    },
+    "safe_merge": true,
+    "elapsed_seconds": 29.219
+  },
+  "gguf": {
+    "filename": "bt2-one-qwen25coder-step2-q8_0.gguf",
+    "converter": "llama.cpp/convert_hf_to_gguf.py",
+    "llama_cpp_revision": "f5222f25c18da062ab2b8a2dbbfbf4feae398566",
+    "outtype": "q8_0",
+    "bytes": 1646572704,
+    "sha256": "297f71992ff92092dd3e0e373084c455cc30f093c4e27aac1bb14cbc31c33dd6",
+    "conversion_exit_code": 0,
+    "local_inference": {
+      "tool": "llama-cli",
+      "model_loaded_as": "Q8_0",
+      "gpu_layers": 0,
+      "threads": 2,
+      "temperature": 0,
+      "prompt": "Write a Python function named add that returns a+b. Output code only.",
+      "observed_output": "def add(a, b):\n    return a + b",
+      "process_exit_code": 0,
+      "status": "PASS_ONE_SMOKE_NOT_QUALITY_EVAL"
+    }
+  },
+  "limitations": [
+    "Only two optimizer steps on unqualified synthetic examples; no demonstrated identity fidelity, coding improvement, or generalization.",
+    "Sham and corrupted-label arms verify training mechanics, not role competence.",
+    "A tiny same-session function-generation smoke is not a blinded holdout or comparison with baseline and prompt-only controls.",
+    "Labyrinth's existing arithmetic-focused HF trainer was not used for this role-specific adapter; its extension and independent evaluation remain future work.",
+    "No model was installed into Ollama, activated, or deployed; the existing donor and running services were preserved.",
+    "The other twelve BT2 identities have source profiles and candidate examples but do not yet have individual trained GGUF builds."
+  ]
+}

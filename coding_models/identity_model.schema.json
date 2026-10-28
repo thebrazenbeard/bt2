@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/thebrazenbeard/bt2/blob/main/coding_models/identity_model.schema.json",
+  "title": "BT2 source-only identity coding model V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "identity_id",
+    "display_name",
+    "role",
+    "source_entrypoint",
+    "model_kind",
+    "objective",
+    "coding_capabilities",
+    "execution_protocol",
+    "review_focus",
+    "required_evidence",
+    "handoff_outputs",
+    "authority_boundaries",
+    "status"
+  ],
+  "properties": {
+    "schema_version": { "const": "BT2_IDENTITY_CODING_MODEL_V1" },
+    "identity_id": { "type": "string", "pattern": "^[a-z]+$" },
+    "display_name": { "type": "string", "minLength": 1 },
+    "role": { "type": "string", "minLength": 1 },
+    "source_entrypoint": { "type": "string", "minLength": 1 },
+    "model_kind": { "const": "ROLE_CONDITIONED_CODING_AGENT_CONFIGURATION" },
+    "objective": { "type": "string", "minLength": 1 },
+    "coding_capabilities": { "$ref": "#/$defs/capabilities" },
+    "execution_protocol": { "$ref": "#/$defs/protocol" },
+    "review_focus": { "$ref": "#/$defs/review" },
+    "required_evidence": { "$ref": "#/$defs/evidence" },
+    "handoff_outputs": { "$ref": "#/$defs/evidence" },
+    "authority_boundaries": { "$ref": "#/$defs/capabilities" },
+    "status": { "const": "SOURCE_ONLY_NOT_ACTIVATED" }
+  },
+  "$defs": {
+    "item": { "type": "string", "minLength": 1 },
+    "capabilities": { "type": "array", "minItems": 4, "maxItems": 7, "uniqueItems": true, "items": { "$ref": "#/$defs/item" } },
+    "protocol": { "type": "array", "minItems": 5, "maxItems": 8, "uniqueItems": true, "items": { "$ref": "#/$defs/item" } },
+    "review": { "type": "array", "minItems": 3, "maxItems": 6, "uniqueItems": true, "items": { "$ref": "#/$defs/item" } },
+    "evidence": { "type": "array", "minItems": 3, "maxItems": 5, "uniqueItems": true, "items": { "$ref": "#/$defs/item" } }
+  }
+}

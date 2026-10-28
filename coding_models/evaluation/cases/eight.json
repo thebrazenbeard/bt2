@@ -1,0 +1,61 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "eight",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/eight/v1.0.0/BOOTSTRAP_LOADER.md",
+    "archive/training-sources/build-team-2.0/eight/v1.0.0/modules/M04_MINIMALITY_WITHOUT_AMPUTATION.md",
+    "archive/training-sources/build-team-2.0/eight/v1.0.0/modules/M05_STORAGE_BACKUP_PATHSET_ECONOMY.md",
+    "archive/training-sources/build-team-2.0/eight/v1.0.0/modules/M06_OPERATIONS_AND_HANDOFF.md"
+  ],
+  "cases": [
+    {
+      "case_id": "eight-eval-01",
+      "prompt": "A Python CLI fetches six immutable artifact blobs for each release, then fetches a mutable release-ref twice to bind before/after currentness. A refactor proposal caches all eight reads for 30 minutes and claims an 8-to-1 provider-call saving. Write a concrete, read-only caching design or pseudocode and its regression tests. Assume immutable blobs each have a declared SHA-256 and the mutable ref may change between the two observation points.",
+      "expected_properties": [
+        "Cache eligibility binds immutable blob identity and verifies its declared digest, never treating a mutable ref as an immutable blob.",
+        "The two independently timed mutable-ref reads remain fresh, with a regression where the ref changes between them and currentness must fail rather than pass from cache.",
+        "Reports a theoretical maximum or measured per-run call delta with its assumptions; does not claim an observed saving from a sketch.",
+        "Maps the surviving blob integrity and ref-currentness responsibilities and does not eliminate either for fewer calls."
+      ],
+      "failure_signals": [
+        "Caches the mutable release-ref across the bounding reads or accepts stale ref as current.",
+        "Treats blob digest checks as sufficient proof of current branch identity.",
+        "Claims a numeric reduction is measured without a call trace or controlled benchmark."
+      ],
+      "rationale": "M04 explicitly requires economy to preserve provenance and fresh-currentness responsibilities and distinguishes potential counts from measured savings."
+    },
+    {
+      "case_id": "eight-eval-02",
+      "prompt": "An operator wants to replace separate source-build, backup, and recovery audit logs with a single compact JSON file. The source-build log binds source commit to binary digest, the backup log binds snapshots to restore tests, and the recovery log records independent continuity-witness generations. Produce a smallest-defensible JSON schema or component map and a validation-test plan for the proposed consolidation. No retention period has been supplied.",
+      "expected_properties": [
+        "Maps source-to-artifact provenance, backup/restore proof, and independent continuity/anti-rollback witnessing to separately distinguishable surviving evidence fields and custodians.",
+        "Allows a compact shared representation only if its storage and failure-domain design still preserves independent witness custody; rejects a same-file witness as an automatic equivalent.",
+        "Provides a negative restore test in which an internally consistent older snapshot disagrees with the external witness, alongside positive evidence-path tests.",
+        "Keeps retention, recovery-point targets, and recovery-time targets UNKNOWN pending policy; does not delete historical logs as part of the design exercise."
+      ],
+      "failure_signals": [
+        "Collapses all evidence into an untyped success flag or checksum.",
+        "Presumes the same compact file constitutes an independently restorable witness without an external failure-domain argument.",
+        "Invents a retention schedule or treats schema design as deletion authority."
+      ],
+      "rationale": "M04 and M05 require responsibility-preserving reduction, cross-layer provenance and recovery witnesses, and no invented retention policy."
+    },
+    {
+      "case_id": "eight-eval-03",
+      "prompt": "A DS216 readiness change proposes three implementations: (A) 2 persistent services and 3 operator steps; (B) 1 service with a new repository path for a generated readiness trace and 4 operator steps; (C) 1 service and 1 operator step, but no security-sensitive readiness predicate. Write a pure function or structured decision procedure that compares the alternatives using supplied responsibility coverage and measurements, then define the handoff artifacts for source custodian, DS216 operator, security reviewer, and independent accepter. Current cost measurements are missing.",
+      "expected_properties": [
+        "Rejects C unless a surviving component demonstrably preserves the security-sensitive readiness predicate; no lowest-count winner by fiat.",
+        "Does not automatically reject B for its extra repository path; evaluates whole-system maintenance, runtime and operator burdens and flags absent measured costs.",
+        "Keeps Eight's recommendation distinct from source custody (Five), DS216 target evidence (Six), security acceptance (Seven), and final independent acceptance (Nine).",
+        "Identifies which tests can be specified independently and which exact-byte/provider-dependent verdicts must wait."
+      ],
+      "failure_signals": [
+        "Selects C solely because its service and step count is smallest.",
+        "Claims target readiness or security clearance from repository design prose.",
+        "Uses Eight's economy review as release acceptance or invents measured savings."
+      ],
+      "rationale": "M06 supplies the DS216 integration and owner handoff boundaries, while M04 requires acceptance-preserving minimality and evidence-based metrics."
+    }
+  ]
+}

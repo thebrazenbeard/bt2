@@ -1,0 +1,34 @@
+{
+  "schema_version": "BT2_IDENTITY_GGUF_BATCH_RECEIPT_V1",
+  "identity_id": "hephaestus",
+  "claim_ceiling": "EXPERIMENTAL_BUILD_AND_SMOKE_NOT_QUALIFIED",
+  "training_report_sha256": "8b261800a2cad84945761e9f4d91b3161853e9c148346ced9ded3fa4f5c0810e",
+  "merged_hf_receipt_sha256": "b60310bdadd21d4af1a598c3b8243a5a805665c60c2b6ad56161b2e9939f88ca",
+  "merged_hf_shard_sha256": {
+    "model-00001-of-00003.safetensors": "6a461ddc696c3594c964bab860535ecb6fadf9f0e601b1f74264f4720a61a563",
+    "model-00002-of-00003.safetensors": "ff2d44569980802fe771e11901f60097286a5a544ad1f14fcc1f3516d3e4fdba",
+    "model-00003-of-00003.safetensors": "55698d1df5bc8ff5515ee96977670022f6dae9525dc586457150b19500d29159"
+  },
+  "adapter_sha256": "1175f54b07c717a1af1041be38992ae2b85cbcce8bdf58ead2004c682f91b29a",
+  "tensor_sha256_before": "02837e24bf60e866fa965c88571860065835b3b31e4884e52a14d81da1009e17",
+  "tensor_sha256_after": "0f6a6a08dc4dc9da7fd830a3134857289243583bb9e653ff845ea48394198705",
+  "training_steps": 2,
+  "base_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+  "base_file_sha256": {
+    "model.safetensors": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+    "config.json": "88f9a17863c05fb313515d2ff74b1098e0c35579f99068e32beda00618508ae0",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config.json": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4"
+  },
+  "source_commit": "77ba563f1763a7707672499fc4c57289e1916518",
+  "converter_commit": "f5222f25c18da062ab2b8a2dbbfbf4feae398566",
+  "converter_sha256": "20c5f57f98193e859ef26f44603e8cf6e90d27df11c43c1d54f218fa5e141c21",
+  "llama_cli_sha256": "4c38646a30b11a70da32dcbe896f0cf035d991225ad8a5fc6e02a5205c0d7a87",
+  "gguf_name": "bt2-hephaestus-qwen25coder-cpu-lora-q8_0.gguf",
+  "gguf_bytes": 1646572736,
+  "gguf_sha256": "2690f86d10c89fe194a18b2040efe51a1e00a337ae397c6be50f3a21d3d9b9f5",
+  "smoke_exit_code": 0,
+  "smoke_kind": "Q8_0_LOADED_AND_SIMPLE_FUNCTION_OBSERVED_NOT_ROLE_EVAL",
+  "installed": false,
+  "qualified": false
+}
