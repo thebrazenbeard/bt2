@@ -22,10 +22,41 @@ from train_identity_lora_pilot import sha256_file, trainable_digest
 from validate_personality_sft import CASE_ROOT, validate_persona_cases
 
 
-SCHEMA = "BT2_LABYRINTH_SCHEDULED_PERSONALITY_LORA_V1"
+SCHEMA = "BT2_LABYRINTH_SCHEDULED_PERSONALITY_LORA_V2"
 CEILING = "SYNTHETIC_ROLE_DISPOSITION_WEIGHT_UPDATE_NOT_BEHAVIOR_QUALIFIED"
 LEVELS = ("grounded", "adversarial")
 REQUIRED_BASE = ("model.safetensors", "config.json", "tokenizer.json", "tokenizer_config.json")
+REQUIRED_METADATA = REQUIRED_BASE[1:]
+OPTIONAL_METADATA = ("generation_config.json", "special_tokens_map.json",
+                     "added_tokens.json", "vocab.json", "merges.txt",
+                     "tokenizer.model")
+KNOWN_METADATA = REQUIRED_METADATA + OPTIONAL_METADATA
+
+
+def donor_metadata_digests(base: Path) -> dict[str, str]:
+    """Pin required and optional HF model/tokenizer inputs, including absence."""
+    digests = {}
+    for name in KNOWN_METADATA:
+        file = base / name
+        if name in OPTIONAL_METADATA and not file.exists() and not file.is_symlink():
+            continue
+        require(file.is_file() and not file.is_symlink(),
+                f"missing or unsafe HF donor metadata: {name}")
+        digests[name] = sha256_file(file)
+    return digests
+
+
+def verify_donor_metadata(base: Path, expected: object) -> dict[str, str]:
+    require(isinstance(expected, dict) and
+            set(REQUIRED_METADATA) <= set(expected) <= set(KNOWN_METADATA),
+            "missing or invalid training-time donor metadata receipt")
+    require(all(isinstance(value, str) and len(value) == 64 and
+                all(ch in "0123456789abcdef" for ch in value)
+                for value in expected.values()),
+            "invalid training-time donor metadata SHA-256")
+    actual = donor_metadata_digests(base)
+    require(actual == expected, "donor metadata changed since personality training")
+    return actual
 
 
 def checked_checkout(path: Path, expected: str, package_file: str) -> Path:
@@ -125,6 +156,7 @@ def preflight(args) -> dict:
         require(file.is_file() and not file.is_symlink(), f"missing or unsafe HF donor file: {name}")
     require(sha256_file(base / "model.safetensors") == args.base_sha256,
             "pinned HF donor digest mismatch")
+    base_metadata_sha256 = donor_metadata_digests(base)
     output = Path(args.run_dir).resolve(strict=False)
     require(not output.exists() and not output.is_symlink() and output.parent.is_dir(),
             "run directory must be new under existing parent")
@@ -134,7 +166,8 @@ def preflight(args) -> dict:
     return {"bt2": bt2, "labyrinth": labyrinth, "base": base, "dossier": dossier,
             "profile": load_models()[args.identity], "schedule": schedule,
             "cases_by_id": {c["id"]: c for c in cases}, "output": output,
-            "dataset_sha256": sha256_file(CASE_ROOT / f"{args.identity}.json")}
+            "dataset_sha256": sha256_file(CASE_ROOT / f"{args.identity}.json"),
+            "base_metadata_sha256": base_metadata_sha256}
 
 
 def run_training(args) -> dict:
@@ -196,6 +229,7 @@ def run_training(args) -> dict:
     _assert_frozen_state(model, torch, frozen_before, buffers_before, "persona training")
     require(sha256_file(info["base"] / "model.safetensors") == args.base_sha256,
             "HF donor changed during persona run")
+    verify_donor_metadata(info["base"], info["base_metadata_sha256"])
     checked_checkout(info["bt2"], args.source_commit, "tools/train_personality_lora.py")
     checked_checkout(info["labyrinth"], args.labyrinth_commit, "labyrinth/curriculum.py")
     require((after != before) == (args.arm != "sham"),
@@ -219,6 +253,7 @@ def run_training(args) -> dict:
         "persona_instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest(),
         "base_model_dir": str(info["base"]),
         "base_model_sha256": args.base_sha256,
+        "base_metadata_sha256": info["base_metadata_sha256"],
         "base_model_bytes": (info["base"] / "model.safetensors").stat().st_size,
         "schedule": info["schedule"], "seed": args.seed, "steps": args.steps,
         "max_length": args.max_length, "threads": args.threads,
@@ -249,6 +284,7 @@ def verify_reload(args) -> dict:
     donor = Path(report["base_model_dir"])
     require(sha256_file(donor / "model.safetensors") == report["base_model_sha256"],
             "donor changed after persona training")
+    verify_donor_metadata(donor, report.get("base_metadata_sha256"))
     file = run / "adapter/adapter_model.safetensors"
     require(sha256_file(file) == report["adapter_safetensors_sha256"],
             "persona adapter changed after training")

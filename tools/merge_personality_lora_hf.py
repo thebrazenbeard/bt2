@@ -15,7 +15,8 @@ import time
 
 from identity_coding_models import ROOT, require
 from train_identity_lora_pilot import sha256_file
-from train_personality_lora import SCHEMA, CEILING, checked_checkout, require_isolated_output
+from train_personality_lora import (SCHEMA, CEILING, checked_checkout,
+                                    require_isolated_output, verify_donor_metadata)
 
 
 MERGE_SCHEMA = "BT2_LABYRINTH_PERSONALITY_MERGED_HF_V1"
@@ -80,11 +81,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     donor_file = donor / "model.safetensors"
     require(donor_file.is_file() and not donor_file.is_symlink(), "missing/nonregular donor weights")
     require(sha256_file(donor_file) == donor_sha, "HF donor changed since persona training")
-    donor_meta = {}
-    for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
-        path = donor / name
-        require(path.is_file() and not path.is_symlink(), f"missing/nonregular donor {name}")
-        donor_meta[name] = sha256_file(path)
+    donor_meta = verify_donor_metadata(donor, report.get("base_metadata_sha256"))
     adapter = run / "adapter"
     require(adapter.is_dir() and not adapter.is_symlink(), "missing/nonregular adapter directory")
     adapter_file = adapter / "adapter_model.safetensors"
