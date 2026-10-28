@@ -53,6 +53,11 @@ membership against the V2 worker topology. The
 unqualified candidate conversations, CPU PEFT LoRA build tools, and artifact
 receipts. [39 role-specific evaluation drafts](coding_models/evaluation/README.md)
 are public, author-created questions, **not a blind qualification suite**.
+The new [operational personality conditioning corpus](coding_models/personality/README.md)
+adds separate source-grounded behavioral dispositions and unqualified cases
+for every role. Its Labyrinth-scheduled CPU PEFT route is distinct from
+Labyrinth's size-limited numerical `train-hf` and requires independent
+evaluation before any personality-fidelity claim.
 
 On 2026-10-28, an isolated Lappy workspace produced **13 distinct Q8_0 GGUF
 files**, one per role, from a pinned Qwen2.5-Coder-1.5B-Instruct Hugging Face
