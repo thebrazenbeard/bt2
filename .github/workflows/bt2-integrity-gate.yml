@@ -1,0 +1,33 @@
+name: BT2 Integrity Gate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bt2-integrity-gate:
+    name: bt2-integrity-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out proposed merge
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install pinned YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Check V3 historical payload and mutation controls
+        # V3 is checked against its seed Git objects; a V3 acceptance doc was
+        # intentionally amended after that seed, so live V3 bytes are not frozen.
+        run: |
+          python native/project/validation/verify_bt2_v3_history.py
+          python -m unittest discover -s native/project/validation -p 'test_bt2_v3_history_controls.py' -v
+          python -m unittest discover -s native/project/validation -p 'test_bt2_integrity_workflow_controls.py' -v
+      - name: Check V4 and V5 source bindings
+        run: |
+          python tools/qualification/test_lantern_postgresql_v4_source_binding.py
+          python native/project/validation/test_bt2_native_v5_source_binding.py
+      - name: Check V5 recovery pointers
+        run: python -m unittest discover -s native/project/tests -p 'test_bt2_native_v5_recovery_pointers.py' -v
