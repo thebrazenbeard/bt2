@@ -15,7 +15,8 @@ import time
 
 from identity_coding_models import ROOT, require
 from train_identity_lora_pilot import sha256_file
-from train_personality_lora import SCHEMA, CEILING, checked_checkout, require_isolated_output
+from train_personality_lora import (SCHEMA, CEILING, checked_checkout,
+                                    require_isolated_output, verify_donor_metadata)
 
 
 MERGE_SCHEMA = "BT2_LABYRINTH_PERSONALITY_MERGED_HF_V1"
@@ -80,11 +81,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     donor_file = donor / "model.safetensors"
     require(donor_file.is_file() and not donor_file.is_symlink(), "missing/nonregular donor weights")
     require(sha256_file(donor_file) == donor_sha, "HF donor changed since persona training")
-    donor_meta = {}
-    for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
-        path = donor / name
-        require(path.is_file() and not path.is_symlink(), f"missing/nonregular donor {name}")
-        donor_meta[name] = sha256_file(path)
+    donor_meta = verify_donor_metadata(donor, report.get("base_metadata_sha256"))
     adapter = run / "adapter"
     require(adapter.is_dir() and not adapter.is_symlink(), "missing/nonregular adapter directory")
     adapter_file = adapter / "adapter_model.safetensors"
@@ -149,9 +146,9 @@ def merge(args) -> dict:
     require(sha256_file(context["dataset_file"]) ==
             context["report"]["personality_dataset_sha256"],
             "persona dataset changed during merge")
-    for name, digest in context["donor_meta_sha256"].items():
-        require(sha256_file(context["base_dir"] / name) == digest,
-                f"donor {name} changed during merge")
+    # Re-enumerate the complete tokenizer template set after the expensive
+    # merge: checking only receipt keys misses new precedence-changing files.
+    verify_donor_metadata(context["base_dir"], context["donor_meta_sha256"])
     checked_checkout(context["bt2_dir"], context["report"]["bt2_source_commit"],
                      "tools/train_personality_lora.py")
     checked_checkout(context["labyrinth_dir"],

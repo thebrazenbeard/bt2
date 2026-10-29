@@ -53,6 +53,10 @@ class MergePersonaPreflightTests(unittest.TestCase):
             "labyrinth_scheduler_commit": "b" * 40,
             "base_model_dir": str(donor),
             "base_model_sha256": module.sha256_file(donor / "model.safetensors"),
+            "base_metadata_sha256": {
+                name: module.sha256_file(donor / name)
+                for name in ("config.json", "tokenizer.json", "tokenizer_config.json")
+            },
             "adapter_safetensors_sha256": module.sha256_file(run / "adapter/adapter_model.safetensors"),
             "personality_dataset_sha256": module.sha256_file(dataset),
             "persona_instruction_sha256": "c" * 64,
@@ -127,11 +131,77 @@ class MergePersonaPreflightTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         self._check(run, destination, labyrinth, source)
 
+    def test_rejects_donor_metadata_changed_since_training(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, labyrinth, donor, run, report = self._fixture(temp)
+            for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
+                with self.subTest(name=name):
+                    file = donor / name
+                    original = file.read_bytes()
+                    file.write_bytes(original + b"changed-after-training")
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        self._check(run, root / "output", labyrinth, source)
+                    file.write_bytes(original)
+            extra = donor / "special_tokens_map.json"
+            extra.write_text('{"eos_token": "<eos>"}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                self._check(run, root / "output", labyrinth, source)
+            self.assertFalse((root / "output").exists())
+
+    def test_merge_checks_standalone_and_named_template_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, labyrinth, donor, run, report = self._fixture(temp)
+            (donor / "tokenizer_config.json").write_text(
+                '{"chat_template":"embedded-default"}', encoding="utf-8")
+            standalone = donor / "chat_template.jinja"
+            standalone.write_text("standalone-default", encoding="utf-8")
+            legacy = donor / "chat_template.json"
+            legacy.write_text('{"chat_template":"legacy"}', encoding="utf-8")
+            extras = donor / "additional_chat_templates"
+            extras.mkdir()
+            named = extras / "tools.jinja"
+            named.write_text("tools-v1", encoding="utf-8")
+            from train_personality_lora import donor_metadata_digests
+            report["base_metadata_sha256"] = donor_metadata_digests(donor)
+            (run / "report.json").write_text(json.dumps(report), encoding="utf-8")
+            self.assertEqual(self._check(run, root / "output", labyrinth, source)
+                             ["donor_meta_sha256"], report["base_metadata_sha256"])
+            for path in (standalone, legacy, named):
+                with self.subTest(path=path):
+                    before = path.read_bytes()
+                    path.write_bytes(before + b"tampered")
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        self._check(run, root / "output", labyrinth, source)
+                    path.write_bytes(before)
+            (extras / "new.jinja").write_text("untracked-template", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                self._check(run, root / "output", labyrinth, source)
+            (extras / "new.jinja").unlink()
+            named.unlink()
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                self._check(run, root / "output", labyrinth, source)
+
+    def test_rejects_missing_or_untrusted_training_metadata_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, labyrinth, donor, run, report = self._fixture(temp)
+            for bad in (None, {}, {"config.json": "0" * 64},
+                        dict(report["base_metadata_sha256"], **{"unexpected.json": "0" * 64})):
+                with self.subTest(metadata=bad):
+                    broken = dict(report)
+                    if bad is None:
+                        broken.pop("base_metadata_sha256")
+                    else:
+                        broken["base_metadata_sha256"] = bad
+                    (run / "report.json").write_text(json.dumps(broken), encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        self._check(run, root / "output", labyrinth, source)
+
     def test_merge_writes_source_bound_receipt_in_new_directory(self):
         with tempfile.TemporaryDirectory() as temp:
             root, source, labyrinth, donor, run, _report = self._fixture(temp)
             output = root / "merged-hf"
             context = self._check(run, output, labyrinth, source)
+            inject_late_template = [False]
 
             class FakeMerged:
                 def save_pretrained(self, path, *, safe_serialization, max_shard_size):
@@ -161,6 +231,9 @@ class MergePersonaPreflightTests(unittest.TestCase):
                 def save_pretrained(self, path):
                     for name in ("tokenizer.json", "tokenizer_config.json"):
                         (Path(path) / name).write_text("{}", encoding="utf-8")
+                    if inject_late_template[0]:
+                        (donor / "chat_template.jinja").write_text(
+                            "injected-after-preflight", encoding="utf-8")
 
             fake = {
                 "torch": types.SimpleNamespace(set_num_threads=lambda _n: None, float32="float32"),
@@ -192,6 +265,19 @@ class MergePersonaPreflightTests(unittest.TestCase):
             })
             self.assertFalse(receipt["gguf_converted"])
             self.assertFalse(receipt["installed"])
+
+            # A standalone template added during the expensive merge must be
+            # detected too, even when absent from the training-time receipt.
+            inject_late_template[0] = True
+            late_output = root / "merge-with-late-donor-change"
+            late_context = self._check(run, late_output, labyrinth, source)
+            late_args = types.SimpleNamespace(run_dir=str(run), output_dir=str(late_output),
+                                              labyrinth_dir=str(labyrinth), threads=2)
+            with mock.patch.object(module, "validate_merge_inputs", return_value=late_context), \
+                 mock.patch.object(module, "checked_checkout", return_value=root), \
+                 mock.patch.dict(sys.modules, fake):
+                with self.assertRaisesRegex(ValueError, "donor metadata"):
+                    module.merge(late_args)
 
 
 if __name__ == "__main__":
