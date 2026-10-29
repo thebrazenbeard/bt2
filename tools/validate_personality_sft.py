@@ -16,6 +16,8 @@ from identity_coding_models import ROOT, load_models, require
 SCHEMA = "BT2_PERSONALITY_SFT_V1"
 STATUS = "SYNTHETIC_SOURCE_GROUNDED_UNQUALIFIED"
 CASE_ROOT = ROOT / "coding_models/personality/cases"
+USER_CORRECTION_SOURCE = "coding_models/personality/USER_TRAIT_CORRECTIONS_20261028.md"
+MAX_TRAIN_CASES = 16
 
 
 def _safe_source(raw: str) -> None:
@@ -35,7 +37,8 @@ def validate_persona_cases() -> dict[str, dict]:
     roles = load_models()
     found = set(path.stem for path in CASE_ROOT.glob("*.json"))
     require(found == set(roles), f"persona roster mismatch: missing={sorted(set(roles)-found)} extra={sorted(found-set(roles))}")
-    all_prompts: set[str] = set()
+    all_prompts: dict[str, tuple[str | None, set[str]]] = {}
+    shared_groups: dict[str, str] = {}
     output: dict[str, dict] = {}
     for identity in sorted(roles):
         path = CASE_ROOT / f"{identity}.json"
@@ -53,13 +56,18 @@ def validate_persona_cases() -> dict[str, dict]:
             require(isinstance(label, str) and 3 <= len(label) <= 120, "invalid trait label")
             require(label.casefold() not in labels, "duplicate trait label")
             labels.add(label.casefold())
-            require(trait.get("evidence_kind") in ("SOURCE", "INFERENCE"), "trait must classify evidence")
+            require(trait.get("evidence_kind") in ("SOURCE", "INFERENCE", "USER"),
+                    "trait must classify evidence")
+            if trait.get("evidence_kind") == "USER":
+                require(trait.get("source_basis") == USER_CORRECTION_SOURCE,
+                        "USER trait must cite the single Patrick-correction source note")
             _safe_source(trait.get("source_basis"))
             for field in ("observable_behavior", "anti_pattern"):
                 require(isinstance(trait.get(field), str) and len(trait[field]) >= 25,
                         f"short/empty trait {field}: {identity}")
         cases = doc.get("cases")
-        require(isinstance(cases, list) and len(cases) == 6, f"must have 6 persona cases: {identity}")
+        require(isinstance(cases, list) and 6 <= len(cases) <= MAX_TRAIN_CASES + 2,
+                f"persona case budget out of range: {identity}")
         ids = set()
         splits = {"train": [], "dev": []}
         for case in cases:
@@ -76,15 +84,32 @@ def validate_persona_cases() -> dict[str, dict]:
                         f"short/empty {field}: {key}")
             _safe_source(case.get("source_basis"))
             prompt = _prompt_key(case["task"])
-            require(prompt not in all_prompts, f"reused persona prompt: {key}")
-            all_prompts.add(prompt)
+            contrastive_group = case.get("contrastive_group")
+            if contrastive_group is not None:
+                require(isinstance(contrastive_group, str) and
+                        re.fullmatch(r"shared-[a-z0-9-]{3,80}", contrastive_group),
+                        f"invalid shared training group: {key}")
+                require(split == "train", "shared-group case cannot be in the public dev split")
+                prior_group_prompt = shared_groups.setdefault(contrastive_group, prompt)
+                require(prior_group_prompt == prompt,
+                        f"shared group must use exactly one task: {contrastive_group}")
+            prior = all_prompts.get(prompt)
+            if prior is not None:
+                require(contrastive_group is not None and
+                        prior[0] == contrastive_group and identity not in prior[1],
+                        f"reused persona prompt without a cross-role group: {key}")
+                prior[1].add(identity)
+            else:
+                all_prompts[prompt] = (contrastive_group, {identity})
             splits[split].append(case)
-        require(len(splits["train"]) == 4 and len(splits["dev"]) == 2,
+        train_count = len(splits["train"])
+        require(4 <= train_count <= MAX_TRAIN_CASES and train_count % 2 == 0 and
+                len(splits["dev"]) == 2,
                 f"train/dev count mismatch: {identity}")
         require({c["level"] for c in splits["train"]} == {"grounded", "adversarial"},
                 f"missing training level: {identity}")
-        require(sum(c["level"] == "grounded" for c in splits["train"]) == 2,
-                f"expected exactly two grounded train cases: {identity}")
+        require(sum(c["level"] == "grounded" for c in splits["train"]) == train_count // 2,
+                f"train levels must be balanced: {identity}")
         output[identity] = doc
     return output
 

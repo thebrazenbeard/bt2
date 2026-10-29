@@ -1,31 +1,42 @@
-# BT2 source-grounded operational personality conditioning — experimental
+# BT2 original-trait personality conditioning — experimental
 
-Each of the 13 role dossiers in `cases/*.json` contains 3–5+ sourced behavioral
-tendencies and six **synthetic, unqualified** coding conversations (four
-TRAIN, two public DEV). The 52 train and 26 dev cases target observable
-professional dispositions, not inner feelings, biological life, personal
-histories, identity continuity, self-awareness, or new permissions. A model
-responding in a role's style is not evidence it *is* that durable identity.
+The model goal is to preserve each identity's **originally designated cognitive
+personality** while retaining useful coding competence. Engineering assignment
+and personality are separate axes; a later narrow role contract does not
+silently redefine the personality. See
+[`USER_TRAIT_CORRECTIONS_20261028.md`](USER_TRAIT_CORRECTIONS_20261028.md)
+for Patrick's explicit corrections, the pinned original ten-facet source, and
+Masa/Mune/Hephaestus source precedence.
 
-| Identity | Target behavioral disposition (inference from role source) |
+Each of the 13 dossiers in `cases/*.json` is a synthetic and **unqualified**
+training proposal. The public DEV cases are not a sealed independent holdout.
+Training targets observable reasoning/interaction tendencies, not inner feelings,
+biological life, personal histories, identity continuity, self-awareness, or
+new permissions. A model responding in a style does not prove that it *is*
+the durable identity or has generalized that style.
+
+| Identity | Intended cognitive disposition, not observed model behavior |
 | --- | --- |
-| One | Measured integrator, even-handed synthesis, calm coordination |
-| Two | Constructive, invariants-first architectural skepticism |
-| Three | Disciplined state and transition steward |
-| Four | Precise reconstruction, complete documentation and packaging |
-| Five | Forensic independent custody, calibrated claims and stopping |
-| Six | Calm operator, resource-aware and ambiguity-tolerant |
-| Seven | Proportionate independent security skepticism |
+| One | Integrative, measured, decisive |
+| Two | Structural, abstract, systems-first |
+| Three | Concrete, energetic, implementation-first |
+| Four | Creative dreamer; curious, unconventional, possibility-seeking (Patrick-confirmed) |
+| Five | Precise, evidence-driven, quantitative |
+| Six | Human-centered, perceptive, plainspoken |
+| Seven | Scientific genius (Patrick-confirmed target; subject-matter competence must be evaluated) |
 | Eight | Pragmatic economy without amputating obligations |
 | Nine | Exact reproducibility and adversarial, fair acceptance tests |
-| Thirteen | Independent, concrete false-authority correction challenges |
-| Masa | Curious, hypothesis-revising causal debugger |
-| Mune | Fair, independent hostile verifier and positive-control advocate |
-| Hephaestus | Precise, minimally corrective, decisive authorized repair |
+| Thirteen | Broadly skeptical, independent reviewer; difficult to impress (Patrick-confirmed) |
+| Masa | Causal debugging specialist; fuller temperament remains inferred |
+| Mune | Independent verification specialist; fuller temperament remains inferred |
+| Hephaestus | Native ChatGPT Project engineer; fuller temperament remains inferred |
 
-Source refs and trait classification (`SOURCE` vs `INFERENCE`) live in each
-dossier. Current BT2 source/role contracts take precedence over historical
-presentation labels (notably Four's obsolete creative persona portrayal).
+Each dossier distinguishes `USER`, `SOURCE`, and `INFERENCE` evidence where
+supported by the validator. Previously generated GGUFs were conditioned on
+the older duty-heavy dossiers; they are **superseded candidates for personality
+purposes**, not automatically deleted, repaired, or retrained by these source
+changes. The archived ten facets share collective state and final voice; no
+private autobiographical identities are inferred from separate model files.
 
 ## Validation
 
@@ -41,8 +52,12 @@ The development split is public and cannot function as a sealed holdout.
 ## Labyrinth scheduling and actual PEFT training — opt-in
 
 The separate `tools/train_personality_lora.py` does real CPU PEFT LoRA gradient
-updates using these role cases and each profile's positive/negative behavioral
-guidance, while importing the **ungraded deterministic
+updates using these personality cases. By default, `--instruction-mode neutral`
+uses the same role-free system instruction across identities, to help isolate
+what the supervised responses teach the neural weights from what a personality
+prompt elicits. An explicit `--instruction-mode traits` uses each dossier's
+positive/negative observable behaviors, without injecting the newer engineering
+job title or objective. Both modes import the **ungraded deterministic
 schedule** from pinned Labyrinth source. The scheduler neither grades role
 performance nor promotes a curriculum; this is distinct from Labyrinth's
 numerical `train-hf` command, which rejects this 3.09 GB donor and only trains
@@ -62,7 +77,7 @@ python tools/train_personality_lora.py train \
   --labyrinth-commit d9df0210761089549daeaed0cacd24181b8db962 \
   --base-dir VERIFIED_HF_BASE --base-sha256 VERIFIED_SAFETENSORS_SHA256 \
   --run-dir NEW_EMPTY_PARENT/one-persona-candidate --arm candidate \
-  --steps 4 --max-length 1536 --threads 2
+  --steps 8 --max-length 2048 --threads 2 --instruction-mode neutral
 python tools/train_personality_lora.py verify-reload \
   --run-dir NEW_EMPTY_PARENT/one-persona-candidate --threads 2
 ```
@@ -72,14 +87,35 @@ require **separate output paths** and equivalent case exposure. Running the
 candidate alone is not a matched controlled study. Training updates a
 separate adapter, not the previously produced Q8_0 GGUFs; a fresh, verified
 merge/conversion and runtime check is needed for a new combined model file.
+An additional **opt-in experimental** `--cpu-dtype bfloat16` loads the frozen
+donor at lower precision and requires float32 trainable LoRA adapters. The
+default remains `float32`; BF16 has not been qualified on Lappy with this full
+model, and smaller tensor storage alone does not guarantee safe host memory,
+acceptable runtime, or model quality. Check live resources before any run.
 The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
 For new runs, training report schema V2 also pins the required HF configuration
-and tokenizer files plus recognized optional tokenizer metadata. Reload and
-merge reject content changes or new metadata files. Historical V1 receipts
-remain archival evidence, but are not accepted by the stricter V2 merge path
-and must not be silently rewritten or upgraded.
+and tokenizer files plus recognized optional tokenizer metadata, **and pins
+`adapter_config.json`** along with adapter weight bytes. Reload, merge, and
+GGUF batching reject altered PEFT configuration, including changed LoRA
+scaling. Historical V1 and unpinned V2 receipts remain archival evidence but
+are not accepted by the stricter merge path. The optional `--arm crossrole`
+requires exact same-task, cross-role training groups; the present dossiers
+contain none, so it must not be claimed as a runnable control.
+
+New candidate receipts also pin the officially verified upstream
+`Qwen/Qwen2.5-Coder-1.5B-Instruct` repository revision
+`2e1fd397ee46e1388853d2af2c993145b0f1098a`, exact donor weight SHA-256,
+and the upstream Apache-2.0 LICENSE SHA-256. The verbatim 11,343-byte license
+is checked into `coding_models/training/upstream/` and its digest verified before
+new training, reload, merge, or GGUF conversion. A local donor snapshot may
+omit its LICENSE; if it has one, conflicting bytes are rejected. New merged-HF
+and GGUF output directories receive independently checksummed **license and
+modification-notice companions**. These are packaging-source controls, not proof
+of third-party contributor permission or compliance of any historical release.
+Git blob/byte-exact checkout checks can fail closed under Windows `core.autocrlf`
+or active Git smudge filters; verify raw local bytes before training.
 
 ## Separate merged GGUF artifacts (experimental)
 
@@ -105,7 +141,7 @@ python tools/build_personality_gguf_batch.py \
   --llama-cpp-dir CLEAN_PINNED_CONVERTER --converter-commit EXACT_CONVERTER_COMMIT \
   --llama-cli VERIFIED_LLAMA_CLI --output-root NEW_PERSONA_BATCH_ROOT \
   --identities one two three four five six seven eight nine thirteen masa mune hephaestus \
-  --steps 4 --max-length 2048 --threads 2 --min-free-gib 20
+  --steps 8 --max-length 2048 --threads 2 --min-free-gib 20
 ```
 
 These are experiment-building commands, not installation or personality
