@@ -31,7 +31,7 @@ presentation labels (notably Four's obsolete creative persona portrayal).
 
 ```sh
 python tools/validate_personality_sft.py
-python -m unittest discover -s tests -p test_personality_training.py
+python -m unittest discover -s identity_tests -p test_personality_training.py
 ```
 
 These check exact roster, local source links, split counts, unique tasks,

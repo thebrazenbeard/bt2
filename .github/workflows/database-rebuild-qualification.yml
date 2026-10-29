@@ -9,6 +9,7 @@ on:
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
       - 'tests/**'
+      - 'identity_tests/**'
       - 'native/project/**'
       - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
@@ -18,6 +19,7 @@ on:
       - 'archive/supabase-project-lantern/**'
       - 'tools/qualification/**'
       - 'tests/**'
+      - 'identity_tests/**'
       - 'native/project/**'
       - 'docs/runtime/LANTERN_POSTGRESQL_*.md'
       - '.github/workflows/database-rebuild-qualification.yml'
@@ -43,6 +45,8 @@ jobs:
         run: python native/project/validation/test_bt2_native_v5_source_binding.py
       - name: Probe stale recovery pointers and protected-boundary regressions
         run: python -m unittest discover -s native/project/tests -p 'test_bt2_native_v5_recovery_pointers.py' -v
+      - name: Exercise isolated coding-identity source tests
+        run: python -m unittest discover -s identity_tests -v
 
   postgres16:
     runs-on: ubuntu-latest
