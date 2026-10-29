@@ -87,6 +87,11 @@ require **separate output paths** and equivalent case exposure. Running the
 candidate alone is not a matched controlled study. Training updates a
 separate adapter, not the previously produced Q8_0 GGUFs; a fresh, verified
 merge/conversion and runtime check is needed for a new combined model file.
+An additional **opt-in experimental** `--cpu-dtype bfloat16` loads the frozen
+donor at lower precision and requires float32 trainable LoRA adapters. The
+default remains `float32`; BF16 has not been qualified on Lappy with this full
+model, and smaller tensor storage alone does not guarantee safe host memory,
+acceptable runtime, or model quality. Check live resources before any run.
 The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
