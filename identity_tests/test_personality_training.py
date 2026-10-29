@@ -1,6 +1,7 @@
 """Fast, dependency-free checks for persona data and Labyrinth schedule bridge."""
 
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -48,6 +49,100 @@ class PersonaTrainingTests(unittest.TestCase):
             (donor / "tokenizer.json").write_text('{"changed":true}', encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "donor metadata"):
                 verify_donor_metadata(donor, current)
+
+    def test_standalone_and_legacy_templates_override_embedded_and_are_pinned(self):
+        with tempfile.TemporaryDirectory() as temp:
+            donor = Path(temp)
+            (donor / "config.json").write_text("{}", encoding="utf-8")
+            (donor / "tokenizer.json").write_text("{}", encoding="utf-8")
+            (donor / "tokenizer_config.json").write_text(
+                '{"chat_template":"embedded-template"}', encoding="utf-8")
+            embedded_only = donor_metadata_digests(donor)
+            for name in ("chat_template.jinja", "chat_template.json"):
+                with self.subTest(template=name):
+                    file = donor / name
+                    file.write_text("standalone-overrides-embedded", encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        verify_donor_metadata(donor, embedded_only)
+                    pinned = donor_metadata_digests(donor)
+                    self.assertIn(name, pinned)
+                    file.write_text("silently-replaced", encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        verify_donor_metadata(donor, pinned)
+                    file.write_text("standalone-overrides-embedded", encoding="utf-8")
+                    file.unlink()
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        verify_donor_metadata(donor, pinned)
+
+    def test_named_templates_exact_file_set_and_content_are_pinned(self):
+        with tempfile.TemporaryDirectory() as temp:
+            donor = Path(temp)
+            for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
+                (donor / name).write_text("{}", encoding="utf-8")
+            original = donor_metadata_digests(donor)
+            extras = donor / "additional_chat_templates"
+            extras.mkdir()
+            a = extras / "tools.jinja"
+            a.write_text("template-v1", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, original)
+            pinned = donor_metadata_digests(donor)
+            self.assertIn("additional_chat_templates/tools.jinja", pinned)
+            a.write_text("template-v2", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, pinned)
+            a.write_text("template-v1", encoding="utf-8")
+            b = extras / "analysis.jinja"
+            b.write_text("template-new", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, pinned)
+            b.unlink()
+            a.unlink()
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, pinned)
+
+    def test_unsafe_template_paths_symlinks_and_nonregular_entries_fail_closed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            donor = Path(temp)
+            for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
+                (donor / name).write_text("{}", encoding="utf-8")
+            metadata = donor_metadata_digests(donor)
+            bad_receipt = dict(metadata, **{"additional_chat_templates/../escape.jinja": "0" * 64})
+            with self.assertRaisesRegex(ValueError, "metadata"):
+                verify_donor_metadata(donor, bad_receipt)
+            (donor / "chat_template.jinja").symlink_to(donor / "tokenizer_config.json")
+            with self.assertRaisesRegex(ValueError, "metadata"):
+                donor_metadata_digests(donor)
+            (donor / "chat_template.jinja").unlink()
+            extras = donor / "additional_chat_templates"
+            extras.symlink_to(donor, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "metadata"):
+                donor_metadata_digests(donor)
+            extras.unlink()
+            extras.mkdir()
+            for unsafe in ("unexpected.txt", ".hidden.jinja", "nested"):
+                with self.subTest(entry=unsafe):
+                    path = extras / unsafe
+                    if unsafe == "nested":
+                        path.mkdir()
+                    else:
+                        path.write_text("untrusted", encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "metadata"):
+                        donor_metadata_digests(donor)
+                    if unsafe == "nested":
+                        path.rmdir()
+                    else:
+                        path.unlink()
+            linked = extras / "linked.jinja"
+            linked.symlink_to(donor / "tokenizer_config.json")
+            with self.assertRaisesRegex(ValueError, "metadata"):
+                donor_metadata_digests(donor)
+            linked.unlink()
+            if hasattr(os, "mkfifo"):
+                pipe = extras / "pipe.jinja"
+                os.mkfifo(pipe)
+                with self.assertRaisesRegex(ValueError, "metadata"):
+                    donor_metadata_digests(donor)
 
     def test_exact_roster_and_train_dev_separation(self):
         dossiers = validate_persona_cases()

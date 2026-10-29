@@ -146,9 +146,9 @@ def merge(args) -> dict:
     require(sha256_file(context["dataset_file"]) ==
             context["report"]["personality_dataset_sha256"],
             "persona dataset changed during merge")
-    for name, digest in context["donor_meta_sha256"].items():
-        require(sha256_file(context["base_dir"] / name) == digest,
-                f"donor {name} changed during merge")
+    # Re-enumerate the complete tokenizer template set after the expensive
+    # merge: checking only receipt keys misses new precedence-changing files.
+    verify_donor_metadata(context["base_dir"], context["donor_meta_sha256"])
     checked_checkout(context["bt2_dir"], context["report"]["bt2_source_commit"],
                      "tools/train_personality_lora.py")
     checked_checkout(context["labyrinth_dir"],

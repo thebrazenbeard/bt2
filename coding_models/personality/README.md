@@ -76,8 +76,13 @@ The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
 For new runs, training report schema V2 also pins the required HF configuration
-and tokenizer files plus recognized optional tokenizer metadata. Reload and
-merge reject content changes or new metadata files. Historical V1 receipts
+and tokenizer files plus recognized optional tokenizer metadata, including
+standalone `chat_template.jinja`, legacy `chat_template.json`, and the exact
+`additional_chat_templates/*.jinja` names and digests. Standalone chat templates
+can override an embedded tokenizer-config template. Unsafe, nonregular,
+symlinked, nested, or unrecognized named-template entries fail closed. Reload
+and merge reject content changes, additions, or deletions (including files
+introduced during merge). Historical V1 receipts
 remain archival evidence, but are not accepted by the stricter V2 merge path
 and must not be silently rewritten or upgraded.
 

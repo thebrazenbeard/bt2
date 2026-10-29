@@ -13,6 +13,7 @@ import importlib
 import json
 from pathlib import Path
 import random
+import re
 import subprocess
 import sys
 import time
@@ -29,8 +30,19 @@ REQUIRED_BASE = ("model.safetensors", "config.json", "tokenizer.json", "tokenize
 REQUIRED_METADATA = REQUIRED_BASE[1:]
 OPTIONAL_METADATA = ("generation_config.json", "special_tokens_map.json",
                      "added_tokens.json", "vocab.json", "merges.txt",
-                     "tokenizer.model")
+                     "tokenizer.model", "chat_template.jinja", "chat_template.json")
 KNOWN_METADATA = REQUIRED_METADATA + OPTIONAL_METADATA
+ADDITIONAL_TEMPLATES = "additional_chat_templates"
+NAMED_TEMPLATE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.jinja\Z")
+
+
+def _known_metadata_name(name: object) -> bool:
+    if not isinstance(name, str):
+        return False
+    if name in KNOWN_METADATA:
+        return True
+    prefix = ADDITIONAL_TEMPLATES + "/"
+    return name.startswith(prefix) and NAMED_TEMPLATE.fullmatch(name[len(prefix):]) is not None
 
 
 def donor_metadata_digests(base: Path) -> dict[str, str]:
@@ -43,12 +55,24 @@ def donor_metadata_digests(base: Path) -> dict[str, str]:
         require(file.is_file() and not file.is_symlink(),
                 f"missing or unsafe HF donor metadata: {name}")
         digests[name] = sha256_file(file)
+    templates = base / ADDITIONAL_TEMPLATES
+    require(not templates.is_symlink(), "unsafe HF donor metadata: additional chat templates link")
+    if templates.exists():
+        require(templates.is_dir(), "unsafe HF donor metadata: additional chat templates directory")
+        entries = sorted(templates.iterdir())
+        require(bool(entries), "unsupported empty HF donor metadata: additional chat templates")
+        for file in entries:
+            require(NAMED_TEMPLATE.fullmatch(file.name) is not None and
+                    file.is_file() and not file.is_symlink(),
+                    f"unsafe or unsupported HF donor metadata: {ADDITIONAL_TEMPLATES}/{file.name}")
+            digests[f"{ADDITIONAL_TEMPLATES}/{file.name}"] = sha256_file(file)
     return digests
 
 
 def verify_donor_metadata(base: Path, expected: object) -> dict[str, str]:
     require(isinstance(expected, dict) and
-            set(REQUIRED_METADATA) <= set(expected) <= set(KNOWN_METADATA),
+            set(REQUIRED_METADATA) <= set(expected) and
+            all(_known_metadata_name(name) for name in expected),
             "missing or invalid training-time donor metadata receipt")
     require(all(isinstance(value, str) and len(value) == 64 and
                 all(ch in "0123456789abcdef" for ch in value)
