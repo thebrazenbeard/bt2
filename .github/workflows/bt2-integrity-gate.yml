@@ -16,6 +16,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Install pinned YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Check V3 historical payload and mutation controls
         # V3 is checked against its seed Git objects; a V3 acceptance doc was
         # intentionally amended after that seed, so live V3 bytes are not frozen.
