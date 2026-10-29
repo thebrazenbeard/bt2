@@ -12,8 +12,14 @@ From the repository root, with Python 3.10+ and no third-party dependencies:
 python tools/identity_coding_models.py validate
 python tools/identity_coding_models.py list
 python tools/identity_coding_models.py render --identity three --task "Implement the scoped fix and prove it"
-python -m unittest discover -s tests -p test_identity_coding_models.py
+python -m unittest discover -s identity_tests -p test_identity_coding_models.py
 ```
+
+All coding-model source tests live under `identity_tests/` and are run separately
+by the existing GitHub Actions source job. The root `tests/` tree is sealed in
+`database/BUILD_MANIFEST_V3.json` as part of the PostgreSQL qualification
+package; adding unrelated coding tests there invalidates that exact tree binding.
+Moving tests does not weaken or update the historical manifest.
 
 `render` prints a reusable role-conditioned coding prompt. It performs no model invocation and no external write. `validate` checks the exact 13-member V2 topology, source entrypoint bindings, schema fields, content bounds, and source-only status. It fails closed on missing, extra, or mismatched profiles.
 
