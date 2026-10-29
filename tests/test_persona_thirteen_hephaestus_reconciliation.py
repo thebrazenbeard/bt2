@@ -21,7 +21,7 @@ class PersonalitySourceReconciliationTests(unittest.TestCase):
         self.assertEqual(doc["status"], "SYNTHETIC_SOURCE_GROUNDED_UNQUALIFIED")
         explicit = [trait for trait in doc["traits"] if trait["evidence_kind"] == "USER"]
         self.assertEqual(len(explicit), 1)
-        self.assertEqual(explicit[0]["label"], "independent_premise_skepticism")
+        self.assertEqual(explicit[0]["label"], "Skeptical reviewer")
         self.assertEqual(
             explicit[0]["source_basis"],
             "coding_models/personality/USER_TRAIT_CORRECTIONS_20261028.md",

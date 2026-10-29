@@ -10,6 +10,7 @@ import argparse
 import ast
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
 import re
@@ -61,17 +62,29 @@ def read_jsonl(path: Path) -> list[dict]:
 
 
 def write_jsonl_new(path: Path, rows: list[dict]) -> None:
-    require(path.parent.is_dir() and not path.is_symlink(), "output parent missing/unsafe")
-    with path.open("x", encoding="utf-8") as handle:
+    with private_output_new(path) as handle:
         for row in rows:
             handle.write(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n")
 
 
 def write_json_new(path: Path, data: dict) -> None:
-    require(path.parent.is_dir() and not path.is_symlink(), "output parent missing/unsafe")
-    with path.open("x", encoding="utf-8") as handle:
+    with private_output_new(path) as handle:
         json.dump(data, handle, indent=2, sort_keys=True)
         handle.write("\n")
+
+
+def private_output_new(path: Path):
+    """Create sensitive holdout/custody output exclusively with private POSIX mode.
+
+    A default `Path.open('x')` obeys a process umask that may permit other local
+    users to read unreleased holdout cases, answers, or the blinding key.
+    """
+    require(path.parent.is_dir() and not path.parent.is_symlink() and
+            not path.is_symlink(), "output parent missing/unsafe")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(path, flags, 0o600)
+    return os.fdopen(descriptor, "w", encoding="utf-8")
 
 
 def validated_cases(rows: list[dict]) -> list[dict]:
@@ -132,6 +145,20 @@ def chat_prompt(instruction: str, task: str) -> str:
             "<|im_start|>assistant\n")
 
 
+def unframe_chat_prompt(full: str) -> tuple[str, str]:
+    prefix = "<|im_start|>system\n"
+    middle = "<|im_end|>\n<|im_start|>user\n"
+    suffix = "<|im_end|>\n<|im_start|>assistant\n"
+    require(full.startswith(prefix) and full.endswith(suffix),
+            "noncanonical chat prompt framing")
+    body = full[len(prefix):-len(suffix)]
+    require(middle in body, "noncanonical chat prompt framing")
+    instruction, task = body.split(middle, 1)
+    require(len(task.strip()) >= 10 and chat_prompt(instruction, task) == full,
+            "noncanonical chat prompt framing")
+    return instruction, task
+
+
 def plan(models: list[dict], cases: list[dict], seed: int) -> list[dict]:
     require(type(seed) is int and 0 <= seed < 2**31, "invalid seed")
     planned = []
@@ -174,6 +201,12 @@ def validate_plan(rows: list[dict]) -> None:
         require(isinstance(row.get("prompt"), str) and
                 digest(row["prompt"]) == row.get("prompt_sha256"),
                 "planned prompt digest mismatch")
+        instruction, task = unframe_chat_prompt(row["prompt"])
+        require(row["prompt_mode"] != "neutral" or
+                instruction == NEUTRAL_INSTRUCTION,
+                "neutral instruction changed in evaluation plan")
+        require(digest(task) == row.get("case_prompt_sha256"),
+                "case prompt digest mismatch")
         require(isinstance(row.get("model_sha256"), str) and
                 SHA_RE.fullmatch(row["model_sha256"]), "missing model digest")
         comparison = (row["identity"], row["case_id"], row["prompt_mode"])
@@ -297,6 +330,7 @@ def blind_packet(responses: list[dict], plan_rows: list[dict],
     planned = {item["run_id"]: item for item in plan_rows}
     require(len(responses) == len(planned), "inference coverage differs from registered plan")
     run_ids = set()
+    generator_settings = None
     for item in responses:
         require(item.get("run_id") not in run_ids, "duplicate inference run ID")
         run_ids.add(item["run_id"])
@@ -307,6 +341,22 @@ def blind_packet(responses: list[dict], plan_rows: list[dict],
             require(item.get(field) == expected.get(field),
                     f"inference identity/prompt custody mismatch: {field}")
         require(item.get("exit_code") == 0, "inference failure blocks blind scoring")
+        generator = item.get("generator")
+        require(isinstance(generator, dict) and
+                isinstance(generator.get("llama_cli_sha256"), str) and
+                SHA_RE.fullmatch(generator["llama_cli_sha256"]) and
+                type(generator.get("max_tokens")) is int and
+                1 <= generator["max_tokens"] <= 1024 and
+                type(generator.get("threads")) is int and
+                1 <= generator["threads"] <= 4 and
+                generator.get("temperature") == 0 and
+                generator.get("n_gpu_layers") == 0 and
+                type(generator.get("seed")) is int and
+                0 <= generator["seed"] < 2**31 and
+                (generator_settings is None or generator_settings == generator),
+                "generator settings missing/inconsistent with bounded deterministic inference")
+        generator_settings = generator
+        require(isinstance(item.get("response"), str), "inference response must be text")
         require(digest(item.get("response", "")) == item.get("response_sha256"),
                 "response tampered before blind review")
         reviewed.append({

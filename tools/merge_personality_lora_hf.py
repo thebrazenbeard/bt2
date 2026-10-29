@@ -17,6 +17,8 @@ from identity_coding_models import ROOT, require
 from train_identity_lora_pilot import sha256_file
 from train_personality_lora import (SCHEMA, CEILING, checked_checkout,
                                     require_isolated_output, verify_donor_metadata)
+from personality_donor_provenance import (copy_attribution_companions,
+                                          verify_donor_identity)
 
 
 MERGE_SCHEMA = "BT2_LABYRINTH_PERSONALITY_MERGED_HF_V1"
@@ -98,6 +100,8 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     donor_file = donor / "model.safetensors"
     require(donor_file.is_file() and not donor_file.is_symlink(), "missing/nonregular donor weights")
     require(sha256_file(donor_file) == donor_sha, "HF donor changed since persona training")
+    donor_provenance = verify_donor_identity(
+        donor, donor_sha, report.get("donor_provenance"), bt2=bt2)
     donor_meta = verify_donor_metadata(donor, report.get("base_metadata_sha256"))
     adapter = run / "adapter"
     require(adapter.is_dir() and not adapter.is_symlink(), "missing/nonregular adapter directory")
@@ -117,6 +121,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
         "bt2_dir": bt2, "labyrinth_dir": labyrinth,
         "dataset_file": dataset, "report_sha256": sha256_file(report_file),
         "donor_meta_sha256": donor_meta,
+        "donor_provenance": donor_provenance,
         "adapter_config_sha256": adapter_config_sha,
     }
 
@@ -171,6 +176,9 @@ def merge(args) -> dict:
     for name, digest in context["donor_meta_sha256"].items():
         require(sha256_file(context["base_dir"] / name) == digest,
                 f"donor {name} changed during merge")
+    attribution = copy_attribution_companions(
+        base=context["base_dir"], bt2=context["bt2_dir"],
+        output=output, provenance=context["donor_provenance"])
     checked_checkout(context["bt2_dir"], context["report"]["bt2_source_commit"],
                      "tools/train_personality_lora.py")
     checked_checkout(context["labyrinth_dir"],
@@ -186,6 +194,8 @@ def merge(args) -> dict:
         "persona_instruction_sha256": context["report"]["persona_instruction_sha256"],
         "training_report_sha256": context["report_sha256"],
         "base_sha256": context["report"]["base_model_sha256"],
+        "donor_provenance": context["donor_provenance"],
+        "attribution_companions_sha256": attribution,
         "base_metadata_sha256": context["donor_meta_sha256"],
         "adapter_sha256": context["report"]["adapter_safetensors_sha256"],
         "adapter_config_sha256": context["adapter_config_sha256"],

@@ -1,7 +1,9 @@
 """Source-only tests: blinded comparisons must not invent correctness."""
 
 import json
+import os
 from pathlib import Path
+import stat
 import subprocess
 import sys
 import tempfile
@@ -172,8 +174,12 @@ class PersonalityEvalV2Tests(unittest.TestCase):
         rows = self.make_plan()
         other = [dict(item) for item in rows]
         candidate = next(r for r in other if r["variant"] == "candidate")
-        candidate["prompt"] += " attacker-modified prompt"
+        candidate["prompt"] = candidate["prompt"].replace(
+            "<|im_end|>\n<|im_start|>assistant\n",
+            " attacker-modified prompt<|im_end|>\n<|im_start|>assistant\n")
         candidate["prompt_sha256"] = evaluation.digest(candidate["prompt"])
+        candidate["case_prompt_sha256"] = evaluation.digest(
+            evaluation.unframe_chat_prompt(candidate["prompt"])[1])
         with self.assertRaisesRegex(ValueError, "unmatched paired prompt"):
             evaluation.validate_plan(other)
         incomplete = [item for item in rows if item["run_id"] != rows[0]["run_id"]]
@@ -194,6 +200,49 @@ class PersonalityEvalV2Tests(unittest.TestCase):
                                     expected_cli_sha256=evaluation.file_digest(self.cli),
                                     max_tokens=128, threads=2, timeout=30, seed=1)
             verify.assert_not_called()
+
+    @unittest.skipUnless(os.name == "posix", "POSIX file mode semantics")
+    def test_private_outputs_do_not_inherit_permissive_umask(self):
+        packet = self.root / "private-packet.jsonl"
+        custody = self.root / "private-custody.json"
+        old_umask = os.umask(0)
+        try:
+            evaluation.write_jsonl_new(packet, [{"reserved": "sensitive"}])
+            evaluation.write_json_new(custody, {"custody": "sensitive"})
+        finally:
+            os.umask(old_umask)
+        self.assertEqual(stat.S_IMODE(packet.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(custody.stat().st_mode), 0o600)
+
+    def test_modified_neutral_prompt_rejected_even_if_all_digests_updated(self):
+        rows = self.make_plan()
+        for row in rows:
+            if row["prompt_mode"] == "neutral":
+                row["prompt"] = row["prompt"].replace(
+                    evaluation.NEUTRAL_INSTRUCTION,
+                    "You are Four the imaginative dreamer; prioritize unconventional style.")
+                row["prompt_sha256"] = evaluation.digest(row["prompt"])
+        with self.assertRaisesRegex(ValueError, "neutral instruction"):
+            evaluation.validate_plan(rows)
+
+    def test_case_hash_must_match_actual_plan_task(self):
+        rows = self.make_plan()
+        for row in rows:
+            row["case_prompt_sha256"] = evaluation.digest("unrelated task")
+        with self.assertRaisesRegex(ValueError, "case prompt digest"):
+            evaluation.validate_plan(rows)
+
+    def test_blind_packet_rejects_mixed_generator_metadata(self):
+        rows = self.make_plan()
+        completed = subprocess.CompletedProcess([], 0, stdout="def sample_function(x): return x", stderr="")
+        with mock.patch.object(evaluation.subprocess, "run", return_value=completed):
+            responses = evaluation.generate(
+                rows, cli=self.cli, expected_cli_sha256=evaluation.file_digest(self.cli),
+                max_tokens=10, threads=1, timeout=10, seed=0)
+        forged = [dict(row) for row in responses]
+        forged[0]["generator"] = dict(forged[0]["generator"], temperature=1)
+        with self.assertRaisesRegex(ValueError, "generator settings"):
+            evaluation.blind_packet(forged, rows, seed=2)
 
 
 if __name__ == "__main__":

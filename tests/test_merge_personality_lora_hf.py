@@ -17,9 +17,14 @@ SPEC = importlib.util.spec_from_file_location(
 )
 module = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(module)
+import personality_donor_provenance as provenance  # noqa: E402
 
 
 class MergePersonaPreflightTests(unittest.TestCase):
+    def tearDown(self):
+        if hasattr(self, "_weight_patcher"):
+            self._weight_patcher.stop()
+
     def test_missing_run_fails_without_output(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -34,11 +39,23 @@ class MergePersonaPreflightTests(unittest.TestCase):
         dataset = source / "coding_models/personality/cases/one.json"
         dataset.parent.mkdir(parents=True)
         dataset.write_text('{"case":"source-bound"}', encoding="utf-8")
+        notice = source / provenance.NOTICE_SOURCE
+        notice.parent.mkdir(parents=True, exist_ok=True)
+        notice.write_text(
+            f"Modified from {provenance.DONOR_REPO} at {provenance.DONOR_REVISION}.\n",
+            encoding="utf-8")
+        license_source = source / provenance.UPSTREAM_LICENSE_SOURCE
+        license_source.parent.mkdir(parents=True, exist_ok=True)
+        upstream_license = ROOT / provenance.UPSTREAM_LICENSE_SOURCE
+        license_source.write_bytes(upstream_license.read_bytes())
         labyrinth = root / "labyrinth"
         labyrinth.mkdir()
         donor = root / "donor"
         donor.mkdir()
         (donor / "model.safetensors").write_bytes(b"pinned HF donor bytes")
+        weight_sha = module.sha256_file(donor / "model.safetensors")
+        self._weight_patcher = mock.patch.object(provenance, "DONOR_WEIGHTS_SHA256", weight_sha)
+        self._weight_patcher.start()
         for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
             (donor / name).write_text("{}", encoding="utf-8")
         run = root / "run"
@@ -56,6 +73,8 @@ class MergePersonaPreflightTests(unittest.TestCase):
             "labyrinth_scheduler_commit": "b" * 40,
             "base_model_dir": str(donor),
             "base_model_sha256": module.sha256_file(donor / "model.safetensors"),
+            "donor_provenance": provenance.verify_donor_identity(donor, weight_sha,
+                                                                   bt2=source),
             "base_metadata_sha256": {
                 name: module.sha256_file(donor / name)
                 for name in ("config.json", "tokenizer.json", "tokenizer_config.json")
@@ -107,6 +126,7 @@ class MergePersonaPreflightTests(unittest.TestCase):
                                ("bt2_source_commit", "not-a-hash"),
                                ("persona_instruction_sha256", "bad"),
                                ("adapter_config_sha256", "bad"),
+                               ("donor_provenance", {}),
                                ("trainable_tensor_sha256_before", "bad"),
                                ("frozen_parameter_sha256_unchanged", "bad")):
                 with self.subTest(field=field, bad=bad):
@@ -120,6 +140,7 @@ class MergePersonaPreflightTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root, source, labyrinth, donor, run, report = self._fixture(temp)
             for path in (donor / "model.safetensors",
+                         source / provenance.UPSTREAM_LICENSE_SOURCE,
                          run / "adapter/adapter_model.safetensors",
                          run / "adapter/adapter_config.json",
                          source / "coding_models/personality/cases/one.json"):
@@ -236,6 +257,12 @@ class MergePersonaPreflightTests(unittest.TestCase):
             })
             self.assertFalse(receipt["gguf_converted"])
             self.assertFalse(receipt["installed"])
+            self.assertEqual(receipt["donor_provenance"], report_from :=
+                             json.loads((run / "report.json").read_text(encoding="utf-8"))["donor_provenance"])
+            self.assertEqual(receipt["attribution_companions_sha256"][provenance.LICENSE_COMPANION],
+                             report_from["license_sha256"])
+            self.assertTrue((output / provenance.LICENSE_COMPANION).is_file())
+            self.assertTrue((output / provenance.NOTICE_COMPANION).is_file())
 
 
 if __name__ == "__main__":

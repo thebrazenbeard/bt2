@@ -104,6 +104,19 @@ are not accepted by the stricter merge path. The optional `--arm crossrole`
 requires exact same-task, cross-role training groups; the present dossiers
 contain none, so it must not be claimed as a runnable control.
 
+New candidate receipts also pin the officially verified upstream
+`Qwen/Qwen2.5-Coder-1.5B-Instruct` repository revision
+`2e1fd397ee46e1388853d2af2c993145b0f1098a`, exact donor weight SHA-256,
+and the upstream Apache-2.0 LICENSE SHA-256. The verbatim 11,343-byte license
+is checked into `coding_models/training/upstream/` and its digest verified before
+new training, reload, merge, or GGUF conversion. A local donor snapshot may
+omit its LICENSE; if it has one, conflicting bytes are rejected. New merged-HF
+and GGUF output directories receive independently checksummed **license and
+modification-notice companions**. These are packaging-source controls, not proof
+of third-party contributor permission or compliance of any historical release.
+Git blob/byte-exact checkout checks can fail closed under Windows `core.autocrlf`
+or active Git smudge filters; verify raw local bytes before training.
+
 ## Separate merged GGUF artifacts (experimental)
 
 `tools/merge_personality_lora_hf.py` accepts only a source-pinned candidate
