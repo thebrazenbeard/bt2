@@ -1,0 +1,81 @@
+{
+  "case_id": "BT2-PERSONA-20261029",
+  "hypothesis": "The current 13 source-grounded eight-step LoRA recipe suffices to demonstrate genuinely differentiated neural personalities with retained coding competence.",
+  "falsifier": "No corrected candidate/sham/corrupt model receipts or no independent reserved behavioral-and-coding inference, or a demonstrated coding regression.",
+  "proposer": "/root",
+  "definitions": {
+    "source_ready": "Traceable case materials, deterministic schedule, tests, and experimental trainer are present in source.",
+    "demonstrate": "Observed post-training neutral-vs-trait behavioral gains and coding retention against donor, prompt-only, historical, sham, and corrupted-label controls on reserved cases.",
+    "independence": "Review identity is not provider, host, or model independence; attributable external invocation receipts would be needed for that stronger claim."
+  },
+  "evidence": [
+    {
+      "identifier": "source-pr99",
+      "claim": "The composed BT2 source suite passed 122 tests and validated 13 dossiers/130 cases at the exact PR #99 head.",
+      "source": "https://github.com/thebrazenbeard/bt2/commit/9036b904def1322a30fd73d21af2a85b59bba21c",
+      "method": "Local exact-commit tests and GitHub CI run 40863934639 were read back.",
+      "reliability": "Source and test evidence, not model inference.",
+      "uncertainty": "No model behavioral qualification follows."
+    },
+    {
+      "identifier": "host-nogo",
+      "claim": "Fresh WorkBridge and Executor probes timed out; candidate/sham/corrupt training did not run.",
+      "source": "BT2 host gate 2026-10-29 report (separate retained evidence)",
+      "method": "Bounded authenticated connector probes, no fresh host resource readback.",
+      "reliability": "Observed transport timeout and explicit no-go.",
+      "uncertainty": "Actual host memory capacity and recovery state unknown."
+    }
+  ],
+  "reviews": [
+    {
+      "lens": "purist_logic",
+      "reviewer_id": "/root/identity_nine",
+      "finding": "The source recipe is input/mechanism evidence; neural differentiation and coding retention are unobserved consequents.",
+      "objection": "The original hypothesis improperly promotes source readiness into verified model behavior.",
+      "execution_ref": null
+    },
+    {
+      "lens": "pragmatism",
+      "reviewer_id": "/root/identity_eight",
+      "finding": "Unqualified host access prevented the matched training arms and independent reserved inference; thirteen release reviews now would lack measurement.",
+      "objection": "A cheap source check is not a substitute for a bounded canary and operational receipts.",
+      "execution_ref": null
+    },
+    {
+      "lens": "bridge",
+      "reviewer_id": "/root/identity_thirteen",
+      "finding": "Unproven persona labels risk false trust in independent expertise, especially with correlated models and prompt-only behavior.",
+      "objection": "No neutral-versus-trait, coding-retention, source-pinned control comparison exists for all thirteen corrected weights.",
+      "execution_ref": null
+    }
+  ],
+  "challenges": [
+    {
+      "identifier": "NINE-PURIST-001",
+      "lens": "purist_logic",
+      "target": "Proposer claim that source readiness demonstrates trained effects",
+      "question": "Where are corrected adapter SHA receipts and blind neutral-versus-trait and coding results for each identity? Will you concede the narrower claim if absent?",
+      "status": "CONCEDED",
+      "defense": "Proposer /root explicitly concedes no corrected neural artifact/evaluation evidence; only source-ready experimental design survives and efficacy remains unknown."
+    },
+    {
+      "identifier": "EIGHT-PRAG-001",
+      "lens": "pragmatism",
+      "target": "Matched control and host feasibility claims",
+      "question": "Where are exact candidate, zero-update sham, and corrupted-label receipts and reserved inference versus donor, prompt-only and older coding models?",
+      "status": "CONCEDED",
+      "defense": "Proposer /root explicitly concedes the arms and independent inference were not run; first restore authenticated host access and execute one bounded canary."
+    },
+    {
+      "identifier": "THIRTEEN-BRIDGE-001",
+      "lens": "bridge",
+      "target": "Human/system interpretation of differentiated identities",
+      "question": "What independently scored evidence separates learned role behavior from prompt conformity and rules out coding regression?",
+      "status": "CONCEDED",
+      "defense": "Proposer /root concedes no such scored evidence exists; role labels must not imply tested competence or independent model execution."
+    }
+  ],
+  "rationale": "REFINE: the broad neural-efficacy claim fails observed-evidence requirements. Source-ready training/evaluation design survives; behavioral differentiation and coding retention remain UNKNOWN.",
+  "refined_claim": "BT2 contains thirteen source-grounded personality training dossiers and a bounded experimental training/evaluation recipe, but no corrected neural behavior has yet been qualified.",
+  "review_custody_limitations": "These were three distinct native ChatGPT child-agent reviews in one provider/runtime context, not three local GGUF executions or cryptographically authenticated independent model/host attestations. The proposer wrote a concession; the transcript is not an append-only signed ledger."
+}

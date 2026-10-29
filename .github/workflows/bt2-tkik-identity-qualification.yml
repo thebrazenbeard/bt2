@@ -1,0 +1,59 @@
+name: BT2 TKal identity qualification
+
+on:
+  pull_request:
+    paths:
+      - 'coding_models/personality/**'
+      - 'tools/run_bt2_tkik_proceeding.py'
+      - 'tools/identity_coding_models.py'
+      - 'tools/validate_personality_sft.py'
+      - 'tools/train_personality_lora.py'
+      - 'tests/test_bt2_tkik_*.py'
+      - 'tests/test_identity_*_challenges.py'
+      - '.github/workflows/bt2-tkik-identity-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  external-tkik-refine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      TKIK_EXACT_REPO: ${{ github.workspace }}/external/t-kal-in-ket
+    steps:
+      - name: Checkout BT2 without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Checkout exact external TKal source without vendoring
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: thebrazenbeard/t-kal-in-ket
+          ref: b0af150c2405b519fd921bac33e5f9f1f35f92d7
+          path: external/t-kal-in-ket
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Verify upstream source commit and exact core blob
+        run: |
+          test "$(git -C "$TKIK_EXACT_REPO" rev-parse HEAD)" = 'b0af150c2405b519fd921bac33e5f9f1f35f92d7'
+          test "$(git -C "$TKIK_EXACT_REPO" rev-parse HEAD:tkik/core.py)" = '69e85a62672e1dfffacec08fde98e9df26716300'
+      - name: Run source and actual external protocol tests
+        run: python -m unittest discover -s tests -q
+      - name: Validate all thirteen source-grounded dossiers
+        run: python tools/validate_personality_sft.py
+      - name: Re-execute pinned TKal case and compare frozen result
+        run: |
+          python tools/run_bt2_tkik_proceeding.py \
+            --tkik-repo "$TKIK_EXACT_REPO" \
+            --packet coding_models/personality/iterations/tkik/BT2-PERSONA-20261029.packet.json \
+            --output /tmp/bt2-tkik-ci-result.json
+          cmp /tmp/bt2-tkik-ci-result.json \
+            coding_models/personality/iterations/tkik/BT2-PERSONA-20261029.declared.result.json
