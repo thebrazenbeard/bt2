@@ -52,8 +52,12 @@ The development split is public and cannot function as a sealed holdout.
 ## Labyrinth scheduling and actual PEFT training — opt-in
 
 The separate `tools/train_personality_lora.py` does real CPU PEFT LoRA gradient
-updates using these role cases and each profile's positive/negative behavioral
-guidance, while importing the **ungraded deterministic
+updates using these personality cases. By default, `--instruction-mode neutral`
+uses the same role-free system instruction across identities, to help isolate
+what the supervised responses teach the neural weights from what a personality
+prompt elicits. An explicit `--instruction-mode traits` uses each dossier's
+positive/negative observable behaviors, without injecting the newer engineering
+job title or objective. Both modes import the **ungraded deterministic
 schedule** from pinned Labyrinth source. The scheduler neither grades role
 performance nor promotes a curriculum; this is distinct from Labyrinth's
 numerical `train-hf` command, which rejects this 3.09 GB donor and only trains
@@ -73,7 +77,7 @@ python tools/train_personality_lora.py train \
   --labyrinth-commit d9df0210761089549daeaed0cacd24181b8db962 \
   --base-dir VERIFIED_HF_BASE --base-sha256 VERIFIED_SAFETENSORS_SHA256 \
   --run-dir NEW_EMPTY_PARENT/one-persona-candidate --arm candidate \
-  --steps 4 --max-length 1536 --threads 2
+  --steps 8 --max-length 2048 --threads 2 --instruction-mode neutral
 python tools/train_personality_lora.py verify-reload \
   --run-dir NEW_EMPTY_PARENT/one-persona-candidate --threads 2
 ```
@@ -87,10 +91,13 @@ The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
 For new runs, training report schema V2 also pins the required HF configuration
-and tokenizer files plus recognized optional tokenizer metadata. Reload and
-merge reject content changes or new metadata files. Historical V1 receipts
-remain archival evidence, but are not accepted by the stricter V2 merge path
-and must not be silently rewritten or upgraded.
+and tokenizer files plus recognized optional tokenizer metadata, **and pins
+`adapter_config.json`** along with adapter weight bytes. Reload, merge, and
+GGUF batching reject altered PEFT configuration, including changed LoRA
+scaling. Historical V1 and unpinned V2 receipts remain archival evidence but
+are not accepted by the stricter merge path. The optional `--arm crossrole`
+requires exact same-task, cross-role training groups; the present dossiers
+contain none, so it must not be claimed as a runnable control.
 
 ## Separate merged GGUF artifacts (experimental)
 
@@ -116,7 +123,7 @@ python tools/build_personality_gguf_batch.py \
   --llama-cpp-dir CLEAN_PINNED_CONVERTER --converter-commit EXACT_CONVERTER_COMMIT \
   --llama-cli VERIFIED_LLAMA_CLI --output-root NEW_PERSONA_BATCH_ROOT \
   --identities one two three four five six seven eight nine thirteen masa mune hephaestus \
-  --steps 4 --max-length 2048 --threads 2 --min-free-gib 20
+  --steps 8 --max-length 2048 --threads 2 --min-free-gib 20
 ```
 
 These are experiment-building commands, not installation or personality
