@@ -49,6 +49,28 @@ These check exact roster, local source links, split counts, unique tasks,
 training/development separation, and assistant-only label masking.
 The development split is public and cannot function as a sealed holdout.
 
+## Adversarial T’Kal-in-ket review — optional source-pinned packet replay
+
+`tools/run_bt2_tkik_proceeding.py` replays the saved
+`iterations/tkik/BT2-PERSONA-20261029.packet.json` through **the actual**
+`thebrazenbeard/t-kal-in-ket` Python `Case` implementation from a clean
+checkout pinned to commit `b0af150c2405b519fd921bac33e5f9f1f35f92d7`.
+The repository has no selected software license, so BT2 does not vendor
+the source. Local tests that execute this external protocol require
+`TKIK_EXACT_REPO` and are skipped without it; passing default CI does not
+show that external integration ran.
+
+The new `iterations/tkik/BT2-PERSONA-20261029.declared.result.json` is a
+**packet replay** result, not an authenticated live peer session: reviewer
+identifiers are declared by the packet, not validated against native spawn
+receipts. The result explicitly marks `native_dispatch_receipts_verified`
+and `live_cross_examination_attested` false, and flags the packet-authored
+review custody prose as unverified. See
+[`iterations/tkik/OPEN_CHALLENGES.md`](iterations/tkik/OPEN_CHALLENGES.md)
+for unresolved model/host custody and neural behavior qualifications.
+The original `BT2-PERSONA-20261029.result.json` is preserved unchanged as
+historical V1 evidence and must not be consumed as proof of native custody.
+
 ## Labyrinth scheduling and actual PEFT training — opt-in
 
 The separate `tools/train_personality_lora.py` does real CPU PEFT LoRA gradient

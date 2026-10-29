@@ -3,8 +3,10 @@
 The [BT2-PERSONA-20261029](BT2-PERSONA-20261029.packet.json) case was narrowed
 to **REFINE** after separately attributed Nine (Purist Logic), Eight
 (Pragmatism), and Thirteen (Bridge) reviews and the proposer’s explicit
-concessions. This is a native ChatGPT multi-agent inquiry using the actual
-in-memory T’Kal-in-ket protocol, not a local BT2 GGUF-model quorum.
+concessions. The saved packet is replayed through the actual in-memory
+T’Kal-in-ket protocol, not a live authenticated T’Kal peer exchange or local
+BT2 GGUF-model quorum. The packet contains declared reviewers, but the
+protocol execution does not verify native ChatGPT dispatch receipts.
 
 ## Mune's separate OPEN technical-witness question
 
@@ -29,5 +31,9 @@ it remains a blocker for a subsequent efficacy-qualification case.
   waiver is used in this case.
 - The three native reviews are attributable in this conversation, but model
   execution/host independence and durable cryptographic custody are **UNKNOWN**.
+  The machine result therefore reports `declared_reviewer_ids`,
+  `native_dispatch_receipts_verified: false`, `protocol_mode: PACKET_REPLAY`,
+  and `live_cross_examination_attested: false`. Protocol acceptance alone
+  cannot authenticate reviewer origins.
 - A T’Kal determination does not grant merge, training, deployment, or model
   qualification authority.
