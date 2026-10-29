@@ -21,12 +21,14 @@ import time
 from identity_coding_models import ROOT, load_models, require
 from train_identity_lora_pilot import sha256_file, trainable_digest
 from validate_personality_sft import CASE_ROOT, validate_persona_cases
+from personality_donor_provenance import verify_donor_identity
 
 
 SCHEMA = "BT2_LABYRINTH_SCHEDULED_PERSONALITY_LORA_V2"
 CEILING = "SYNTHETIC_ROLE_DISPOSITION_WEIGHT_UPDATE_NOT_BEHAVIOR_QUALIFIED"
 LEVELS = ("grounded", "adversarial")
 MAX_PERSONA_STEPS = 16
+CPU_DTYPES = ("float32", "bfloat16")
 REQUIRED_BASE = ("model.safetensors", "config.json", "tokenizer.json", "tokenizer_config.json")
 REQUIRED_METADATA = REQUIRED_BASE[1:]
 OPTIONAL_METADATA = ("generation_config.json", "special_tokens_map.json",
@@ -46,6 +48,24 @@ def verify_adapter_config(run: Path, report: dict) -> str:
     actual = sha256_file(config)
     require(actual == expected, "PEFT adapter configuration changed since training")
     return actual
+
+
+def resolve_cpu_dtype(torch, name: str):
+    """Resolve a bounded CPU loading dtype; bfloat16 is opt-in and experimental."""
+    require(name in CPU_DTYPES, "unsupported CPU model dtype")
+    return torch.float32 if name == "float32" else torch.bfloat16
+
+
+def configure_gradient_checkpointing(model, enabled: bool) -> None:
+    """Opt-in non-reentrant checkpointing; unqualified until donor runtime probe."""
+    require(type(enabled) is bool, "invalid gradient checkpointing flag")
+    if enabled:
+        # Non-reentrant autograd is important for a frozen donor with LoRA-only
+        # trainables; no inference claim follows from enabling this switch.
+        enable = getattr(model, "gradient_checkpointing_enable", None)
+        require(callable(enable), "model does not support gradient checkpointing")
+        enable(
+            gradient_checkpointing_kwargs={"use_reentrant": False})
 
 
 def donor_metadata_digests(base: Path) -> dict[str, str]:
@@ -86,6 +106,35 @@ def checked_checkout(path: Path, expected: str, package_file: str) -> Path:
     dirty = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"],
                            capture_output=True, text=True, check=True).stdout.strip()
     require(not dirty, f"source checkout must be clean: {repo}")
+    # Git's porcelain status honors the index's assume-unchanged/skip-worktree
+    # bits. Those flags can hide edits to executed source and training labels.
+    # Pin working bytes against *all* tracked HEAD blobs. Current BT2/Labyrinth
+    # checkouts are small (<10 MiB each); this is still bounded to 10k files.
+    fmt = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-object-format"],
+                         capture_output=True, text=True, check=True).stdout.strip()
+    require(fmt in ("sha1", "sha256"), "unsupported Git object format")
+    listing = subprocess.run(["git", "-C", str(repo), "ls-tree", "-rz", "HEAD"],
+                             capture_output=True, check=True).stdout
+    entries = [entry for entry in listing.split(b"\0") if entry]
+    require(0 < len(entries) <= 10_000, "unbounded or empty tracked checkout")
+    tracked = set()
+    for entry in entries:
+        header, raw_name = entry.split(b"\t", 1)
+        mode, kind, object_id = header.split(b" ", 2)
+        require(kind == b"blob" and mode in (b"100644", b"100755"),
+                "unsafe non-file or symlink entry in pinned source checkout")
+        relative = Path(raw_name.decode("utf-8", errors="surrogateescape"))
+        tracked.add(relative.as_posix())
+        file = repo / relative
+        require(file.is_file() and not file.is_symlink() and
+                file.resolve().is_relative_to(repo),
+                f"missing or unsafe tracked checkout file: {relative}")
+        data = file.read_bytes()
+        require(len(data) <= 32 * 1024 * 1024, "oversize tracked source file")
+        digest = hashlib.new(fmt, f"blob {len(data)}\0".encode() + data).hexdigest()
+        require(digest == object_id.decode("ascii"),
+                f"tracked working bytes differ from HEAD: {relative}")
+    require(package_file in tracked, "expected source file is not tracked in HEAD")
     return repo
 
 
@@ -199,6 +248,9 @@ def require_isolated_output(output: Path, *protected: Path) -> None:
 
 def preflight(args) -> dict:
     require(args.device == "cpu", "this Qwen persona pilot only supports CPU")
+    require(args.cpu_dtype in CPU_DTYPES, "unsupported CPU model dtype")
+    require(type(args.gradient_checkpointing) is bool,
+            "invalid gradient checkpointing flag")
     require(args.arm in ("candidate", "sham", "corrupt", "crossrole"), "unknown arm")
     require(args.instruction_mode in ("neutral", "traits"), "unknown instruction mode")
     require(type(args.steps) is int and 2 <= args.steps <= MAX_PERSONA_STEPS and
@@ -220,6 +272,7 @@ def preflight(args) -> dict:
         require(file.is_file() and not file.is_symlink(), f"missing or unsafe HF donor file: {name}")
     require(sha256_file(base / "model.safetensors") == args.base_sha256,
             "pinned HF donor digest mismatch")
+    donor_provenance = verify_donor_identity(base, args.base_sha256, bt2=bt2)
     base_metadata_sha256 = donor_metadata_digests(base)
     output = Path(args.run_dir).resolve(strict=False)
     require(not output.exists() and not output.is_symlink() and output.parent.is_dir(),
@@ -232,7 +285,8 @@ def preflight(args) -> dict:
             "profile": load_models()[args.identity], "schedule": schedule,
             "cases_by_id": {c["id"]: c for c in cases}, "output": output,
             "dataset_sha256": sha256_file(CASE_ROOT / f"{args.identity}.json"),
-            "base_metadata_sha256": base_metadata_sha256}
+            "base_metadata_sha256": base_metadata_sha256,
+            "donor_provenance": donor_provenance}
 
 
 def run_training(args) -> dict:
@@ -265,7 +319,7 @@ def run_training(args) -> dict:
     encoded = [encode_case(tokenizer, instruction, case, target, args.max_length)
                for case, target in zip(chosen, targets)]
     base_model = AutoModelForCausalLM.from_pretrained(
-        str(info["base"]), local_files_only=True, dtype=torch.float32,
+        str(info["base"]), local_files_only=True, dtype=resolve_cpu_dtype(torch, args.cpu_dtype),
         low_cpu_mem_usage=True,
     )
     base_model.config.use_cache = False
@@ -273,6 +327,10 @@ def run_training(args) -> dict:
         r=4, lora_alpha=8, lora_dropout=0.0, bias="none",
         task_type=TaskType.CAUSAL_LM, target_modules=["q_proj", "v_proj"],
     ))
+    configure_gradient_checkpointing(model, args.gradient_checkpointing)
+    if args.cpu_dtype == "bfloat16":
+        require(all(p.dtype == torch.float32 for p in model.parameters() if p.requires_grad),
+                "CPU BF16 donor requires float32 trainable adapters")
     model.train()
     before = trainable_digest(model, torch)
     frozen_before = _frozen_parameter_digest(model, torch)
@@ -300,6 +358,8 @@ def run_training(args) -> dict:
     require(sha256_file(info["base"] / "model.safetensors") == args.base_sha256,
             "HF donor changed during persona run")
     verify_donor_metadata(info["base"], info["base_metadata_sha256"])
+    verify_donor_identity(info["base"], args.base_sha256, info["donor_provenance"],
+                          bt2=info["bt2"])
     checked_checkout(info["bt2"], args.source_commit, "tools/train_personality_lora.py")
     checked_checkout(info["labyrinth"], args.labyrinth_commit, "labyrinth/curriculum.py")
     require((after != before) == (args.arm != "sham"),
@@ -317,6 +377,8 @@ def run_training(args) -> dict:
         "schema_version": SCHEMA,
         "claim_ceiling": CEILING,
         "identity_id": args.identity, "arm": args.arm, "device": "cpu",
+        "cpu_dtype": args.cpu_dtype,
+        "gradient_checkpointing_enabled": args.gradient_checkpointing,
         "bt2_source_commit": args.source_commit,
         "labyrinth_scheduler_commit": args.labyrinth_commit,
         "labyrinth_role": "ungraded deterministic training-case schedule",
@@ -332,6 +394,7 @@ def run_training(args) -> dict:
         "base_model_dir": str(info["base"]),
         "base_model_sha256": args.base_sha256,
         "base_metadata_sha256": info["base_metadata_sha256"],
+        "donor_provenance": info["donor_provenance"],
         "base_model_bytes": (info["base"] / "model.safetensors").stat().st_size,
         "schedule": info["schedule"], "seed": args.seed, "steps": args.steps,
         "max_length": args.max_length, "threads": args.threads,
@@ -360,10 +423,14 @@ def verify_reload(args) -> dict:
             "missing or unsafe personality training report")
     report = json.loads(report_file.read_text(encoding="utf-8"))
     require(report["schema_version"] == SCHEMA, "wrong persona receipt schema")
+    cpu_dtype = report.get("cpu_dtype", "float32")  # V2 receipt compatibility
+    require(cpu_dtype in CPU_DTYPES, "unsupported CPU model dtype receipt")
     donor = Path(report["base_model_dir"])
     require(sha256_file(donor / "model.safetensors") == report["base_model_sha256"],
             "donor changed after persona training")
     verify_donor_metadata(donor, report.get("base_metadata_sha256"))
+    verify_donor_identity(donor, report["base_model_sha256"],
+                          report.get("donor_provenance"))
     file = run / "adapter/adapter_model.safetensors"
     require(file.is_file() and not file.is_symlink(),
             "missing or unsafe PEFT adapter weights")
@@ -376,7 +443,8 @@ def verify_reload(args) -> dict:
 
     torch.set_num_threads(args.threads)
     base = AutoModelForCausalLM.from_pretrained(
-        str(donor), local_files_only=True, dtype=torch.float32, low_cpu_mem_usage=True,
+        str(donor), local_files_only=True, dtype=resolve_cpu_dtype(torch, cpu_dtype),
+        low_cpu_mem_usage=True,
     )
     adapter = PeftModel.from_pretrained(base, str(run / "adapter"), is_trainable=True)
     digest = trainable_digest(adapter, torch)
@@ -399,6 +467,10 @@ def main() -> int:
     train.add_argument("--base-sha256", required=True)
     train.add_argument("--run-dir", required=True)
     train.add_argument("--device", default="cpu")
+    train.add_argument("--cpu-dtype", choices=CPU_DTYPES, default="float32",
+                       help="opt-in bfloat16 frozen donor may lower RAM use, but requires full qualification")
+    train.add_argument("--gradient-checkpointing", action="store_true",
+                       help="experimental non-reentrant checkpointing trades compute for activation memory")
     train.add_argument("--arm", choices=("candidate", "sham", "corrupt", "crossrole"),
                        default="candidate")
     train.add_argument("--instruction-mode", choices=("neutral", "traits"),

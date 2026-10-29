@@ -67,6 +67,15 @@ defined rubrics, **never the custody key**. The packet reveals the task ID,
 domain, rubric ID, response, response hash, and optional syntax diagnostic;
 it hides model variant, model digest, and run ID.
 
+The writer creates packet, key, plan, response, and report files exclusively
+with private `0600` permissions on POSIX, regardless of a permissive process
+umask. This is **not** a substitute for a private directory, correct Windows
+ACLs, disk encryption where applicable, or separating the key from reviewers.
+Verify the destination directory's actual sharing and permissions before
+handling reserved cases. No artifact or digest makes an evaluator who controls
+all inputs cryptographically independent; external custody must retain the
+sealed case bank, plan digest, and execution receipts.
+
 For `reviewer-scores.jsonl`, each row must have the packet's `review_id` and
 `response_sha256` with independently assigned `correctness` and
 `role_fidelity` on 0–4 integer scales. Use JSON `null` for any metric not
@@ -105,6 +114,10 @@ significance without further uncertainty analysis and repeat evaluations.
 ## Safety and reproducibility
 
 - All model and `llama-cli` binaries are SHA-256 verified before generation.
+- The plan is checked against the exact neutral system instruction and the
+  independently recorded case-prompt digest; matching two altered arms cannot
+  silently introduce a different "neutral" instruction. Blinding refuses
+  missing, non-deterministic, or inconsistent generator settings.
 - Experimental training reports are SHA-256 pinned and checked against their
   claimed arms. These receipts alone do not prove a GGUF's neural ancestry;
   link the corresponding merge/conversion receipts during independent review.

@@ -15,9 +15,13 @@ module = prior.module
 
 class AdapterConfigPinTests(unittest.TestCase):
     def _fixture(self, temp):
+        case = prior.MergePersonaPreflightTests("test_missing_run_fails_without_output")
         root, source, labyrinth, donor, run, report = (
-            prior.MergePersonaPreflightTests("test_missing_run_fails_without_output")._fixture(temp)
+            case._fixture(temp)
         )
+        # This helper creates a scoped, synthetic donor digest patch. Another
+        # TestCase cannot leave its patch active after the borrowing test ends.
+        self.addCleanup(case.tearDown)
         config_file = run / "adapter/adapter_config.json"
         config_file.write_text(json.dumps({"r": 8, "lora_alpha": 16}), encoding="utf-8")
         report["adapter_config_sha256"] = module.sha256_file(config_file)

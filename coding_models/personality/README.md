@@ -87,6 +87,11 @@ require **separate output paths** and equivalent case exposure. Running the
 candidate alone is not a matched controlled study. Training updates a
 separate adapter, not the previously produced Q8_0 GGUFs; a fresh, verified
 merge/conversion and runtime check is needed for a new combined model file.
+An additional **opt-in experimental** `--cpu-dtype bfloat16` loads the frozen
+donor at lower precision and requires float32 trainable LoRA adapters. The
+default remains `float32`; BF16 has not been qualified on Lappy with this full
+model, and smaller tensor storage alone does not guarantee safe host memory,
+acceptable runtime, or model quality. Check live resources before any run.
 The opt-in trainer checks untouched frozen neural weights, persistent buffers,
 the HF donor, and the exact pinned source checkouts after optimization before
 saving the adapter; those checks do not demonstrate behavioral improvement.
@@ -98,6 +103,19 @@ scaling. Historical V1 and unpinned V2 receipts remain archival evidence but
 are not accepted by the stricter merge path. The optional `--arm crossrole`
 requires exact same-task, cross-role training groups; the present dossiers
 contain none, so it must not be claimed as a runnable control.
+
+New candidate receipts also pin the officially verified upstream
+`Qwen/Qwen2.5-Coder-1.5B-Instruct` repository revision
+`2e1fd397ee46e1388853d2af2c993145b0f1098a`, exact donor weight SHA-256,
+and the upstream Apache-2.0 LICENSE SHA-256. The verbatim 11,343-byte license
+is checked into `coding_models/training/upstream/` and its digest verified before
+new training, reload, merge, or GGUF conversion. A local donor snapshot may
+omit its LICENSE; if it has one, conflicting bytes are rejected. New merged-HF
+and GGUF output directories receive independently checksummed **license and
+modification-notice companions**. These are packaging-source controls, not proof
+of third-party contributor permission or compliance of any historical release.
+Git blob/byte-exact checkout checks can fail closed under Windows `core.autocrlf`
+or active Git smudge filters; verify raw local bytes before training.
 
 ## Separate merged GGUF artifacts (experimental)
 

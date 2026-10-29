@@ -19,6 +19,8 @@ from build_identity_gguf_batch import (
 )
 from identity_coding_models import load_models, require
 from train_personality_lora import SCHEMA as TRAIN_SCHEMA, CEILING as TRAIN_CEILING, checked_checkout
+from personality_donor_provenance import (copy_attribution_companions,
+                                          verify_donor_identity)
 
 
 SCHEMA = "BT2_LABYRINTH_PERSONA_GGUF_BATCH_RECEIPT_V1"
@@ -43,6 +45,7 @@ def inputs(args) -> dict:
     digests = {name: sha256_file(base / name) for name in files}
     require(digests["model.safetensors"] == args.base_sha256,
             "HF donor digest mismatch")
+    donor_provenance = verify_donor_identity(base, args.base_sha256, bt2=source)
     converter_dir = checked_checkout(Path(args.llama_cpp_dir), args.converter_commit,
                                      "convert_hf_to_gguf.py")
     converter = converter_dir / "convert_hf_to_gguf.py"
@@ -58,10 +61,13 @@ def inputs(args) -> dict:
     return {"source": source, "labyrinth": labyrinth, "base": base,
             "converter": converter, "cli": cli, "output": output,
             "base_digests": digests, "converter_sha": sha256_file(converter),
+            "donor_provenance": donor_provenance,
             "cli_sha": sha256_file(cli)}
 
 
 def check_input_digests(ctx: dict) -> None:
+    verify_donor_identity(ctx["base"], ctx["donor_provenance"]["weights_sha256"],
+                          ctx["donor_provenance"], bt2=ctx["source"])
     for name, expected in ctx["base_digests"].items():
         require(sha256_file(ctx["base"] / name) == expected,
                 f"HF donor input changed: {name}")
@@ -123,6 +129,8 @@ def build(identity: str, args, ctx: dict) -> dict:
         "--labyrinth-dir", str(ctx["labyrinth"]), *common,
     ], dest / "merge.log", ctx["source"], 900)
     merge = json.loads((merged / "BT2_PERSONA_MERGE_RECEIPT.json").read_text(encoding="utf-8"))
+    require(merge.get("donor_provenance") == ctx["donor_provenance"],
+            "persona merge donor attribution differs from pinned source")
     require(checked_adapter_config(run, report, merge) == config_sha,
             "adapter configuration changed during merge")
     require_disk_headroom(ctx["output"], args.min_free_gib, 3)
@@ -145,6 +153,9 @@ def build(identity: str, args, ctx: dict) -> dict:
             "llama-cli smoke lacks loaded Q8_0 and simple Python add output")
     require(checked_adapter_config(run, report, merge) == config_sha,
             "adapter configuration changed during conversion/smoke")
+    attribution = copy_attribution_companions(
+        base=ctx["base"], bt2=ctx["source"],
+        output=dest / "gguf", provenance=ctx["donor_provenance"])
     require(report["schema_version"] == TRAIN_SCHEMA and report["claim_ceiling"] == TRAIN_CEILING
             and report["identity_id"] == identity and report["arm"] == "candidate"
             and report["bt2_source_commit"] == args.source_commit
@@ -167,6 +178,8 @@ def build(identity: str, args, ctx: dict) -> dict:
         "claim_ceiling": CEILING, "source_commit": args.source_commit,
         "labyrinth_commit": args.labyrinth_commit,
         "base_sha256": args.base_sha256, "base_file_sha256": ctx["base_digests"],
+        "donor_provenance": ctx["donor_provenance"],
+        "attribution_companions_sha256": attribution,
         "training_report_sha256": train_sha,
         "merged_receipt_sha256": sha256_file(merged / "BT2_PERSONA_MERGE_RECEIPT.json"),
         "adapter_sha256": report["adapter_safetensors_sha256"],
