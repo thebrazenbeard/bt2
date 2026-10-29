@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 
@@ -11,7 +12,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from validate_personality_sft import validate_persona_cases  # noqa: E402
 from train_personality_lora import (  # noqa: E402
-    build_schedule, encode_case, persona_instruction, require_isolated_output,
+    build_schedule, donor_metadata_digests, encode_case, persona_instruction,
+    require_isolated_output, verify_donor_metadata,
 )
 from identity_coding_models import load_models  # noqa: E402
 
@@ -29,6 +31,24 @@ class FakeTokenizer:
 
 
 class PersonaTrainingTests(unittest.TestCase):
+    def test_training_metadata_snapshot_and_reload_guards(self):
+        with tempfile.TemporaryDirectory() as temp:
+            donor = Path(temp)
+            for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
+                (donor / name).write_text("{}", encoding="utf-8")
+            pinned = donor_metadata_digests(donor)
+            self.assertEqual(set(pinned),
+                             {"config.json", "tokenizer.json", "tokenizer_config.json"})
+            self.assertEqual(verify_donor_metadata(donor, pinned), pinned)
+            (donor / "generation_config.json").write_text('{"temperature":0}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, pinned)
+            current = donor_metadata_digests(donor)
+            self.assertIn("generation_config.json", current)
+            (donor / "tokenizer.json").write_text('{"changed":true}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                verify_donor_metadata(donor, current)
+
     def test_exact_roster_and_train_dev_separation(self):
         dossiers = validate_persona_cases()
         self.assertEqual(len(dossiers), 13)

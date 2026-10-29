@@ -53,6 +53,10 @@ class MergePersonaPreflightTests(unittest.TestCase):
             "labyrinth_scheduler_commit": "b" * 40,
             "base_model_dir": str(donor),
             "base_model_sha256": module.sha256_file(donor / "model.safetensors"),
+            "base_metadata_sha256": {
+                name: module.sha256_file(donor / name)
+                for name in ("config.json", "tokenizer.json", "tokenizer_config.json")
+            },
             "adapter_safetensors_sha256": module.sha256_file(run / "adapter/adapter_model.safetensors"),
             "personality_dataset_sha256": module.sha256_file(dataset),
             "persona_instruction_sha256": "c" * 64,
@@ -126,6 +130,38 @@ class MergePersonaPreflightTests(unittest.TestCase):
                         destination.mkdir()
                     with self.assertRaises(ValueError):
                         self._check(run, destination, labyrinth, source)
+
+    def test_rejects_donor_metadata_changed_since_training(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, labyrinth, donor, run, report = self._fixture(temp)
+            for name in ("config.json", "tokenizer.json", "tokenizer_config.json"):
+                with self.subTest(name=name):
+                    file = donor / name
+                    original = file.read_bytes()
+                    file.write_bytes(original + b"changed-after-training")
+                    with self.assertRaisesRegex(ValueError, "donor metadata"):
+                        self._check(run, root / "output", labyrinth, source)
+                    file.write_bytes(original)
+            extra = donor / "special_tokens_map.json"
+            extra.write_text('{"eos_token": "<eos>"}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "donor metadata"):
+                self._check(run, root / "output", labyrinth, source)
+            self.assertFalse((root / "output").exists())
+
+    def test_rejects_missing_or_untrusted_training_metadata_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root, source, labyrinth, donor, run, report = self._fixture(temp)
+            for bad in (None, {}, {"config.json": "0" * 64},
+                        dict(report["base_metadata_sha256"], **{"unexpected.json": "0" * 64})):
+                with self.subTest(metadata=bad):
+                    broken = dict(report)
+                    if bad is None:
+                        broken.pop("base_metadata_sha256")
+                    else:
+                        broken["base_metadata_sha256"] = bad
+                    (run / "report.json").write_text(json.dumps(broken), encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        self._check(run, root / "output", labyrinth, source)
 
     def test_merge_writes_source_bound_receipt_in_new_directory(self):
         with tempfile.TemporaryDirectory() as temp:
