@@ -26,7 +26,7 @@ CEILING = "EXPERIMENTAL_PERSONA_WEIGHT_BUILD_AND_SIMPLE_SMOKE_NOT_QUALIFIED"
 
 
 def inputs(args) -> dict:
-    require(1 <= args.threads <= 4 and args.steps in (2, 4) and
+    require(1 <= args.threads <= 4 and args.steps in (2, 4, 8) and
             768 <= args.max_length <= 2048, "invalid bounded training parameters")
     require(16 <= args.min_free_gib <= 128, "invalid free-space reserve")
     require(len(args.identities) == len(set(args.identities)) and
@@ -71,6 +71,25 @@ def check_input_digests(ctx: dict) -> None:
             "llama-cli changed during batch")
 
 
+def checked_adapter_config(run: Path, training: dict, merge: dict | None = None) -> str:
+    """Pin exact PEFT adapter settings across disk, training and merge custody."""
+    adapter = run / "adapter"
+    require(adapter.is_dir() and not adapter.is_symlink(),
+            "missing/nonregular persona adapter directory")
+    path = adapter / "adapter_config.json"
+    require(path.is_file() and not path.is_symlink(),
+            "missing/nonregular persona adapter configuration")
+    claimed = training.get("adapter_config_sha256")
+    require(isinstance(claimed, str) and re.fullmatch(r"[a-f0-9]{64}", claimed) is not None,
+            "missing/invalid training adapter_config_sha256 receipt")
+    require(sha256_file(path) == claimed,
+            "persona adapter configuration differs from training receipt")
+    if merge is not None:
+        require(merge.get("adapter_config_sha256") == claimed,
+                "missing/mismatched merge adapter_config_sha256 receipt")
+    return claimed
+
+
 def build(identity: str, args, ctx: dict) -> dict:
     require_disk_headroom(ctx["output"], args.min_free_gib, 10)
     check_input_digests(ctx)
@@ -94,12 +113,18 @@ def build(identity: str, args, ctx: dict) -> dict:
         python, str(ctx["source"] / "tools/train_personality_lora.py"),
         "verify-reload", "--run-dir", str(run), *common,
     ], dest / "reload.log", ctx["source"], 360)
+    # Require newly produced trainer evidence before an expensive merge/conversion.
+    report = json.loads((run / "report.json").read_text(encoding="utf-8"))
+    config_sha = checked_adapter_config(run, report)
     require_disk_headroom(ctx["output"], args.min_free_gib, 9)
     run_stage(f"persona:{identity}:merge", [
         python, str(ctx["source"] / "tools/merge_personality_lora_hf.py"),
         "--run-dir", str(run), "--output-dir", str(merged),
         "--labyrinth-dir", str(ctx["labyrinth"]), *common,
     ], dest / "merge.log", ctx["source"], 900)
+    merge = json.loads((merged / "BT2_PERSONA_MERGE_RECEIPT.json").read_text(encoding="utf-8"))
+    require(checked_adapter_config(run, report, merge) == config_sha,
+            "adapter configuration changed during merge")
     require_disk_headroom(ctx["output"], args.min_free_gib, 3)
     run_stage(f"persona:{identity}:convert", [
         python, str(ctx["converter"]), str(merged), "--outfile", str(gguf),
@@ -118,8 +143,8 @@ def build(identity: str, args, ctx: dict) -> dict:
     require("ftype      : Q8_0" in smoke and
             re.search(r"def\s+add\s*\([^)]*\).*?return\s+a\s*\+\s*b", smoke, re.S),
             "llama-cli smoke lacks loaded Q8_0 and simple Python add output")
-    report = json.loads((run / "report.json").read_text(encoding="utf-8"))
-    merge = json.loads((merged / "BT2_PERSONA_MERGE_RECEIPT.json").read_text(encoding="utf-8"))
+    require(checked_adapter_config(run, report, merge) == config_sha,
+            "adapter configuration changed during conversion/smoke")
     require(report["schema_version"] == TRAIN_SCHEMA and report["claim_ceiling"] == TRAIN_CEILING
             and report["identity_id"] == identity and report["arm"] == "candidate"
             and report["bt2_source_commit"] == args.source_commit
@@ -145,6 +170,7 @@ def build(identity: str, args, ctx: dict) -> dict:
         "training_report_sha256": train_sha,
         "merged_receipt_sha256": sha256_file(merged / "BT2_PERSONA_MERGE_RECEIPT.json"),
         "adapter_sha256": report["adapter_safetensors_sha256"],
+        "adapter_config_sha256": config_sha,
         "frozen_state_verified": True, "steps": args.steps,
         "converter_sha256": ctx["converter_sha"], "llama_cli_sha256": ctx["cli_sha"],
         "gguf_filename": gguf.name, "gguf_bytes": gguf.stat().st_size,
@@ -168,7 +194,7 @@ def main() -> int:
                  "llama-cli", "output-root"):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--identities", nargs="+", required=True)
-    parser.add_argument("--steps", type=int, default=4)
+    parser.add_argument("--steps", type=int, default=8)
     parser.add_argument("--max-length", type=int, default=2048)
     parser.add_argument("--threads", type=int, default=2)
     parser.add_argument("--seed", type=int, default=74413)

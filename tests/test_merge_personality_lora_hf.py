@@ -44,6 +44,9 @@ class MergePersonaPreflightTests(unittest.TestCase):
         run = root / "run"
         (run / "adapter").mkdir(parents=True)
         (run / "adapter/adapter_model.safetensors").write_bytes(b"candidate LoRA values")
+        (run / "adapter/adapter_config.json").write_text(
+            '{"r": 4, "lora_alpha": 8}', encoding="utf-8"
+        )
         report = {
             "schema_version": module.SCHEMA,
             "claim_ceiling": module.CEILING,
@@ -58,6 +61,7 @@ class MergePersonaPreflightTests(unittest.TestCase):
                 for name in ("config.json", "tokenizer.json", "tokenizer_config.json")
             },
             "adapter_safetensors_sha256": module.sha256_file(run / "adapter/adapter_model.safetensors"),
+            "adapter_config_sha256": module.sha256_file(run / "adapter/adapter_config.json"),
             "personality_dataset_sha256": module.sha256_file(dataset),
             "persona_instruction_sha256": "c" * 64,
             "frozen_parameters_and_buffers_verified_unchanged": True,
@@ -102,6 +106,7 @@ class MergePersonaPreflightTests(unittest.TestCase):
                                ("behavioral_improvement_verified", True),
                                ("bt2_source_commit", "not-a-hash"),
                                ("persona_instruction_sha256", "bad"),
+                               ("adapter_config_sha256", "bad"),
                                ("trainable_tensor_sha256_before", "bad"),
                                ("frozen_parameter_sha256_unchanged", "bad")):
                 with self.subTest(field=field, bad=bad):
@@ -116,6 +121,7 @@ class MergePersonaPreflightTests(unittest.TestCase):
             root, source, labyrinth, donor, run, report = self._fixture(temp)
             for path in (donor / "model.safetensors",
                          run / "adapter/adapter_model.safetensors",
+                         run / "adapter/adapter_config.json",
                          source / "coding_models/personality/cases/one.json"):
                 with self.subTest(path=path):
                     before = path.read_bytes()
@@ -220,6 +226,8 @@ class MergePersonaPreflightTests(unittest.TestCase):
             self.assertEqual(receipt["base_sha256"], module.sha256_file(donor / "model.safetensors"))
             self.assertEqual(receipt["adapter_sha256"],
                              module.sha256_file(run / "adapter/adapter_model.safetensors"))
+            self.assertEqual(receipt["adapter_config_sha256"],
+                             module.sha256_file(run / "adapter/adapter_config.json"))
             self.assertEqual(receipt["training_report_sha256"],
                              module.sha256_file(run / "report.json"))
             self.assertEqual(receipt["safetensors"], {

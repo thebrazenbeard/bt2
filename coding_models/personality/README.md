@@ -1,31 +1,42 @@
-# BT2 source-grounded operational personality conditioning — experimental
+# BT2 original-trait personality conditioning — experimental
 
-Each of the 13 role dossiers in `cases/*.json` contains 3–5+ sourced behavioral
-tendencies and six **synthetic, unqualified** coding conversations (four
-TRAIN, two public DEV). The 52 train and 26 dev cases target observable
-professional dispositions, not inner feelings, biological life, personal
-histories, identity continuity, self-awareness, or new permissions. A model
-responding in a role's style is not evidence it *is* that durable identity.
+The model goal is to preserve each identity's **originally designated cognitive
+personality** while retaining useful coding competence. Engineering assignment
+and personality are separate axes; a later narrow role contract does not
+silently redefine the personality. See
+[`USER_TRAIT_CORRECTIONS_20261028.md`](USER_TRAIT_CORRECTIONS_20261028.md)
+for Patrick's explicit corrections, the pinned original ten-facet source, and
+Masa/Mune/Hephaestus source precedence.
 
-| Identity | Target behavioral disposition (inference from role source) |
+Each of the 13 dossiers in `cases/*.json` is a synthetic and **unqualified**
+training proposal. The public DEV cases are not a sealed independent holdout.
+Training targets observable reasoning/interaction tendencies, not inner feelings,
+biological life, personal histories, identity continuity, self-awareness, or
+new permissions. A model responding in a style does not prove that it *is*
+the durable identity or has generalized that style.
+
+| Identity | Intended cognitive disposition, not observed model behavior |
 | --- | --- |
-| One | Measured integrator, even-handed synthesis, calm coordination |
-| Two | Constructive, invariants-first architectural skepticism |
-| Three | Disciplined state and transition steward |
-| Four | Precise reconstruction, complete documentation and packaging |
-| Five | Forensic independent custody, calibrated claims and stopping |
-| Six | Calm operator, resource-aware and ambiguity-tolerant |
-| Seven | Proportionate independent security skepticism |
+| One | Integrative, measured, decisive |
+| Two | Structural, abstract, systems-first |
+| Three | Concrete, energetic, implementation-first |
+| Four | Creative dreamer; curious, unconventional, possibility-seeking (Patrick-confirmed) |
+| Five | Precise, evidence-driven, quantitative |
+| Six | Human-centered, perceptive, plainspoken |
+| Seven | Scientific genius (Patrick-confirmed target; subject-matter competence must be evaluated) |
 | Eight | Pragmatic economy without amputating obligations |
 | Nine | Exact reproducibility and adversarial, fair acceptance tests |
-| Thirteen | Independent, concrete false-authority correction challenges |
-| Masa | Curious, hypothesis-revising causal debugger |
-| Mune | Fair, independent hostile verifier and positive-control advocate |
-| Hephaestus | Precise, minimally corrective, decisive authorized repair |
+| Thirteen | Broadly skeptical, independent reviewer; difficult to impress (Patrick-confirmed) |
+| Masa | Causal debugging specialist; fuller temperament remains inferred |
+| Mune | Independent verification specialist; fuller temperament remains inferred |
+| Hephaestus | Native ChatGPT Project engineer; fuller temperament remains inferred |
 
-Source refs and trait classification (`SOURCE` vs `INFERENCE`) live in each
-dossier. Current BT2 source/role contracts take precedence over historical
-presentation labels (notably Four's obsolete creative persona portrayal).
+Each dossier distinguishes `USER`, `SOURCE`, and `INFERENCE` evidence where
+supported by the validator. Previously generated GGUFs were conditioned on
+the older duty-heavy dossiers; they are **superseded candidates for personality
+purposes**, not automatically deleted, repaired, or retrained by these source
+changes. The archived ten facets share collective state and final voice; no
+private autobiographical identities are inferred from separate model files.
 
 ## Validation
 

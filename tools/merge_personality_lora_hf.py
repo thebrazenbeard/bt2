@@ -35,6 +35,22 @@ def _commit(value: object, label: str) -> str:
     return value
 
 
+def verify_adapter_config(adapter_dir: Path, receipt_digest: object) -> str:
+    """Pin PEFT scaling/rank/target metadata, not just the LoRA tensor bytes.
+
+    A legacy report without this training-time digest is not merge-qualified:
+    the adapter configuration can change merged neural weights independently
+    of adapter_model.safetensors. Never infer a digest from live adapter files.
+    """
+    expected = _sha(receipt_digest, "adapter config")
+    config = adapter_dir / "adapter_config.json"
+    require(config.is_file() and not config.is_symlink(),
+            "missing/nonregular adapter config")
+    require(sha256_file(config) == expected,
+            "adapter config bytes differ from training receipt")
+    return expected
+
+
 def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
                           *, bt2_dir: Path = ROOT) -> dict:
     """Check source, donor, adapter and output custody before importing torch."""
@@ -60,6 +76,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     labyrinth_commit = _commit(report.get("labyrinth_scheduler_commit"), "Labyrinth source")
     donor_sha = _sha(report.get("base_model_sha256"), "HF donor")
     adapter_sha = _sha(report.get("adapter_safetensors_sha256"), "persona adapter")
+    adapter_config_sha = _sha(report.get("adapter_config_sha256"), "adapter config")
     dataset_sha = _sha(report.get("personality_dataset_sha256"), "persona dataset")
     _sha(report.get("persona_instruction_sha256"), "persona instruction")
     train_before = _sha(report.get("trainable_tensor_sha256_before"), "initial LoRA state")
@@ -67,7 +84,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     require(train_before != train_after, "candidate LoRA state did not change during training")
     _sha(report.get("frozen_parameter_sha256_unchanged"), "frozen parameter state")
     _sha(report.get("persistent_buffer_sha256_unchanged"), "frozen buffer state")
-    require(report.get("steps") in (2, 4) and isinstance(report.get("schedule"), list) and
+    require(report.get("steps") in (2, 4, 8) and isinstance(report.get("schedule"), list) and
             len(report["schedule"]) == report["steps"], "invalid persona schedule receipt")
 
     bt2 = checked_checkout(bt2_dir, bt2_commit, "tools/train_personality_lora.py")
@@ -87,6 +104,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
     adapter_file = adapter / "adapter_model.safetensors"
     require(adapter_file.is_file() and not adapter_file.is_symlink(), "missing/nonregular adapter weights")
     require(sha256_file(adapter_file) == adapter_sha, "persona adapter bytes differ from receipt")
+    verify_adapter_config(adapter, adapter_config_sha)
 
     require(not output_dir.exists() and not output_dir.is_symlink(),
             "merge destination must be an entirely new directory")
@@ -99,6 +117,7 @@ def validate_merge_inputs(run_dir: Path, output_dir: Path, labyrinth_dir: Path,
         "bt2_dir": bt2, "labyrinth_dir": labyrinth,
         "dataset_file": dataset, "report_sha256": sha256_file(report_file),
         "donor_meta_sha256": donor_meta,
+        "adapter_config_sha256": adapter_config_sha,
     }
 
 
@@ -121,6 +140,8 @@ def merge(args) -> dict:
         base, str(context["adapter_dir"]), is_trainable=False,
     )
     merged = adapted.merge_and_unload(safe_merge=True)
+    # Check immediately after PEFT has consumed the config and before allocating output.
+    verify_adapter_config(context["adapter_dir"], context["adapter_config_sha256"])
     tokenizer = AutoTokenizer.from_pretrained(
         str(context["base_dir"]), local_files_only=True,
     )
@@ -141,6 +162,7 @@ def merge(args) -> dict:
     require(sha256_file(context["adapter_dir"] / "adapter_model.safetensors") ==
             context["report"]["adapter_safetensors_sha256"],
             "persona adapter changed during merge")
+    verify_adapter_config(context["adapter_dir"], context["adapter_config_sha256"])
     require(sha256_file(context["report_file"]) == context["report_sha256"],
             "personality training report changed during merge")
     require(sha256_file(context["dataset_file"]) ==
@@ -166,6 +188,7 @@ def merge(args) -> dict:
         "base_sha256": context["report"]["base_model_sha256"],
         "base_metadata_sha256": context["donor_meta_sha256"],
         "adapter_sha256": context["report"]["adapter_safetensors_sha256"],
+        "adapter_config_sha256": context["adapter_config_sha256"],
         "safetensors": {file.name: sha256_file(file) for file in weights},
         "metadata_sha256": {name: sha256_file(output / name) for name in metadata},
         "merge_method": "PEFT merge_and_unload(safe_merge=True)",
