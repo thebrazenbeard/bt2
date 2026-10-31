@@ -1,0 +1,536 @@
+﻿{
+  "lengths": {
+    "A": 100,
+    "A_RETURN": 100,
+    "B": 100,
+    "C": 100
+  },
+  "runs": {
+    "abrupt": {
+      "11": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00236098,
+          "phase_mse": {
+            "A_initial": 0.00442135,
+            "A_return": 0.000879,
+            "B": 0.00251091,
+            "C": 0.00163267
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00189359,
+          "phase_mse": {
+            "A_initial": 0.00399784,
+            "A_return": 0.00101129,
+            "B": 0.00153952,
+            "C": 0.0010257
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 3,
+          "overall_mse": 0.00149529,
+          "phase_mse": {
+            "A_initial": 0.00399784,
+            "A_return": 0.00038292,
+            "B": 0.00059651,
+            "C": 0.00100391
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04752441,
+          "phase_mse": {
+            "A_initial": 0.05824271,
+            "A_return": 0.05073293,
+            "B": 0.03128046,
+            "C": 0.04984154
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.05873596,
+          "phase_mse": {
+            "A_initial": 0.06995943,
+            "A_return": 0.06124447,
+            "B": 0.04235671,
+            "C": 0.06138321
+          },
+          "steps_scored": 400,
+          "terminal": null
+        }
+      },
+      "23": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00238232,
+          "phase_mse": {
+            "A_initial": 0.0041467,
+            "A_return": 0.00114787,
+            "B": 0.00264293,
+            "C": 0.00159179
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00182822,
+          "phase_mse": {
+            "A_initial": 0.00359034,
+            "A_return": 0.00127098,
+            "B": 0.00150165,
+            "C": 0.00094991
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 5,
+          "overall_mse": 0.00141405,
+          "phase_mse": {
+            "A_initial": 0.00359034,
+            "A_return": 0.00039917,
+            "B": 0.00068078,
+            "C": 0.00098592
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.05038203,
+          "phase_mse": {
+            "A_initial": 0.05794192,
+            "A_return": 0.0547561,
+            "B": 0.03816721,
+            "C": 0.0506629
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.0633833,
+          "phase_mse": {
+            "A_initial": 0.07131915,
+            "A_return": 0.06942085,
+            "B": 0.05158723,
+            "C": 0.06120596
+          },
+          "steps_scored": 400,
+          "terminal": null
+        }
+      },
+      "41": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00230755,
+          "phase_mse": {
+            "A_initial": 0.00334613,
+            "A_return": 0.00100586,
+            "B": 0.00285136,
+            "C": 0.00202685
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00162959,
+          "phase_mse": {
+            "A_initial": 0.00300624,
+            "A_return": 0.00114068,
+            "B": 0.00145015,
+            "C": 0.00092129
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 3,
+          "overall_mse": 0.00143358,
+          "phase_mse": {
+            "A_initial": 0.00300624,
+            "A_return": 0.00025791,
+            "B": 0.00066785,
+            "C": 0.00180232
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04252817,
+          "phase_mse": {
+            "A_initial": 0.04948976,
+            "A_return": 0.04055814,
+            "B": 0.02642952,
+            "C": 0.05363524
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.05562246,
+          "phase_mse": {
+            "A_initial": 0.06575046,
+            "A_return": 0.05213367,
+            "B": 0.03205961,
+            "C": 0.0725461
+          },
+          "steps_scored": 400,
+          "terminal": null
+        }
+      },
+      "59": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00300344,
+          "phase_mse": {
+            "A_initial": 0.00553762,
+            "A_return": 0.00117352,
+            "B": 0.00356996,
+            "C": 0.00173266
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00234562,
+          "phase_mse": {
+            "A_initial": 0.00526285,
+            "A_return": 0.00143265,
+            "B": 0.00186278,
+            "C": 0.00082418
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 2,
+          "overall_mse": 0.00205259,
+          "phase_mse": {
+            "A_initial": 0.00526285,
+            "A_return": 0.00018793,
+            "B": 0.00075275,
+            "C": 0.00200681
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04762687,
+          "phase_mse": {
+            "A_initial": 0.05943799,
+            "A_return": 0.04578591,
+            "B": 0.03460023,
+            "C": 0.05068335
+          },
+          "steps_scored": 400,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.06215053,
+          "phase_mse": {
+            "A_initial": 0.07063162,
+            "A_return": 0.06229899,
+            "B": 0.04557422,
+            "C": 0.07009727
+          },
+          "steps_scored": 400,
+          "terminal": null
+        }
+      }
+    },
+    "gradual": {
+      "11": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00236293,
+          "phase_mse": {
+            "A_initial": 0.00442135,
+            "A_return": 0.000931,
+            "A_to_B_drift": 0.00155651,
+            "B": 0.00242208,
+            "C": 0.00174181
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00188187,
+          "phase_mse": {
+            "A_initial": 0.00399784,
+            "A_return": 0.00112019,
+            "A_to_B_drift": 0.00151769,
+            "B": 0.00137603,
+            "C": 0.00106254
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 4,
+          "overall_mse": 0.00152287,
+          "phase_mse": {
+            "A_initial": 0.00399784,
+            "A_return": 0.00055336,
+            "A_to_B_drift": 0.00151133,
+            "B": 0.00043492,
+            "C": 0.00110628
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04760485,
+          "phase_mse": {
+            "A_initial": 0.05824271,
+            "A_return": 0.05094062,
+            "A_to_B_drift": 0.06048362,
+            "B": 0.02967334,
+            "C": 0.05053241
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.05918421,
+          "phase_mse": {
+            "A_initial": 0.06995943,
+            "A_return": 0.0613384,
+            "A_to_B_drift": 0.09621371,
+            "B": 0.03904673,
+            "C": 0.06342991
+          },
+          "steps_scored": 408,
+          "terminal": null
+        }
+      },
+      "23": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00234258,
+          "phase_mse": {
+            "A_initial": 0.0041467,
+            "A_return": 0.00106926,
+            "A_to_B_drift": 0.00047827,
+            "B": 0.00265975,
+            "C": 0.00164376
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.00178901,
+          "phase_mse": {
+            "A_initial": 0.00359034,
+            "A_return": 0.00123649,
+            "A_to_B_drift": 0.00061145,
+            "B": 0.00143017,
+            "C": 0.00099326
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 3,
+          "overall_mse": 0.00143774,
+          "phase_mse": {
+            "A_initial": 0.00359034,
+            "A_return": 0.00052749,
+            "A_to_B_drift": 0.00061145,
+            "B": 0.00068746,
+            "C": 0.00101177
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.05058489,
+          "phase_mse": {
+            "A_initial": 0.05794192,
+            "A_return": 0.05359575,
+            "A_to_B_drift": 0.03694589,
+            "B": 0.03884697,
+            "C": 0.05304604
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.06312647,
+          "phase_mse": {
+            "A_initial": 0.07131915,
+            "A_return": 0.06599428,
+            "A_to_B_drift": 0.05374062,
+            "B": 0.05270491,
+            "C": 0.06323841
+          },
+          "steps_scored": 408,
+          "terminal": null
+        }
+      },
+      "41": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00223241,
+          "phase_mse": {
+            "A_initial": 0.00334613,
+            "A_return": 0.00089353,
+            "A_to_B_drift": 0.00080932,
+            "B": 0.00274828,
+            "C": 0.00205557
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.0015586,
+          "phase_mse": {
+            "A_initial": 0.00300624,
+            "A_return": 0.00104058,
+            "A_to_B_drift": 0.00082197,
+            "B": 0.00131969,
+            "C": 0.0009268
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 4,
+          "overall_mse": 0.00122146,
+          "phase_mse": {
+            "A_initial": 0.00300624,
+            "A_return": 0.00027732,
+            "A_to_B_drift": 0.00082369,
+            "B": 0.0006026,
+            "C": 0.00103147
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04240658,
+          "phase_mse": {
+            "A_initial": 0.04948976,
+            "A_return": 0.04176837,
+            "A_to_B_drift": 0.0239124,
+            "B": 0.02558977,
+            "C": 0.05425795
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.05576852,
+          "phase_mse": {
+            "A_initial": 0.06575046,
+            "A_return": 0.05489254,
+            "A_to_B_drift": 0.04641623,
+            "B": 0.02969269,
+            "C": 0.07348655
+          },
+          "steps_scored": 408,
+          "terminal": null
+        }
+      },
+      "59": {
+        "cumulative_ridge": {
+          "expert_count": null,
+          "overall_mse": 0.00297729,
+          "phase_mse": {
+            "A_initial": 0.00553762,
+            "A_return": 0.00121404,
+            "A_to_B_drift": 0.00200901,
+            "B": 0.00342096,
+            "C": 0.001814
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "ewrls_098": {
+          "expert_count": null,
+          "overall_mse": 0.0022988,
+          "phase_mse": {
+            "A_initial": 0.00526285,
+            "A_return": 0.00147598,
+            "A_to_B_drift": 0.00185209,
+            "B": 0.00162525,
+            "C": 0.00086685
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "lgcm_default": {
+          "expert_count": 3,
+          "overall_mse": 0.00174949,
+          "phase_mse": {
+            "A_initial": 0.00526285,
+            "A_return": 0.00029573,
+            "A_to_B_drift": 0.001831,
+            "B": 0.00061487,
+            "C": 0.000818
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "observation_only": {
+          "expert_count": null,
+          "overall_mse": 0.04767498,
+          "phase_mse": {
+            "A_initial": 0.05943799,
+            "A_return": 0.04653548,
+            "A_to_B_drift": 0.04358761,
+            "B": 0.03410683,
+            "C": 0.05094661
+          },
+          "steps_scored": 408,
+          "terminal": null
+        },
+        "persistence": {
+          "expert_count": null,
+          "overall_mse": 0.06262558,
+          "phase_mse": {
+            "A_initial": 0.07063162,
+            "A_return": 0.06339492,
+            "A_to_B_drift": 0.04203675,
+            "B": 0.04589989,
+            "C": 0.07222299
+          },
+          "steps_scored": 408,
+          "terminal": null
+        }
+      }
+    }
+  },
+  "seeds": [
+    11,
+    23,
+    41,
+    59
+  ]
+}

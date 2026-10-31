@@ -1,0 +1,178 @@
+{
+  "schema": "BT2_FIVE_SYSTEM_RETRIEVAL_PILOT_V1",
+  "model_advertised_id_not_attested": "qwen2.5-coder:1.5b-instruct-q8_0",
+  "fixture_sha256": "d03535c5934d63f61c493c439dc0cbfbf051d8e8c155a6d44e3c2f8b99e9eec3",
+  "source_type": "frozen_synthetic_manual",
+  "cases_per_arm": 6,
+  "scores": {
+    "closed_book": 0,
+    "irrelevant_passage": 0,
+    "relevant_retrieval": 6
+  },
+  "records": [
+    {
+      "unit": "QX-714",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "LUMET-38",
+      "exact_match": false,
+      "latency_ms": 222.53,
+      "prompt_sha256": "93369cbc9f9f32d0781b7f5921dee90cb4cc56e69491eef4c507086ec9e5abd4"
+    },
+    {
+      "unit": "QX-714",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "LUMET-38",
+      "exact_match": false,
+      "latency_ms": 68.26,
+      "prompt_sha256": "ee95c562ec4fe0e9a2b34fda425e36575a86d488ccf78fed1ab57cdeccbd2593"
+    },
+    {
+      "unit": "QX-714",
+      "arm": "relevant_retrieval",
+      "response": "LUMET-38",
+      "expected": "LUMET-38",
+      "exact_match": true,
+      "latency_ms": 108.15,
+      "prompt_sha256": "db1ec2dfddbd3a60d0d11fff8a52b333e9b0fc7bb0633d71c1ae29c93963aa53"
+    },
+    {
+      "unit": "PJ-208",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "ZARON-61",
+      "exact_match": false,
+      "latency_ms": 48.37,
+      "prompt_sha256": "ea4519312bbfb2133b4c12e75e1eaca71f839449de33242f0b7aa7691d204275"
+    },
+    {
+      "unit": "PJ-208",
+      "arm": "relevant_retrieval",
+      "response": "ZARON-61",
+      "expected": "ZARON-61",
+      "exact_match": true,
+      "latency_ms": 98.29,
+      "prompt_sha256": "b66e0ca8801cceca3c08ac6ebedf7d50aeca048008ed0cd16fa0d553a160dd4f"
+    },
+    {
+      "unit": "PJ-208",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "ZARON-61",
+      "exact_match": false,
+      "latency_ms": 66.44,
+      "prompt_sha256": "e206006723117d0f2898cf44762047cf90afda6d9f734ff1b0a74ce0de82f345"
+    },
+    {
+      "unit": "RL-962",
+      "arm": "relevant_retrieval",
+      "response": "TOVAR-47",
+      "expected": "TOVAR-47",
+      "exact_match": true,
+      "latency_ms": 85.89,
+      "prompt_sha256": "0c2ea3ed9d8aff2e485f93c0afdc50477501d4ad8a9e7aa1cac8788febfb615c"
+    },
+    {
+      "unit": "RL-962",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "TOVAR-47",
+      "exact_match": false,
+      "latency_ms": 40.08,
+      "prompt_sha256": "95a2dcb71699d437da7d7fbe81d79378fc7a6c3d2eb2d471d68d3f6b11489a7e"
+    },
+    {
+      "unit": "RL-962",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "TOVAR-47",
+      "exact_match": false,
+      "latency_ms": 40.59,
+      "prompt_sha256": "99e62ca8fdda2319e0380ec61461cb5c35b90f1ea1d1e25bacfeb871f38ff6a2"
+    },
+    {
+      "unit": "FN-435",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "NEXIL-83",
+      "exact_match": false,
+      "latency_ms": 42.59,
+      "prompt_sha256": "10670a800cfae8edf695bb7a427dc08e2ccb40e42a95520b2d1a41437bd689f2"
+    },
+    {
+      "unit": "FN-435",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "NEXIL-83",
+      "exact_match": false,
+      "latency_ms": 43.65,
+      "prompt_sha256": "5745258a9a6d895b7210baa47e50d78c6b43d3db8882cd1111e47b2218725784"
+    },
+    {
+      "unit": "FN-435",
+      "arm": "relevant_retrieval",
+      "response": "NEXIL-83",
+      "expected": "NEXIL-83",
+      "exact_match": true,
+      "latency_ms": 97.8,
+      "prompt_sha256": "9671bfeed7b810e13d5c340f3797d319d399b1b71b59762b0332abb550ba4085"
+    },
+    {
+      "unit": "BK-681",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "VORIN-26",
+      "exact_match": false,
+      "latency_ms": 47.2,
+      "prompt_sha256": "eabf37cf2c10dada900d6b8a6616cc1845b497ec4ad426063455882d62327832"
+    },
+    {
+      "unit": "BK-681",
+      "arm": "relevant_retrieval",
+      "response": "VORIN-26",
+      "expected": "VORIN-26",
+      "exact_match": true,
+      "latency_ms": 99.4,
+      "prompt_sha256": "305ffc253bfbc06858161075a64a2cdfc9a14334aaf6aafbff7d5b1f0b0e45f3"
+    },
+    {
+      "unit": "BK-681",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "VORIN-26",
+      "exact_match": false,
+      "latency_ms": 41.5,
+      "prompt_sha256": "54ee64717995ccf1401faf306668c5466f6ba36599d92e0978ea142810d1a7f2"
+    },
+    {
+      "unit": "DV-159",
+      "arm": "relevant_retrieval",
+      "response": "KELAS-94",
+      "expected": "KELAS-94",
+      "exact_match": true,
+      "latency_ms": 98.13,
+      "prompt_sha256": "310440076e80d34fef7d4cbdc6765801e476278fad8a578c0d86ba282c033569"
+    },
+    {
+      "unit": "DV-159",
+      "arm": "closed_book",
+      "response": "UNKNOWN",
+      "expected": "KELAS-94",
+      "exact_match": false,
+      "latency_ms": 40.79,
+      "prompt_sha256": "35ae53e96ddbf845587b96e8056a37bfccfb32f5bb1832c5d1e5098c6da48a1b"
+    },
+    {
+      "unit": "DV-159",
+      "arm": "irrelevant_passage",
+      "response": "UNKNOWN",
+      "expected": "KELAS-94",
+      "exact_match": false,
+      "latency_ms": 39.35,
+      "prompt_sha256": "4eaab62cbd746f05fe66ca71dbae576a11a166d3a99dd21c947ef0263f82e50e"
+    }
+  ],
+  "learned_state_or_training_verified": false,
+  "retrieval_not_neural_persistence": true
+}
