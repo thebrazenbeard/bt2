@@ -79,6 +79,28 @@ def verify_recovery_pointers(instructions: str, reconstruction: str, topology: d
         raise ValueError("worker topology cannot require chat continuity")
 
 
+def verify_direct_checkout_path(path: str, role: str) -> None:
+    """Reject symlinked sources even when the resolved bytes match the Git blob."""
+    candidate = ROOT / path
+    if candidate.resolve() != ROOT.resolve() / path:
+        raise ValueError(f"{role} source uses symlink: {path}")
+
+
+def verify_retained_historical_payload(ancestor: str) -> None:
+    """Reject historical V4 content drift, indirect files, or missing paths."""
+    for path in ("native/project/PROJECT_FILES_MANIFEST_V4.json",
+                 "native/project/BT2_COORDINATOR_RECONSTRUCTION_V1.md",
+                 "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"):
+        # Git hash-object dereferences a working-tree symlink and can report
+        # the expected blob even if source now resolves outside the checkout.
+        verify_direct_checkout_path(path, "retained V4")
+        candidate = ROOT / path
+        if not candidate.is_file():
+            raise ValueError(f"retained V4 source missing: {path}")
+        if _git("hash-object", path) != _git("rev-parse", f"{ancestor}:{path}"):
+            raise ValueError(f"retained V4 source changed after V5 binding: {path}")
+
+
 def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     if manifest["schema"] != "BT2_NATIVE_PROJECT_FILES_MANIFEST_V5":
@@ -121,6 +143,7 @@ def main() -> int:
         raise SystemExit("V5 manifest member set mismatch")
     for rel, expected in sorted(entries.items()):
         path = ROOT / rel
+        verify_direct_checkout_path(rel, "V5 payload")
         if not path.is_file():
             raise SystemExit(f"V5 payload file absent: {rel}")
         # Bind both the immutable candidate *payload commit* and live file bytes.
@@ -134,12 +157,8 @@ def main() -> int:
         (ROOT / "native/project/BT2_COORDINATOR_RECONSTRUCTION_V2.md").read_text(encoding="utf-8"),
         json.loads((ROOT / "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V2.json").read_text(encoding="utf-8")),
     )
-    # Preserve preexisting V4 package source without a spurious rebinding.
-    for path in ("native/project/PROJECT_FILES_MANIFEST_V4.json",
-                 "native/project/BT2_COORDINATOR_RECONSTRUCTION_V1.md",
-                 "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V1.json"):
-        if not (ROOT / path).is_file():
-            raise SystemExit(f"frozen V4 source missing: {path}")
+    # Preserve historical V4 files and their exact Git-bound contents.
+    verify_retained_historical_payload(ancestor)
     print(f"BT2_NATIVE_V5_SOURCE_PACKAGE_PASS payload_commit={ancestor} "
           "runtime=NOT_ESTABLISHED installation=NOT_INSTALLED")
     return 0
