@@ -3,14 +3,14 @@ name: Export Intake Source Contracts
 on:
   pull_request:
     paths:
-      - 'tools/qualification/export_intake.py'
-      - 'tools/qualification/EXPORT_INTAKE.md'
+      - 'source_recovery/export_intake.py'
+      - 'source_recovery/EXPORT_INTAKE.md'
       - 'tests/test_export_intake.py'
       - '.github/workflows/export-intake-contract.yml'
   push:
     branches: [main]
     paths:
-      - 'tools/qualification/export_intake.py'
+      - 'source_recovery/export_intake.py'
       - 'tests/test_export_intake.py'
       - '.github/workflows/export-intake-contract.yml'
 
