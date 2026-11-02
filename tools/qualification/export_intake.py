@@ -31,7 +31,8 @@ def _sha256(path: Path) -> str:
 
 def _zip_metadata(path: Path, max_members: int) -> dict:
     result = {"status": "UNREADABLE", "members": 0, "unsafe_paths": 0,
-              "encrypted": 0, "symlinks": 0, "suspicious_ratios": 0}
+              "encrypted": 0, "symlinks": 0, "suspicious_ratios": 0,
+              "sensitive_member_names": 0}
     try:
         with zipfile.ZipFile(path) as archive:
             entries = archive.infolist()
@@ -45,6 +46,8 @@ def _zip_metadata(path: Path, max_members: int) -> dict:
                 unsafe = (name.startswith("/") or bool(re.match(r"^[A-Za-z]:", name))
                           or ".." in parts or "\x00" in name)
                 result["unsafe_paths"] += bool(unsafe)
+                result["sensitive_member_names"] += int(any(
+                    hint in name.upper() for hint in PRIVATE_HINTS))
                 result["encrypted"] += bool(member.flag_bits & 1)
                 result["symlinks"] += stat.S_ISLNK(member.external_attr >> 16)
                 result["suspicious_ratios"] += (
@@ -86,6 +89,10 @@ def scan_folder(root: Path, *, max_files: int = 20000,
                                           for token in PRIVATE_HINTS)}
         if path.suffix.lower() == ".zip":
             row["zip"] = _zip_metadata(path, max_zip_members)
+            row["private_review_hold"] = bool(
+                row["private_review_hold"] or
+                row["zip"]["sensitive_member_names"] or
+                row["zip"]["status"] != "METADATA_READABLE_UNTRUSTED")
         rows.append(row)
     archives = [row["zip"] for row in rows if "zip" in row]
     duplicate_groups = [group for group in hashes.values() if len(group) > 1]
