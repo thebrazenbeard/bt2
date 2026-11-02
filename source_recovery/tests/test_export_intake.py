@@ -100,6 +100,12 @@ class ExportIntakeTests(unittest.TestCase):
                                 capture_output=True, text=True, check=False)
         self.assertNotEqual(denied.returncode, 0)
         self.assertFalse(self.out.exists())
+        allowed = subprocess.run([sys.executable, str(script), "--root", str(self.root),
+                                  "--output", str(self.out),
+                                  "--write-private-manifest"],
+                                 capture_output=True, text=True, check=False)
+        self.assertEqual(allowed.returncode, 0, allowed.stderr)
+        self.assertTrue((self.out / "private_manifest.json").is_file())
 
     def test_write_is_separate_and_never_overwrites(self):
         (self.root / "a").write_text("only data")
