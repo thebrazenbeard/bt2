@@ -9,7 +9,7 @@ anything that it scans.
 py -3.12 source_recovery/export_intake.py `
   --root "C:\Users\YOUR_USER\Downloads\Exports" `
   --output "D:\private-review\scan-unique-id"
-py -3.12 -m unittest discover -s tests -p test_export_intake.py -v
+py -3.12 -m unittest discover -s source_recovery/tests -p test_export_intake.py -v
 ```
 
 Supply an **existing source directory** and a **new, separate output directory**
