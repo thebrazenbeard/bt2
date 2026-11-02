@@ -7,8 +7,12 @@ anything that it scans.
 
 ```powershell
 py -3.12 source_recovery/export_intake.py `
+  --root "C:\Users\YOUR_USER\Downloads\Exports"
+# Only for a reviewed owner-restricted output location:
+py -3.12 source_recovery/export_intake.py `
   --root "C:\Users\YOUR_USER\Downloads\Exports" `
-  --output "D:\private-review\scan-unique-id"
+  --output "D:\private-review\scan-unique-id" `
+  --write-private-manifest
 py -3.12 -m unittest discover -s source_recovery/tests -p test_export_intake.py -v
 ```
 
@@ -60,3 +64,10 @@ A historical export never establishes current Lantern state, a working
 installation, identity continuity, or permission for model training.
 The retired WoWSQL backend is not a valid currentness provider; source-only
 SQL Connectome V4 is not an installed runtime.
+
+**Confidentiality warning:** Default CLI output contains aggregate statistics
+only. The private manifest is written only with `--write-private-manifest`
+and `--output`. The tool does **not** enforce Windows DACLs or POSIX
+ownership/modes. Before opting in, verify the destination's inherited access
+controls are restricted to the intended operator. Merely using a local
+folder—especially under shared development roots—does not guarantee privacy.
