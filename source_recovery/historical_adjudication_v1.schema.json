@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/bt2/historical-adjudication-v1.schema.json",
+  "title": "BT2 historical export adjudication record (source-only)",
+  "description": "A private, non-admitting comparison record. This schema never grants data rights, publication, training, installation, or runtime authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "artifact_id", "private_locator", "source_state",
+    "evidence_class", "duplicate_group", "privacy", "rights",
+    "target_repo_candidate", "current_git_comparison", "source_test",
+    "independent_review", "public_admission", "reason_codes"
+  ],
+  "properties": {
+    "schema": {"const": "BT2_HISTORICAL_EXPORT_ADJUDICATION_V1"},
+    "artifact_id": {"type": "string", "pattern": "^[A-Z0-9_-]{4,48}$"},
+    "private_locator": {"const": "REDACTED"},
+    "source_state": {"const": "HISTORICAL_NOT_INSTALLED"},
+    "evidence_class": {
+      "enum": ["INVENTORY", "ARCHIVE_METADATA", "SOURCE_INSPECTION", "TEST"]
+    },
+    "duplicate_group": {
+      "oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Z0-9_-]{4,48}$"}]
+    },
+    "privacy": {"enum": ["UNREVIEWED", "PRIVATE_HOLD", "SANITIZED_REVIEW_REQUIRED"]},
+    "rights": {"const": "UNVERIFIED"},
+    "target_repo_candidate": {
+      "oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[a-z0-9_-]{2,64}$"}]
+    },
+    "current_git_comparison": {"enum": ["NOT_PERFORMED", "CANDIDATE_ONLY"]},
+    "source_test": {"enum": ["NOT_RUN", "SOURCE_ONLY_TESTED"]},
+    "independent_review": {"enum": ["NOT_PERFORMED", "SOURCE_ONLY_REVIEW"]},
+    "public_admission": {"const": "HOLD"},
+    "reason_codes": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": [
+        "SOURCE_PROVENANCE_UNVERIFIED", "RIGHTS_UNVERIFIED",
+        "PRIVATE_CONTENT_UNREVIEWED", "CURRENT_GIT_COMPARISON_PENDING",
+        "HISTORICAL_PROJECT_INSTRUCTIONS", "EVALUATOR_CUSTODY_UNVERIFIED",
+        "HOST_RUNTIME_UNQUALIFIED"
+      ]}
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "BT2_HISTORICAL_EXPORT_ADJUDICATION_V1",
+  "artifact_id": "SYNTHETIC_0001",
+  "private_locator": "REDACTED",
+  "source_state": "HISTORICAL_NOT_INSTALLED",
+  "evidence_class": "INVENTORY",
+  "duplicate_group": null,
+  "privacy": "UNREVIEWED",
+  "rights": "UNVERIFIED",
+  "target_repo_candidate": "bt2",
+  "current_git_comparison": "NOT_PERFORMED",
+  "source_test": "NOT_RUN",
+  "independent_review": "NOT_PERFORMED",
+  "public_admission": "HOLD",
+  "reason_codes": [
+    "SOURCE_PROVENANCE_UNVERIFIED",
+    "RIGHTS_UNVERIFIED",
+    "PRIVATE_CONTENT_UNREVIEWED",
+    "CURRENT_GIT_COMPARISON_PENDING"
+  ]
+}
