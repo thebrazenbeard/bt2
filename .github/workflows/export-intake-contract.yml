@@ -5,13 +5,13 @@ on:
     paths:
       - 'source_recovery/export_intake.py'
       - 'source_recovery/EXPORT_INTAKE.md'
-      - 'tests/test_export_intake.py'
+      - 'source_recovery/tests/test_export_intake.py'
       - '.github/workflows/export-intake-contract.yml'
   push:
     branches: [main]
     paths:
       - 'source_recovery/export_intake.py'
-      - 'tests/test_export_intake.py'
+      - 'source_recovery/tests/test_export_intake.py'
       - '.github/workflows/export-intake-contract.yml'
 
 permissions:
@@ -29,4 +29,4 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run source-only intake tests
-        run: python -m unittest discover -s tests -p 'test_export_intake.py' -v
+        run: python -m unittest discover -s source_recovery/tests -p 'test_export_intake.py' -v
