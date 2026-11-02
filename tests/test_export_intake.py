@@ -39,6 +39,17 @@ class ExportIntakeTests(unittest.TestCase):
         self.assertFalse((self.root.parent / "outside.txt").exists())
         self.assertEqual(result["summary"]["archives_readable"], 1)
 
+    def test_sensitive_member_inside_generic_zip_is_held(self):
+        archive = self.root / "release.zip"
+        with zipfile.ZipFile(archive, "w") as z:
+            z.writestr("configs/private_token.json", '{"value":"DO_NOT_EXPORT"}')
+        result = scan_folder(self.root)
+        row = result["private_manifest"][0]
+        self.assertTrue(row["private_review_hold"])
+        self.assertEqual(row["zip"]["sensitive_member_names"], 1)
+        self.assertNotIn("private_token.json", json.dumps(result))
+        self.assertNotIn("DO_NOT_EXPORT", json.dumps(result))
+
     def test_invalid_archive_fails_closed(self):
         (self.root / "bad.zip").write_bytes(b"not actually a ZIP")
         result = scan_folder(self.root)
