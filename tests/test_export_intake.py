@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
-from tools.qualification.export_intake import scan_folder, write_records, IntakeError
+from source_recovery.export_intake import scan_folder, write_records, IntakeError
 
 class ExportIntakeTests(unittest.TestCase):
     def setUp(self):
