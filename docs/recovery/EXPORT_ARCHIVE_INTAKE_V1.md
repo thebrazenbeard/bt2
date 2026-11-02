@@ -20,7 +20,9 @@ document, and clean ZIP metadata does not make its payload trustworthy.
 From the repository root on an authorized Windows or Linux workstation:
 
 ```shell
-python source_recovery/export_intake.py --root /path/to/exports --output /private/outside-exports/intake-001
+python source_recovery/export_intake.py --root /path/to/exports
+# Only after reviewing the destination's ACLs:
+python source_recovery/export_intake.py --root /path/to/exports --output /private/outside-exports/intake-001 --write-private-manifest
 python -m unittest discover -s source_recovery/tests -p test_export_intake.py -v
 ```
 
@@ -52,3 +54,10 @@ named ZIPs, output isolation, and no content leakage into generated JSON.
 They do not establish archive authenticity, safe ZIP decompression, semantic
 data quality, licensing, live runtime state, or scanner safety under active
 malicious filesystem races. Use isolated read access for untrusted sources.
+
+**Confidentiality warning:** Default CLI output contains aggregate statistics
+only. The private manifest is written only with `--write-private-manifest`
+and `--output`. The tool does **not** enforce Windows DACLs or POSIX
+ownership/modes. Before opting in, verify the destination's inherited access
+controls are restricted to the intended operator. Merely using a local
+folder—especially under shared development roots—does not guarantee privacy.
