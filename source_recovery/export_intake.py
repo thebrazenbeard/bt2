@@ -131,10 +131,18 @@ def write_records(out: Path, root: Path, result: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Read-only, local export inventory")
     parser.add_argument("--root", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output", type=Path,
+                        help="new private output directory outside the source")
+    parser.add_argument("--write-private-manifest", action="store_true",
+                        help="explicitly persist filename-level private metadata")
     opts = parser.parse_args()
+    if opts.output is not None and not opts.write_private_manifest:
+        parser.error("--output requires --write-private-manifest; review output ACLs first")
+    if opts.write_private_manifest and opts.output is None:
+        parser.error("--write-private-manifest requires --output")
     result = scan_folder(opts.root)
-    write_records(opts.output, opts.root, result)
+    if opts.output is not None:
+        write_records(opts.output, opts.root, result)
     print(json.dumps(result["summary"], sort_keys=True))
 
 if __name__ == "__main__":
