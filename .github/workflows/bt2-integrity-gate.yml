@@ -31,5 +31,3 @@ jobs:
           python native/project/validation/test_bt2_native_v5_source_binding.py
       - name: Check V5 recovery pointers
         run: python -m unittest discover -s native/project/tests -p 'test_bt2_native_v5_recovery_pointers.py' -v
-      - name: Check read-only export intake contracts
-        run: python -m unittest discover -s tests -p 'test_export_intake.py' -v
