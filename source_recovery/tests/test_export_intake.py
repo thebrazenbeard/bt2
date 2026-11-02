@@ -83,6 +83,24 @@ class ExportIntakeTests(unittest.TestCase):
         with self.assertRaises(IntakeError):
             scan_folder(self.root, max_files=1)
 
+    def test_cli_defaults_to_aggregate_only(self):
+        import subprocess
+        import sys
+        script = Path(__file__).resolve().parents[1] / "export_intake.py"
+        (self.root / "private_notes.md").write_text("PRIVATE_NOT_IN_STDOUT")
+        bare = subprocess.run([sys.executable, str(script), "--root", str(self.root)],
+                              capture_output=True, text=True, check=False)
+        self.assertEqual(bare.returncode, 0, bare.stderr)
+        self.assertEqual(json.loads(bare.stdout)["files"], 1)
+        self.assertNotIn("private_notes.md", bare.stdout)
+        self.assertNotIn("PRIVATE_NOT_IN_STDOUT", bare.stdout)
+        self.assertFalse(self.out.exists())
+        denied = subprocess.run([sys.executable, str(script), "--root", str(self.root),
+                                 "--output", str(self.out)],
+                                capture_output=True, text=True, check=False)
+        self.assertNotEqual(denied.returncode, 0)
+        self.assertFalse(self.out.exists())
+
     def test_write_is_separate_and_never_overwrites(self):
         (self.root / "a").write_text("only data")
         result = scan_folder(self.root)
