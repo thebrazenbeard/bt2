@@ -45,6 +45,17 @@ class ExportIntakeTests(unittest.TestCase):
         self.assertEqual(result["summary"]["archives_readable"], 0)
         self.assertEqual(result["summary"]["unreadable_archives"], 1)
 
+    def test_archive_entry_cap_holds_without_inspecting_payloads(self):
+        with zipfile.ZipFile(self.root / "bounded.zip", "w") as z:
+            z.writestr("a.py", "print('not executed')")
+            z.writestr("b.py", "print('not executed')")
+        result = scan_folder(self.root, max_zip_members=1)
+        self.assertEqual(result["summary"]["archives_readable"], 0)
+        self.assertEqual(result["summary"]["archive_members"], 2)
+        archive = result["private_manifest"][0]["zip"]
+        self.assertEqual(archive["status"], "MEMBER_LIMIT_EXCEEDED")
+        self.assertFalse((self.root / "a.py").exists())
+
     def test_raw_sensitive_contents_never_appear_in_summary(self):
         secret = "PRIVATE_CONTENT_DO_NOT_PUBLISH"
         (self.root / "private_chat.txt").write_text(secret)
