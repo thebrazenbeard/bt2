@@ -3,7 +3,7 @@
 This tool builds a **local metadata inventory** of a user-selected folder. It is
 intended for recovery triage, not for automatic ingestion or publication.
 
-`tools/qualification/export_intake.py` uses only Python's standard library.
+`source_recovery/export_intake.py` uses only Python's standard library.
 It hashes every regular file with SHA-256, groups exact duplicate content, and
 inspects ZIP central-directory metadata **without extracting or executing
 archive members**. It reports ZIP traversal paths, Windows drive paths,
@@ -20,8 +20,8 @@ document, and clean ZIP metadata does not make its payload trustworthy.
 From the repository root on an authorized Windows or Linux workstation:
 
 ```shell
-python tools/qualification/export_intake.py --root /path/to/exports --output /private/outside-exports/intake-001
-python -m unittest discover -s tests -p test_export_intake.py -v
+python source_recovery/export_intake.py --root /path/to/exports --output /private/outside-exports/intake-001
+python -m unittest discover -s source_recovery/tests -p test_export_intake.py -v
 ```
 
 The output directory must be absent and must be outside the source folder.
