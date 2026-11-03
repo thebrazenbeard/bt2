@@ -23,6 +23,8 @@ _CLOUD_FLAGS = (0x1000 | 0x400 | 0x00040000 | 0x00400000)
 _ZIP_INPUT_CAP = 2 * 1024 * 1024
 _ZIP_UNCOMPRESSED_CAP = 128 * 1024 * 1024
 _ZIP_RATIO_CAP = 100
+_PRIVATE_OUTPUT_MAX_BYTES = 16 * 1024 * 1024
+_PRIVATE_JSON_MAX_CHUNKS = 200_000
 
 class IntakeError(ValueError):
     """Unsafe input location or exceeded read-only inventory cap."""
@@ -99,6 +101,10 @@ def _open_local(path: Path, expected_size: int, limit: int, *,
                 relative_parts: tuple[str, ...] | None = None,
                 expected_identity: tuple[int, int] | None = None):
     _require_qualified_host()
+    # Final-component O_NOFOLLOW cannot protect an ancestor in a path-based
+    # open. Byte reads must stay relative to the already-held source root.
+    if root_fd is None:
+        raise IntakeError("held root descriptor required for local byte reads")
     if expected_size > limit:
         raise IntakeError("bounded local read limit exceeded")
     if not getattr(os, "O_NOFOLLOW", 0):
@@ -107,16 +113,19 @@ def _open_local(path: Path, expected_size: int, limit: int, *,
     # return without blocking before the subsequent fstat can reject it.
     flags = (os.O_RDONLY | getattr(os, "O_BINARY", 0) | os.O_NOFOLLOW
              | getattr(os, "O_NONBLOCK", 0))
-    if root_fd is not None:
-        if not relative_parts:
-            raise IntakeError("relative file components required")
-        parent_fd = _open_directory_beneath(root_fd, relative_parts[:-1])
-        try:
-            fd = os.open(relative_parts[-1], flags, dir_fd=parent_fd)
-        finally:
-            os.close(parent_fd)
-    else:
-        fd = os.open(path, flags)
+    if not isinstance(relative_parts, tuple) or not relative_parts:
+        raise IntakeError("relative file components required")
+    final_component = relative_parts[-1]
+    if (type(final_component) is not str or not final_component
+            or final_component in (".", "..") or "/" in final_component
+            or "\x00" in final_component
+            or (os.altsep is not None and os.altsep in final_component)):
+        raise IntakeError("unsafe final file component")
+    parent_fd = _open_directory_beneath(root_fd, relative_parts[:-1])
+    try:
+        fd = os.open(final_component, flags, dir_fd=parent_fd)
+    finally:
+        os.close(parent_fd)
     try:
         metadata = os.fstat(fd)
         if (not stat.S_ISREG(metadata.st_mode) or _cloud_or_reparse(metadata)
@@ -357,19 +366,114 @@ def scan_folder(root: Path, *, max_files: int = 500,
     return {"private_manifest": rows, "private_duplicate_groups": duplicate_groups,
             "summary": summary}
 
+def _serialize_private_outputs(result: dict) -> tuple[tuple[str, bytes], ...]:
+    """Validate and bound *all* manifest JSON before creating any output.
+
+    Streaming encoder chunks are accumulated only up to an explicit byte and
+    chunk budget. A later serialization failure must not leave earlier private
+    artifacts or an unusable half-created output directory behind.
+    """
+    if not isinstance(result, dict):
+        raise IntakeError("private output result must be a dictionary")
+    try:
+        records_by_name = (("private_manifest.json", result["private_manifest"]),
+                           ("private_duplicate_groups.json", result["private_duplicate_groups"]),
+                           ("summary.json", result["summary"]))
+    except KeyError as exc:
+        raise IntakeError("private output result is missing required fields") from exc
+    encoder = json.JSONEncoder(ensure_ascii=False, indent=2, sort_keys=True,
+                               allow_nan=False)
+    total_bytes = 0
+    total_chunks = 0
+    prepared: list[tuple[str, bytes]] = []
+    try:
+        for name, records in records_by_name:
+            parts: list[bytes] = []
+            for chunk in encoder.iterencode(records):
+                total_chunks += 1
+                if total_chunks > _PRIVATE_JSON_MAX_CHUNKS:
+                    raise IntakeError("private output JSON chunk budget exceeded")
+                # Every UTF-8 character uses at least one byte, so this cheap
+                # check prevents encoding a huge unchecked chunk first.
+                if len(chunk) > _PRIVATE_OUTPUT_MAX_BYTES - total_bytes:
+                    raise IntakeError("private output byte budget exceeded")
+                encoded = chunk.encode("utf-8")
+                total_bytes += len(encoded)
+                if total_bytes > _PRIVATE_OUTPUT_MAX_BYTES:
+                    raise IntakeError("private output byte budget exceeded")
+                parts.append(encoded)
+            prepared.append((name, b"".join(parts)))
+    except (TypeError, ValueError, OverflowError, RecursionError, UnicodeError) as exc:
+        raise IntakeError("private output is not bounded valid JSON") from exc
+    return tuple(prepared)
+
+
 def write_records(out: Path, root: Path, result: dict) -> None:
     _require_qualified_host()
+    prepared = _serialize_private_outputs(result)
+    # Mode bits are not a substitute for held-fd relative creation. A caller
+    # can replace a newly created output directory with a symlink between
+    # Path.mkdir() and path-based os.open(), redirecting private filenames.
+    if (os.name != "posix" or not all(hasattr(os, flag)
+                                       for flag in ("O_DIRECTORY", "O_NOFOLLOW"))
+            or os.mkdir not in os.supports_dir_fd
+            or os.open not in os.supports_dir_fd
+            or os.stat not in os.supports_dir_fd
+            or os.stat not in os.supports_follow_symlinks):
+        raise IntakeError("private output requires POSIX directory-fd/no-follow support")
+    if ".." in Path(out).parts:
+        raise IntakeError("parent-relative private destination is ambiguous")
     source = Path(root).resolve()
-    destination = Path(out).resolve()
+    destination = Path(os.path.abspath(out))
     if destination == source or source in destination.parents:
         raise IntakeError("output directory must be outside the source tree")
-    destination.mkdir(parents=True, exist_ok=False, mode=0o700)
-    for name, records in (("private_manifest.json", result["private_manifest"]),
-                          ("private_duplicate_groups.json", result["private_duplicate_groups"]),
-                          ("summary.json", result["summary"])):
-        descriptor = os.open(destination / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            json.dump(records, stream, ensure_ascii=False, indent=2, sort_keys=True)
+    if destination == Path(destination.anchor):
+        raise IntakeError("private destination must be a new child directory")
+    # Resolve ancestors by held O_NOFOLLOW directory descriptors, not a
+    # path-based check followed by another path-based open.
+    parent_fd = _open_posix_root_without_links(destination.parent)
+    try:
+        parent_metadata = os.fstat(parent_fd)
+        if (parent_metadata.st_uid != os.geteuid()
+                or parent_metadata.st_mode & (stat.S_IWGRP | stat.S_IWOTH)):
+            raise IntakeError("private output parent lacks owner-only write custody")
+        os.mkdir(destination.name, 0o700, dir_fd=parent_fd)
+        directory_fd = os.open(destination.name,
+                               os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                               dir_fd=parent_fd)
+        try:
+            directory_metadata = os.fstat(directory_fd)
+            if (not stat.S_ISDIR(directory_metadata.st_mode)
+                    or directory_metadata.st_uid != os.geteuid()
+                    or directory_metadata.st_mode & (stat.S_IRWXG | stat.S_IRWXO)):
+                raise IntakeError("private output directory custody changed")
+
+            def verify_named_output() -> None:
+                # Catch an output directory moved/replaced while the held fd
+                # remains open. This is a detection check, not a lock against
+                # all same-user races between comparisons and writes.
+                try:
+                    named = os.stat(destination.name, dir_fd=parent_fd,
+                                    follow_symlinks=False)
+                except OSError as exc:
+                    raise IntakeError("private output path vanished") from exc
+                if (named.st_dev, named.st_ino) != (directory_metadata.st_dev,
+                                                    directory_metadata.st_ino):
+                    raise IntakeError("private output directory path changed")
+
+            verify_named_output()
+            for name, payload in prepared:
+                verify_named_output()
+                descriptor = os.open(name,
+                                     os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                                     0o600, dir_fd=directory_fd)
+                with os.fdopen(descriptor, "wb") as stream:
+                    stream.write(payload)
+                verify_named_output()
+        finally:
+            os.close(directory_fd)
+    finally:
+        os.close(parent_fd)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Read-only, local export inventory")

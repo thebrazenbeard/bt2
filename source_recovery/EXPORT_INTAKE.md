@@ -75,7 +75,15 @@ SQL Connectome V4 is not an installed runtime.
 
 **Confidentiality warning:** Default CLI output contains aggregate statistics
 only. The private manifest is written only with `--write-private-manifest`
-and `--output`. The tool does **not** enforce Windows DACLs or POSIX
-ownership/modes. Before opting in, verify the destination's inherited access
-controls are restricted to the intended operator. Merely using a local
-folder—especially under shared development roots—does not guarantee privacy.
+and `--output`. On supported POSIX hosts the writer holds no-follow directory
+descriptors, requires an owner-controlled immediate parent without group/other
+write bits, creates a fresh `0700` directory, and writes `0600` files relative
+to that held descriptor. It refuses unqualified Windows/WSL and unsupported
+POSIX descriptor operations. This is not proof against same-UID actors,
+bind-mount aliases, wider ancestor ACLs or concurrent directory mutation;
+verify destination custody before opting in. A local folder, especially under
+shared development roots, does not guarantee privacy.
+All three JSON payloads must serialize within the aggregate 16 MiB and chunk
+budgets *before* the output directory is created. A later I/O failure such as
+disk-full can still leave partial artifacts in the owner-only directory; they
+are deliberately not path-deleted after an ambiguous rename/symlink race.

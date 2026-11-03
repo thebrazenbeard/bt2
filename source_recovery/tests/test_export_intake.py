@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import tempfile
 import unittest
 import zipfile
@@ -98,6 +99,30 @@ class ExportIntakeTests(unittest.TestCase):
             result = scan_folder(self.root)
         self.assertIsNone(result["private_manifest"][0]["sha256"])
         self.assertFalse(result["summary"]["byte_reads_opted_in"])
+
+    @unittest.skipUnless(os.name == "posix", "POSIX descriptor traversal fixture")
+    def test_direct_byte_open_requires_held_root_descriptor(self):
+        target = self.root / "private.bin"
+        target.write_bytes(b"private")
+        with patch("source_recovery.export_intake.os.open",
+                   side_effect=AssertionError("path-based byte open")):
+            with self.assertRaisesRegex(IntakeError, "root descriptor"):
+                export_intake._open_local(target, expected_size=7, limit=7)
+
+    @unittest.skipUnless(os.name == "posix", "POSIX descriptor traversal fixture")
+    def test_direct_byte_open_rejects_unsafe_final_component(self):
+        sibling = self.root.parent / "outside-secret"
+        sibling.write_bytes(b"PRIVATE")
+        root_fd = export_intake._open_posix_root_without_links(self.root)
+        self.addCleanup(os.close, root_fd)
+        for final in ("../outside-secret", "/etc/passwd", "nested/file", "", ".", "..", "a\x00b"):
+            with self.subTest(final=repr(final)):
+                with patch("source_recovery.export_intake.os.open",
+                           side_effect=AssertionError("escaped byte open")) as byte_open:
+                    with self.assertRaisesRegex(IntakeError, "final file component"):
+                        export_intake._open_local(self.root / "unused", 7, 7,
+                                                  root_fd=root_fd, relative_parts=(final,))
+                    byte_open.assert_not_called()
 
     def test_global_entry_limit_includes_empty_directory_fanout(self):
         for index in range(40):
@@ -250,6 +275,120 @@ class ExportIntakeTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             write_records(self.out, self.root, result)
         self.assertEqual((self.root / "a").read_text(), "only data")
+
+    def test_private_output_directory_swap_does_not_redirect_records(self):
+        result = scan_folder(self.root)
+        outsider = Path(self.tmp.name) / "outsider"
+        outsider.mkdir()
+        displaced = Path(self.tmp.name) / "displaced"
+        original_mkdir = Path.mkdir
+
+        def replace_new_directory(path, *args, **kwargs):
+            outcome = original_mkdir(path, *args, **kwargs)
+            if path == self.out:
+                path.rename(displaced)
+                path.symlink_to(outsider, target_is_directory=True)
+            return outcome
+
+        with patch.object(Path, "mkdir", replace_new_directory):
+            try:
+                write_records(self.out, self.root, result)
+            except (IntakeError, OSError):
+                pass
+        self.assertFalse((outsider / "private_manifest.json").exists())
+
+    def test_private_output_dirfd_creation_detects_symlink_swap(self):
+        result = scan_folder(self.root)
+        outsider = Path(self.tmp.name) / "outsider"
+        outsider.mkdir()
+        displaced = Path(self.tmp.name) / "displaced"
+        original_mkdir = os.mkdir
+        attempted_swap = False
+
+        def replace_after_fd_mkdir(path, mode=0o777, *, dir_fd=None):
+            nonlocal attempted_swap
+            outcome = original_mkdir(path, mode, dir_fd=dir_fd)
+            if path == self.out.name and dir_fd is not None:
+                attempted_swap = True
+                self.out.rename(displaced)
+                self.out.symlink_to(outsider, target_is_directory=True)
+            return outcome
+
+        with (patch.object(export_intake.os, "mkdir", replace_after_fd_mkdir),
+              patch.object(export_intake.os, "supports_dir_fd",
+                           os.supports_dir_fd | {replace_after_fd_mkdir})):
+            with self.assertRaises((IntakeError, OSError)):
+                write_records(self.out, self.root, result)
+        self.assertTrue(attempted_swap)
+        self.assertFalse((outsider / "private_manifest.json").exists())
+
+    def test_private_output_requires_custodial_parent(self):
+        result = scan_folder(self.root)
+        exposed_parent = Path(self.tmp.name) / "exposed"
+        exposed_parent.mkdir()
+        exposed_parent.chmod(0o777)
+        try:
+            with self.assertRaises(IntakeError):
+                write_records(exposed_parent / "private-output", self.root, result)
+            self.assertFalse((exposed_parent / "private-output").exists())
+        finally:
+            exposed_parent.chmod(0o700)
+
+    def test_private_manifest_serialization_failure_creates_no_directory(self):
+        result = scan_folder(self.root)
+        result["private_duplicate_groups"] = [object()]
+        with self.assertRaises(IntakeError) as raised:
+            write_records(self.out, self.root, result)
+        self.assertIsInstance(raised.exception.__cause__, TypeError)
+        self.assertFalse(self.out.exists(),
+                         "invalid later payload must not leave earlier private files")
+
+    def test_private_manifest_json_budget_rejects_before_any_write(self):
+        result = scan_folder(self.root)
+        result["private_manifest"] = [{"path": "long-private-archive-name"}]
+        with patch.object(export_intake, "_PRIVATE_OUTPUT_MAX_BYTES", 24):
+            with self.assertRaises(IntakeError):
+                write_records(self.out, self.root, result)
+        self.assertFalse(self.out.exists())
+
+    def test_private_output_detects_relocation_after_open(self):
+        result = scan_folder(self.root)
+        outsider = Path(self.tmp.name) / "outsider"
+        outsider.mkdir()
+        displaced = Path(self.tmp.name) / "displaced"
+        original_open = os.open
+        attempted_swap = False
+
+        def replace_while_creating_first_file(path, flags, mode=0o777, *, dir_fd=None):
+            nonlocal attempted_swap
+            if path == "private_manifest.json" and dir_fd is not None:
+                attempted_swap = True
+                self.out.rename(displaced)
+                self.out.symlink_to(outsider, target_is_directory=True)
+            return original_open(path, flags, mode, dir_fd=dir_fd)
+
+        with (patch.object(export_intake.os, "open", replace_while_creating_first_file),
+              patch.object(export_intake.os, "supports_dir_fd",
+                           os.supports_dir_fd | {replace_while_creating_first_file})):
+            with self.assertRaises(IntakeError):
+                write_records(self.out, self.root, result)
+        self.assertTrue(attempted_swap)
+        self.assertFalse((outsider / "private_manifest.json").exists())
+        self.assertTrue((displaced / "private_manifest.json").exists())
+
+    def test_private_output_rejects_ancestor_symlink_and_uses_private_modes(self):
+        result = scan_folder(self.root)
+        alternate_parent = Path(self.tmp.name) / "alternate-parent"
+        alternate_parent.mkdir()
+        alias = Path(self.tmp.name) / "alias-parent"
+        alias.symlink_to(alternate_parent, target_is_directory=True)
+        with self.assertRaises((IntakeError, OSError)):
+            write_records(alias / "private-output", self.root, result)
+        self.assertFalse((alternate_parent / "private-output").exists())
+        write_records(self.out, self.root, result)
+        self.assertEqual(stat.S_IMODE(self.out.stat().st_mode), 0o700)
+        self.assertEqual(stat.S_IMODE((self.out / "private_manifest.json").stat().st_mode),
+                         0o600)
 
 if __name__ == "__main__":
     unittest.main()
