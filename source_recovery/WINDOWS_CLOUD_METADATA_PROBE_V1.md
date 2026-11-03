@@ -17,6 +17,11 @@ even if normal file-attribute reporting suppresses the reparse point.
 Query failure remains UNKNOWN/HOLD, never an ordinary-file assertion.
 Wildcard search paths containing `*` or `?`, empty paths, byte-string paths,
 and paths with embedded NUL characters fail closed before any native query.
+The validated `os.fspath` result must be an exact built-in `str`: hostile
+string subclasses can override membership checks and conceal wildcard syntax.
+Ordinary exceptions raised by a caller-controlled `__fspath__` implementation
+also become a structured metadata-query HOLD, without swallowing process
+interrupts such as `KeyboardInterrupt` or `SystemExit`.
 This intentionally also rejects Windows extended-length paths with a `\\?\`
 prefix until that namespace is explicitly validated. Native
 `ctypes.ArgumentError` marshalling failures also return metadata-query HOLD.
@@ -50,6 +55,10 @@ open, hash, decompress, copy, download, train, or publish bytes.
   marshalling-error and wildcard guards reproduced failing behavior before
   the fix, then all 32 intake/adjudication/cloud tests passed. No Windows host
   runtime check is claimed for these follow-up changes.
+- Subsequent source-only hostile-string regression: a `str` subclass whose
+  membership check hides `*` reached the native-query seam before hardening;
+  exact-string validation now blocks it. All 37 source-recovery tests passed
+  on Linux/Python 3.12. This is not a Windows runtime or hydration witness.
 
 ## Hard limitations
 

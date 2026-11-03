@@ -69,8 +69,15 @@ class _FindDataW(ctypes.Structure):
 
 def _literal_query_path(path: str | Path) -> str:
     """Reject Win32 search patterns before FindFirstFileW can enumerate them."""
-    literal = os.fspath(path)
-    if not isinstance(literal, str):
+    try:
+        # PathLike.__fspath__ is caller-controlled. Only normalize exceptions
+        # at this untrusted boundary; do not mask bugs in native-query logic.
+        literal = os.fspath(path)
+    except Exception as exc:
+        raise TypeError("Windows metadata path coercion failed") from exc
+    # A str subclass may override __contains__ to conceal a Win32 wildcard.
+    # Accept only built-in strings returned by os.fspath before inspecting it.
+    if type(literal) is not str:
         raise TypeError("Windows metadata path must be text")
     if not literal or any(char in literal for char in ("*", "?", "\x00")):
         raise ValueError("Windows metadata path must be a nonempty literal")

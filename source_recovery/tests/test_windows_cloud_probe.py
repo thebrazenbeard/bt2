@@ -1,5 +1,6 @@
 """Hostile contract tests: CFAPI classification never authorizes content reads."""
 import ctypes
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 from source_recovery import windows_cloud_probe as w
@@ -83,6 +84,55 @@ class WindowsCloudMetadataTests(unittest.TestCase):
             with self.subTest(path=path):
                 with self.assertRaises(ValueError):
                     w._attributes_and_tag(path)
+
+    def test_hostile_string_subclass_cannot_hide_wildcard_from_probe(self):
+        class HiddenGlob(str):
+            def __contains__(self, item):
+                return False
+
+        class HostilePath:
+            def __fspath__(self):
+                return HiddenGlob(r"C:\private\*.zip")
+
+        with patch.object(w, "_attributes_and_tag") as query:
+            result = w.probe_placeholder(HostilePath())
+        self.assertEqual(result, {"status": "METADATA_QUERY_FAILED_HOLD",
+                                  "byte_read_authorized": False})
+        query.assert_not_called()
+
+    def test_hostile_string_subclass_cannot_reach_findfirstfile_wrapper(self):
+        class HiddenGlob(str):
+            def __contains__(self, item):
+                return False
+
+        with self.assertRaises(TypeError):
+            w._attributes_and_tag(HiddenGlob("*.zip"))
+
+    def test_normal_pathlib_path_retains_literal_preflight_support(self):
+        self.assertEqual(w._literal_query_path(Path("local.zip")), "local.zip")
+
+    def test_hostile_fspath_runtime_errors_are_structured_holds(self):
+        for error_type in (RuntimeError, KeyError, AssertionError):
+            class HostilePath:
+                def __fspath__(self):
+                    raise error_type("synthetic path coercion failure")
+
+            with self.subTest(error_type=error_type.__name__), \
+                 patch.object(w, "_attributes_and_tag") as query:
+                result = w.probe_placeholder(HostilePath())
+                self.assertEqual(result, {"status": "METADATA_QUERY_FAILED_HOLD",
+                                          "byte_read_authorized": False})
+                query.assert_not_called()
+
+    def test_process_interrupts_are_not_swallowed_by_path_preflight(self):
+        for error_type in (KeyboardInterrupt, SystemExit):
+            class InterruptPath:
+                def __fspath__(self):
+                    raise error_type("synthetic interrupt")
+
+            with self.subTest(error_type=error_type.__name__):
+                with self.assertRaises(error_type):
+                    w.probe_placeholder(InterruptPath())
 
     def test_empty_nul_and_binary_paths_fail_without_native_call(self):
         for path in ("", "bad\x00name.zip", b"bytes.zip"):
