@@ -1,0 +1,137 @@
+"""Read-only Windows Cloud Files metadata probe; never opens file content.
+
+This diagnostic only helps route files for later authorized review. A successful
+state classification is NOT proof of complete on-disk byte ranges or permission
+to read, copy, hydrate, train, publish, or ingest an export.
+"""
+from __future__ import annotations
+
+import ctypes
+from ctypes import wintypes
+import os
+from pathlib import Path
+
+_REPARSE = 0x400
+_OFFLINE_OR_RECALL = 0x1000 | 0x40000 | 0x400000
+_CF_PLACEHOLDER = 0x01
+_CF_IN_SYNC = 0x08
+_CF_PARTIAL = 0x10
+_CF_PARTIALLY_ON_DISK = 0x20
+_CF_INVALID = 0xFFFFFFFF
+
+
+def classify_placeholder(attributes: int, state: int) -> dict[str, object]:
+    """Classify CFAPI state without ever admitting a file to byte reading."""
+    if type(attributes) is not int or type(state) is not int:
+        raise TypeError("attributes and state must be exact integers")
+    if not (0 <= attributes <= 0xFFFFFFFF and 0 <= state <= 0xFFFFFFFF):
+        raise ValueError("invalid Windows metadata range")
+    if state == _CF_INVALID:
+        status = "INVALID_STATE_HOLD"
+    elif attributes & _OFFLINE_OR_RECALL:
+        status = "OFFLINE_OR_RECALL_HOLD"
+    elif state & (_CF_PARTIAL | _CF_PARTIALLY_ON_DISK):
+        status = "PARTIAL_PLACEHOLDER_HOLD"
+    elif attributes & _REPARSE:
+        if not state & _CF_PLACEHOLDER:
+            status = "UNKNOWN_REPARSE_HOLD"
+        elif state & _CF_IN_SYNC:
+            status = "CLOUD_PLACEHOLDER_METADATA_ONLY"
+        else:
+            status = "UNSYNCED_PLACEHOLDER_HOLD"
+    elif state:
+        status = "INCONSISTENT_METADATA_HOLD"
+    else:
+        status = "REGULAR_FILE_METADATA_ONLY"
+    return {"status": status, "byte_read_authorized": False}
+
+
+class _FindDataW(ctypes.Structure):
+    _fields_ = [
+        ("dwFileAttributes", wintypes.DWORD),
+        ("ftCreationTime", wintypes.FILETIME),
+        ("ftLastAccessTime", wintypes.FILETIME),
+        ("ftLastWriteTime", wintypes.FILETIME),
+        ("nFileSizeHigh", wintypes.DWORD),
+        ("nFileSizeLow", wintypes.DWORD),
+        ("dwReserved0", wintypes.DWORD),
+        ("dwReserved1", wintypes.DWORD),
+        ("cFileName", wintypes.WCHAR * 260),
+        ("cAlternateFileName", wintypes.WCHAR * 14),
+        ("dwFileType", wintypes.DWORD),
+        ("dwCreatorType", wintypes.DWORD),
+        ("wFinderFlags", wintypes.WORD),
+    ]
+
+
+def _attributes_and_tag(path: str | Path) -> tuple[int, int]:
+    if os.name != "nt":
+        raise OSError("Windows-only metadata probe")
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    first = kernel.FindFirstFileW
+    first.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(_FindDataW)]
+    first.restype = ctypes.c_void_p
+    close = kernel.FindClose
+    close.argtypes = [ctypes.c_void_p]
+    close.restype = wintypes.BOOL
+    data = _FindDataW()
+    handle = first(os.fspath(path), ctypes.byref(data))
+    if handle is None or handle == ctypes.c_void_p(-1).value:
+        raise OSError("Windows attribute/tag query failed")
+    try:
+        attributes = int(data.dwFileAttributes)
+        tag = int(data.dwReserved0) if attributes & _REPARSE else 0
+        return attributes, tag
+    finally:
+        close(handle)
+
+
+def _state_from_attributes_tag(attributes: int, reparse_tag: int) -> int:
+    if os.name != "nt":
+        raise OSError("Windows-only CFAPI probe")
+    cloud = ctypes.WinDLL("CldApi.dll", use_last_error=True)
+    state = cloud.CfGetPlaceholderStateFromAttributeTag
+    state.argtypes = [wintypes.DWORD, wintypes.DWORD]
+    state.restype = wintypes.DWORD
+    return int(state(attributes, reparse_tag))
+
+
+def _is_cloud_sync_root(path: str | Path) -> bool | None:
+    """CFAPI checks sync-root membership even when normal Win32 hides reparse tags.
+
+    Failure is *unknown*, never proof of an ordinary file. No file handle or
+    payload read is performed.
+    """
+    if os.name != "nt":
+        raise OSError("Windows-only CFAPI sync-root probe")
+    cloud = ctypes.WinDLL("CldApi.dll", use_last_error=True)
+    call = cloud.CfGetSyncRootInfoByPath
+    call.argtypes = [
+        wintypes.LPCWSTR, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD,
+        ctypes.POINTER(wintypes.DWORD),
+    ]
+    call.restype = wintypes.LONG
+    buffer = ctypes.create_string_buffer(1024)
+    returned = wintypes.DWORD()
+    status = call(os.fspath(Path(path).absolute()), 0, buffer, len(buffer),
+                  ctypes.byref(returned))
+    return True if status == 0 else None
+
+
+def probe_placeholder(path: str | Path) -> dict[str, object]:
+    """Metadata-only and path-redacted; all read/publish authority stays HOLD."""
+    try:
+        attributes, tag = _attributes_and_tag(path)
+        state = _state_from_attributes_tag(attributes, tag)
+        result = classify_placeholder(attributes, state)
+        if result["status"] == "OFFLINE_OR_RECALL_HOLD":
+            return result
+        root_state = _is_cloud_sync_root(path)
+        if root_state is True:
+            return {"status": "CLOUD_SYNC_ROOT_HOLD", "byte_read_authorized": False}
+        if root_state is None and result["status"] in (
+                "REGULAR_FILE_METADATA_ONLY", "CLOUD_PLACEHOLDER_METADATA_ONLY"):
+            return {"status": "SYNC_ROOT_UNVERIFIED_HOLD", "byte_read_authorized": False}
+        return result
+    except (OSError, AttributeError, ValueError, TypeError):
+        return {"status": "METADATA_QUERY_FAILED_HOLD", "byte_read_authorized": False}
