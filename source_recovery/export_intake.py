@@ -23,9 +23,33 @@ _CLOUD_FLAGS = (0x1000 | 0x400 | 0x00040000 | 0x00400000)
 _ZIP_INPUT_CAP = 2 * 1024 * 1024
 _ZIP_UNCOMPRESSED_CAP = 128 * 1024 * 1024
 _ZIP_RATIO_CAP = 100
+_PRIVATE_OUTPUT_MAX_BYTES = 16 * 1024 * 1024
+_PRIVATE_JSON_MAX_CHUNKS = 200_000
 
 class IntakeError(ValueError):
     """Unsafe input location or exceeded read-only inventory cap."""
+
+def _require_qualified_host() -> None:
+    # Python path-based enumeration/open cannot pin every ancestor against a
+    # Windows reparse-point swap, and creation modes do not attest the actual
+    # host DACL. A native, independently qualified Windows implementation is
+    # required before even metadata-only traversal or private output writes.
+    if os.name == "nt":
+        raise IntakeError("Windows intake unqualified: refuse traversal and private writes")
+    # WSL is POSIX at Python's os.name boundary but can expose OneDrive paths
+    # through DrvFs (/mnt/c, /mnt/d), where cloud/recall attributes are not
+    # represented by POSIX st_file_attributes. Refuse the whole WSL runtime
+    # rather than guessing which mounted paths are safely local.
+    if os.environ.get("WSL_INTEROP") or os.environ.get("WSL_DISTRO_NAME"):
+        raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
+    uname = getattr(os, "uname", None)
+    if callable(uname):
+        try:
+            release = uname().release.casefold()
+        except OSError as exc:
+            raise IntakeError("host qualification unavailable") from exc
+        if "microsoft" in release or "wsl" in release:
+            raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
 
 def _cloud_or_reparse(metadata: os.stat_result) -> bool:
     attributes = getattr(metadata, "st_file_attributes", None)
@@ -34,22 +58,95 @@ def _cloud_or_reparse(metadata: os.stat_result) -> bool:
     return ((attributes is None and os.name == "nt")
             or bool((attributes or 0) & _CLOUD_FLAGS))
 
-def _open_local(path: Path, expected_size: int, limit: int):
+def _open_directory_beneath(root_fd: int, components: tuple[str, ...]) -> int:
+    """Reopen only directories beneath a held POSIX root without link following.
+
+    A path-based lstat/resolve check followed by scandir(path) is racy: its
+    intermediate directory can become a symlink after inspection. The return
+    value is an owned file descriptor and must be closed by the caller.
+    """
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    fd = os.dup(root_fd)
+    try:
+        for component in components:
+            if not component or component in (".", "..") or "/" in component:
+                raise IntakeError("unsafe relative directory component")
+            next_fd = os.open(component, flags, dir_fd=fd)
+            os.close(fd)
+            fd = next_fd
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+def _open_posix_root_without_links(path: Path) -> int:
+    """Anchor every root-path component without following ancestor symlinks.
+
+    Opening ``alias/child`` with O_NOFOLLOW only protects ``child``. Walk from
+    the filesystem anchor through held directory fds to reject ``alias`` too.
+    """
+    if ".." in path.parts:
+        raise IntakeError("parent-relative source root is ambiguous")
+    absolute = Path(os.path.abspath(path))
+    anchor_fd = os.open(absolute.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        return _open_directory_beneath(anchor_fd, absolute.parts[1:])
+    finally:
+        os.close(anchor_fd)
+
+
+def _open_local(path: Path, expected_size: int, limit: int, *,
+                root_fd: int | None = None,
+                relative_parts: tuple[str, ...] | None = None,
+                expected_identity: tuple[int, int] | None = None):
+    _require_qualified_host()
+    # Final-component O_NOFOLLOW cannot protect an ancestor in a path-based
+    # open. Byte reads must stay relative to the already-held source root.
+    if root_fd is None:
+        raise IntakeError("held root descriptor required for local byte reads")
     if expected_size > limit:
         raise IntakeError("bounded local read limit exceeded")
-    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
-    fd = os.open(path, flags)
-    metadata = os.fstat(fd)
-    if (not stat.S_ISREG(metadata.st_mode) or _cloud_or_reparse(metadata)
-            or metadata.st_size != expected_size or metadata.st_size > limit):
+    if not getattr(os, "O_NOFOLLOW", 0):
+        raise IntakeError("no safe final-component no-follow open available")
+    # If a regular file is replaced with a FIFO after stat, the open must
+    # return without blocking before the subsequent fstat can reject it.
+    flags = (os.O_RDONLY | getattr(os, "O_BINARY", 0) | os.O_NOFOLLOW
+             | getattr(os, "O_NONBLOCK", 0))
+    if not isinstance(relative_parts, tuple) or not relative_parts:
+        raise IntakeError("relative file components required")
+    final_component = relative_parts[-1]
+    if (type(final_component) is not str or not final_component
+            or final_component in (".", "..") or "/" in final_component
+            or "\x00" in final_component
+            or (os.altsep is not None and os.altsep in final_component)):
+        raise IntakeError("unsafe final file component")
+    parent_fd = _open_directory_beneath(root_fd, relative_parts[:-1])
+    try:
+        fd = os.open(final_component, flags, dir_fd=parent_fd)
+    finally:
+        os.close(parent_fd)
+    try:
+        metadata = os.fstat(fd)
+        if (not stat.S_ISREG(metadata.st_mode) or _cloud_or_reparse(metadata)
+                or metadata.st_size != expected_size or metadata.st_size > limit
+                or (expected_identity is not None
+                    and (metadata.st_dev, metadata.st_ino) != expected_identity)):
+            raise IntakeError("local file changed or is not safely readable")
+        return os.fdopen(fd, "rb")
+    except BaseException:
         os.close(fd)
-        raise IntakeError("local file changed or is not safely readable")
-    return os.fdopen(fd, "rb")
+        raise
 
-def _sha256(path: Path, *, expected_size: int, max_bytes: int) -> str:
+def _sha256(path: Path, *, expected_size: int, max_bytes: int,
+            root_fd: int | None = None,
+            relative_parts: tuple[str, ...] | None = None,
+            expected_identity: tuple[int, int] | None = None) -> str:
     digest = hashlib.sha256()
     counted = 0
-    with _open_local(path, expected_size, max_bytes) as stream:
+    with _open_local(path, expected_size, max_bytes, root_fd=root_fd,
+                     relative_parts=relative_parts,
+                     expected_identity=expected_identity) as stream:
         for chunk in iter(lambda: stream.read(min(64 * 1024, max_bytes + 1 - counted)), b""):
             counted += len(chunk)
             if counted > max_bytes:
@@ -59,7 +156,10 @@ def _sha256(path: Path, *, expected_size: int, max_bytes: int) -> str:
             raise IntakeError("local file changed during hash")
     return digest.hexdigest()
 
-def _zip_metadata(path: Path, max_members: int, expected_size: int) -> dict:
+def _zip_metadata(path: Path, max_members: int, expected_size: int, *,
+                  root_fd: int | None = None,
+                  relative_parts: tuple[str, ...] | None = None,
+                  expected_identity: tuple[int, int] | None = None) -> dict:
     result = {"status": "UNREADABLE", "members": 0, "unsafe_paths": 0,
               "encrypted": 0, "symlinks": 0, "suspicious_ratios": 0,
               "sensitive_member_names": 0}
@@ -67,7 +167,9 @@ def _zip_metadata(path: Path, max_members: int, expected_size: int) -> dict:
         if expected_size > _ZIP_INPUT_CAP:
             result["status"] = "ZIP_INPUT_LIMIT_EXCEEDED"
             return result
-        with _open_local(path, expected_size, _ZIP_INPUT_CAP) as stream:
+        with _open_local(path, expected_size, _ZIP_INPUT_CAP, root_fd=root_fd,
+                         relative_parts=relative_parts,
+                         expected_identity=expected_identity) as stream:
             with zipfile.ZipFile(stream) as archive:
                 entries = archive.infolist()
                 result["members"] = len(entries)
@@ -106,86 +208,138 @@ def scan_folder(root: Path, *, max_files: int = 500,
     ``max_files`` is a global entry cap (files AND directories). Results are
     private Python data; only aggregate summary is printed by the CLI.
     """
+    _require_qualified_host()
     root = Path(root)
     if (max_files < 1 or max_zip_members < 1 or max_read_bytes < 1
             or max_total_read_bytes < 1):
         raise IntakeError("positive inventory caps required")
+    secure_posix = os.name == "posix"
+    if secure_posix and not (getattr(os, "O_DIRECTORY", 0)
+                             and getattr(os, "O_NOFOLLOW", 0)
+                             and os.open in os.supports_dir_fd):
+        raise IntakeError("descriptor-relative no-follow traversal unavailable")
+    root_fd = None
     try:
-        root_meta = root.lstat()
+        if secure_posix:
+            root_fd = _open_posix_root_without_links(root)
+            root_meta = os.fstat(root_fd)
+        else:
+            root_meta = root.lstat()
+        if not stat.S_ISDIR(root_meta.st_mode) or _cloud_or_reparse(root_meta):
+            raise IntakeError("input must be a real non-cloud directory")
     except OSError as exc:
+        if root_fd is not None:
+            os.close(root_fd)
         raise IntakeError("input location unavailable") from exc
-    if not stat.S_ISDIR(root_meta.st_mode) or _cloud_or_reparse(root_meta):
-        raise IntakeError("input must be a real non-cloud directory")
-    root = root.resolve()
-    queue = [root]
-    paths = []
+    except BaseException:
+        if root_fd is not None:
+            os.close(root_fd)
+        raise
+    # The POSIX root fd, not this presentation path, is the trust anchor.
+    root = root.absolute() if secure_posix else root.resolve()
+    queue = [(((), (root_meta.st_dev, root_meta.st_ino)) if secure_posix else root)]
+    paths = []  # (relative, display_path, size, relative_parts, (device, inode))
     skipped_symlinks = 0
     skipped_cloud = 0
     scanned_entries = 0
-    while queue:
-        folder = queue.pop(0)
-        try:
-            with os.scandir(folder) as listing:
-                entries = []
-                for entry in listing:
-                    entries.append(entry)
-                    if scanned_entries + len(entries) > max_files:
-                        raise IntakeError("entry count exceeds hard inventory cap")
-                entries.sort(key=lambda e: (e.name.casefold(), e.name))
-        except OSError as exc:
-            raise IntakeError("unsafe directory inspection") from exc
-        scanned_entries += len(entries)
-        for entry in entries:
-            try:
-                meta = entry.stat(follow_symlinks=False)
-            except OSError as exc:
-                raise IntakeError("unreadable entry metadata") from exc
-            if _cloud_or_reparse(meta):
-                skipped_cloud += 1
-            elif stat.S_ISDIR(meta.st_mode):
-                queue.append(Path(entry.path))
-            elif stat.S_ISREG(meta.st_mode):
-                paths.append((Path(entry.path), meta.st_size))
-            else:
-                skipped_symlinks += 1
-    paths.sort(key=lambda pair: str(pair[0].relative_to(root)).casefold())
-    rows = []
-    hashes = defaultdict(list)
-    byte_budget_used = 0
-    for path, expected_size in paths:
-        relative = str(path.relative_to(root))
-        row = {"path": relative, "bytes": expected_size,
-               "sha256": None, "extension": path.suffix.lower(),
-               "publication_status": "HOLD_UNREVIEWED",
-               "read_status": "METADATA_ONLY",
-               "private_review_hold": any(token in relative.upper()
-                                          for token in PRIVATE_HINTS)}
-        if hash_local or (inspect_zip_local and row["extension"] == ".zip"):
-            # Strict cumulative upper bound, including separately opted-in ZIP
-            # reads. Unknown/oversized files are skipped without opening them.
-            cap = min(max_read_bytes, _ZIP_INPUT_CAP if row["extension"] == ".zip"
-                      and inspect_zip_local else max_read_bytes)
-            read_count = int(hash_local) + int(inspect_zip_local and row["extension"] == ".zip")
-            planned_bytes = expected_size * read_count
-            if expected_size > cap or byte_budget_used + planned_bytes > max_total_read_bytes:
-                row["read_status"] = "SKIPPED_READ_SIZE_LIMIT"
-            else:
-                byte_budget_used += planned_bytes
+    try:
+        while queue:
+            folder = queue.pop(0)
+            folder_fd = None
+            if secure_posix:
+                components, identity = folder
                 try:
-                    if hash_local:
-                        digest = _sha256(path, expected_size=expected_size, max_bytes=cap)
-                        row["sha256"] = digest
-                        hashes[digest].append(relative)
-                    if inspect_zip_local and row["extension"] == ".zip":
-                        row["zip"] = _zip_metadata(path, max_zip_members, expected_size)
-                        row["private_review_hold"] = bool(
-                            row["private_review_hold"] or
-                            row["zip"]["sensitive_member_names"] or
-                            row["zip"]["status"] != "METADATA_READABLE_UNTRUSTED")
-                    row["read_status"] = "BOUNDED_LOCAL_BYTES"
-                except (OSError, IntakeError):
-                    row["read_status"] = "SKIPPED_CHANGED_OR_UNSAFE_FILE"
-        rows.append(row)
+                    folder_fd = _open_directory_beneath(root_fd, components)
+                    folder_meta = os.fstat(folder_fd)
+                    if ((folder_meta.st_dev, folder_meta.st_ino) != identity
+                            or _cloud_or_reparse(folder_meta)):
+                        os.close(folder_fd)
+                        folder_fd = None
+                        raise IntakeError("queued directory changed during inspection")
+                except OSError as exc:
+                    if folder_fd is not None:
+                        os.close(folder_fd)
+                    raise IntakeError("queued directory is no longer safely reachable") from exc
+            try:
+                with os.scandir(folder_fd if secure_posix else folder) as listing:
+                    entries = []
+                    for entry in listing:
+                        entries.append(entry)
+                        if scanned_entries + len(entries) > max_files:
+                            raise IntakeError("entry count exceeds hard inventory cap")
+                    entries.sort(key=lambda e: (e.name.casefold(), e.name))
+                scanned_entries += len(entries)
+                for entry in entries:
+                    try:
+                        meta = (os.stat(entry.name, dir_fd=folder_fd, follow_symlinks=False)
+                                if secure_posix else entry.stat(follow_symlinks=False))
+                    except OSError as exc:
+                        raise IntakeError("unreadable entry metadata") from exc
+                    if secure_posix:
+                        relative_parts = components + (entry.name,)
+                        path = root.joinpath(*relative_parts)
+                    else:
+                        path = Path(entry.path)
+                        relative_parts = None
+                    if _cloud_or_reparse(meta):
+                        skipped_cloud += 1
+                    elif stat.S_ISDIR(meta.st_mode):
+                        queue.append((relative_parts, (meta.st_dev, meta.st_ino))
+                                     if secure_posix else path)
+                    elif stat.S_ISREG(meta.st_mode):
+                        paths.append((str(path.relative_to(root)), path, meta.st_size,
+                                      relative_parts, (meta.st_dev, meta.st_ino)))
+                    else:
+                        skipped_symlinks += 1
+            except OSError as exc:
+                raise IntakeError("unsafe directory inspection") from exc
+            finally:
+                if folder_fd is not None:
+                    os.close(folder_fd)
+        paths.sort(key=lambda pair: pair[0].casefold())
+        rows = []
+        hashes = defaultdict(list)
+        byte_budget_used = 0
+        for relative, path, expected_size, relative_parts, identity in paths:
+            row = {"path": relative, "bytes": expected_size,
+                   "sha256": None, "extension": path.suffix.lower(),
+                   "publication_status": "HOLD_UNREVIEWED",
+                   "read_status": "METADATA_ONLY",
+                   "private_review_hold": any(token in relative.upper()
+                                              for token in PRIVATE_HINTS)}
+            if hash_local or (inspect_zip_local and row["extension"] == ".zip"):
+                # Cumulative budget includes every separately requested byte read.
+                cap = min(max_read_bytes, _ZIP_INPUT_CAP if row["extension"] == ".zip"
+                          and inspect_zip_local else max_read_bytes)
+                read_count = int(hash_local) + int(inspect_zip_local and row["extension"] == ".zip")
+                planned_bytes = expected_size * read_count
+                if expected_size > cap or byte_budget_used + planned_bytes > max_total_read_bytes:
+                    row["read_status"] = "SKIPPED_READ_SIZE_LIMIT"
+                else:
+                    byte_budget_used += planned_bytes
+                    try:
+                        if hash_local:
+                            digest = _sha256(path, expected_size=expected_size, max_bytes=cap,
+                                             root_fd=root_fd, relative_parts=relative_parts,
+                                             expected_identity=identity if secure_posix else None)
+                            row["sha256"] = digest
+                            hashes[digest].append(relative)
+                        if inspect_zip_local and row["extension"] == ".zip":
+                            row["zip"] = _zip_metadata(
+                                path, max_zip_members, expected_size, root_fd=root_fd,
+                                relative_parts=relative_parts,
+                                expected_identity=identity if secure_posix else None)
+                            row["private_review_hold"] = bool(
+                                row["private_review_hold"] or
+                                row["zip"]["sensitive_member_names"] or
+                                row["zip"]["status"] != "METADATA_READABLE_UNTRUSTED")
+                        row["read_status"] = "BOUNDED_LOCAL_BYTES"
+                    except (OSError, IntakeError):
+                        row["read_status"] = "SKIPPED_CHANGED_OR_UNSAFE_FILE"
+            rows.append(row)
+    finally:
+        if root_fd is not None:
+            os.close(root_fd)
     archives = [row["zip"] for row in rows if "zip" in row]
     duplicate_groups = [group for group in hashes.values() if len(group) > 1]
     summary = {"schema": SCHEMA, "files": len(rows),
@@ -212,18 +366,114 @@ def scan_folder(root: Path, *, max_files: int = 500,
     return {"private_manifest": rows, "private_duplicate_groups": duplicate_groups,
             "summary": summary}
 
+def _serialize_private_outputs(result: dict) -> tuple[tuple[str, bytes], ...]:
+    """Validate and bound *all* manifest JSON before creating any output.
+
+    Streaming encoder chunks are accumulated only up to an explicit byte and
+    chunk budget. A later serialization failure must not leave earlier private
+    artifacts or an unusable half-created output directory behind.
+    """
+    if not isinstance(result, dict):
+        raise IntakeError("private output result must be a dictionary")
+    try:
+        records_by_name = (("private_manifest.json", result["private_manifest"]),
+                           ("private_duplicate_groups.json", result["private_duplicate_groups"]),
+                           ("summary.json", result["summary"]))
+    except KeyError as exc:
+        raise IntakeError("private output result is missing required fields") from exc
+    encoder = json.JSONEncoder(ensure_ascii=False, indent=2, sort_keys=True,
+                               allow_nan=False)
+    total_bytes = 0
+    total_chunks = 0
+    prepared: list[tuple[str, bytes]] = []
+    try:
+        for name, records in records_by_name:
+            parts: list[bytes] = []
+            for chunk in encoder.iterencode(records):
+                total_chunks += 1
+                if total_chunks > _PRIVATE_JSON_MAX_CHUNKS:
+                    raise IntakeError("private output JSON chunk budget exceeded")
+                # Every UTF-8 character uses at least one byte, so this cheap
+                # check prevents encoding a huge unchecked chunk first.
+                if len(chunk) > _PRIVATE_OUTPUT_MAX_BYTES - total_bytes:
+                    raise IntakeError("private output byte budget exceeded")
+                encoded = chunk.encode("utf-8")
+                total_bytes += len(encoded)
+                if total_bytes > _PRIVATE_OUTPUT_MAX_BYTES:
+                    raise IntakeError("private output byte budget exceeded")
+                parts.append(encoded)
+            prepared.append((name, b"".join(parts)))
+    except (TypeError, ValueError, OverflowError, RecursionError, UnicodeError) as exc:
+        raise IntakeError("private output is not bounded valid JSON") from exc
+    return tuple(prepared)
+
+
 def write_records(out: Path, root: Path, result: dict) -> None:
+    _require_qualified_host()
+    prepared = _serialize_private_outputs(result)
+    # Mode bits are not a substitute for held-fd relative creation. A caller
+    # can replace a newly created output directory with a symlink between
+    # Path.mkdir() and path-based os.open(), redirecting private filenames.
+    if (os.name != "posix" or not all(hasattr(os, flag)
+                                       for flag in ("O_DIRECTORY", "O_NOFOLLOW"))
+            or os.mkdir not in os.supports_dir_fd
+            or os.open not in os.supports_dir_fd
+            or os.stat not in os.supports_dir_fd
+            or os.stat not in os.supports_follow_symlinks):
+        raise IntakeError("private output requires POSIX directory-fd/no-follow support")
+    if ".." in Path(out).parts:
+        raise IntakeError("parent-relative private destination is ambiguous")
     source = Path(root).resolve()
-    destination = Path(out).resolve()
+    destination = Path(os.path.abspath(out))
     if destination == source or source in destination.parents:
         raise IntakeError("output directory must be outside the source tree")
-    destination.mkdir(parents=True, exist_ok=False, mode=0o700)
-    for name, records in (("private_manifest.json", result["private_manifest"]),
-                          ("private_duplicate_groups.json", result["private_duplicate_groups"]),
-                          ("summary.json", result["summary"])):
-        descriptor = os.open(destination / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            json.dump(records, stream, ensure_ascii=False, indent=2, sort_keys=True)
+    if destination == Path(destination.anchor):
+        raise IntakeError("private destination must be a new child directory")
+    # Resolve ancestors by held O_NOFOLLOW directory descriptors, not a
+    # path-based check followed by another path-based open.
+    parent_fd = _open_posix_root_without_links(destination.parent)
+    try:
+        parent_metadata = os.fstat(parent_fd)
+        if (parent_metadata.st_uid != os.geteuid()
+                or parent_metadata.st_mode & (stat.S_IWGRP | stat.S_IWOTH)):
+            raise IntakeError("private output parent lacks owner-only write custody")
+        os.mkdir(destination.name, 0o700, dir_fd=parent_fd)
+        directory_fd = os.open(destination.name,
+                               os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                               dir_fd=parent_fd)
+        try:
+            directory_metadata = os.fstat(directory_fd)
+            if (not stat.S_ISDIR(directory_metadata.st_mode)
+                    or directory_metadata.st_uid != os.geteuid()
+                    or directory_metadata.st_mode & (stat.S_IRWXG | stat.S_IRWXO)):
+                raise IntakeError("private output directory custody changed")
+
+            def verify_named_output() -> None:
+                # Catch an output directory moved/replaced while the held fd
+                # remains open. This is a detection check, not a lock against
+                # all same-user races between comparisons and writes.
+                try:
+                    named = os.stat(destination.name, dir_fd=parent_fd,
+                                    follow_symlinks=False)
+                except OSError as exc:
+                    raise IntakeError("private output path vanished") from exc
+                if (named.st_dev, named.st_ino) != (directory_metadata.st_dev,
+                                                    directory_metadata.st_ino):
+                    raise IntakeError("private output directory path changed")
+
+            verify_named_output()
+            for name, payload in prepared:
+                verify_named_output()
+                descriptor = os.open(name,
+                                     os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                                     0o600, dir_fd=directory_fd)
+                with os.fdopen(descriptor, "wb") as stream:
+                    stream.write(payload)
+                verify_named_output()
+        finally:
+            os.close(directory_fd)
+    finally:
+        os.close(parent_fd)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Read-only, local export inventory")
