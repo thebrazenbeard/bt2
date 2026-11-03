@@ -78,6 +78,24 @@ class WindowsCloudMetadataTests(unittest.TestCase):
                                           "byte_read_authorized": False})
                 query.assert_not_called()
 
+    def test_unc_device_and_drive_relative_paths_never_reach_native_query(self):
+        # FindFirstFileW on UNC paths can initiate unintended SMB/network I/O.
+        rejected = (
+            r"\\\\server\\share\\archive.zip",
+            "//server/share/archive.zip",
+            r"\\\\.\\C:\\Windows\\file.zip",
+            "C:archive.zip",
+        )
+        for candidate in rejected:
+            with self.subTest(path=candidate):
+                with self.assertRaises(ValueError):
+                    w._literal_query_path(candidate)
+                with patch.object(w, "_attributes_and_tag") as query:
+                    result = w.probe_placeholder(candidate)
+                    self.assertEqual(result["status"], "METADATA_QUERY_FAILED_HOLD")
+                    self.assertFalse(result["byte_read_authorized"])
+                    query.assert_not_called()
+
     def test_direct_findfirstfile_wrapper_rejects_wildcards(self):
         # Reject before native boundary, including on a non-Windows test runner.
         for path in ("*.zip", "exp?rt.zip"):
