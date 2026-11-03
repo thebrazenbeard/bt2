@@ -75,6 +75,37 @@ open, hash, decompress, copy, download, train, or publish bytes.
   passed afterward. This is local Windows TEST evidence, not a formal proof
   that no provider/network effect is possible under any OS condition.
 
+## Local volume preflight (2026-11-03)
+
+The native metadata probe now requires a **fully qualified drive-letter path**
+(`C:\\folder\\file`), with no relative/root-relative paths, `.`/`..`
+segments, repeated interior separators, or alternate-data-stream suffix.
+It uses Windows `GetDriveTypeW` on the **drive root only** before querying the
+file. All values other than `DRIVE_FIXED (3)` return
+`REMOTE_OR_NONFIXED_VOLUME_HOLD`, with
+`byte_read_authorized=false`. Native drive-query errors also fail closed.
+The existing OneDrive sync-root HOLD remains unchanged.
+
+**TDD evidence:** Five ambiguous paths passed preflight before this
+change, and six simulated nonfixed/unknown drive types had no guard.
+The tests were observed failing/erroring before implementation.
+The new fixed-drive and exception guards were implemented, then the **exact
+published source** was pulled onto Lappy at
+`d4224ea2c1e8554cfd42dc5706e2140d9e3dfcaa`: Windows Python 3.12,
+`42/42` source-recovery tests passed with exit 0; Python compilation with
+`SyntaxWarning` treated as error also succeeded. The host's actual
+`GetDriveTypeW` returned `3` for both existing C: and D: roots.
+No remote drive was mapped or queried, and no export bytes were opened.
+
+> **Hostile qualification limit:** `DRIVE_FIXED` is a property of the root
+> drive, not a cryptographic or OS-enforced guarantee that every descendant
+> remains local. Directory junctions, mount points, substituted drives,
+> endpoint remapping, and time-of-check/time-of-use races remain outside this
+> source/test evidence. The probe must NOT be used as authority to read
+> export bytes or as a qualified network-isolation boundary.
+
+Reference: https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdrivetypew
+
 ## Hard limitations
 
 The code makes no direct payload-read call, but a metadata API can have
