@@ -5,20 +5,28 @@ directories. It does not migrate project instructions, import memory, run
 archive code, assign an authoritative repo, grant rights, or make public
 anything that it scans.
 
-```powershell
-py -3.12 source_recovery/export_intake.py `
-  --root "C:\Users\YOUR_USER\Downloads\Exports"
+**Platform gate:** The current source intentionally refuses *all* native
+Windows **and WSL** scans, including metadata-only enumeration, direct byte
+opens, and private manifest writes. Windows path traversal may cross an unverified reparse race;
+the installed interpreter's directory DACL behavior has not been verified.
+This is a source-only safety hold, not proof that any Lappy directory is unsafe.
+WSL also exposes Windows-mounted DrvFs paths without usable cloud/recall
+attributes; this conservative gate blocks even WSL's ordinary Linux files.
+No Windows/WSL/OneDrive inspection should be attempted until a native
+no-reparse implementation and destination ACL custody are independently
+qualified. The examples below are for trusted, isolated POSIX directories.
+
+```shell
+python -m source_recovery.export_intake --root ./synthetic-exports
 # Only for a reviewed owner-restricted output location:
-py -3.12 source_recovery/export_intake.py `
-  --root "C:\Users\YOUR_USER\Downloads\Exports" `
-  --output "D:\private-review\scan-unique-id" `
-  --write-private-manifest
-py -3.12 -m unittest discover -s source_recovery/tests -p test_export_intake.py -v
+python -m source_recovery.export_intake --root ./synthetic-exports \
+  --output ./private-review/scan-unique-id --write-private-manifest
+python -m unittest discover -s source_recovery/tests -p 'test_*intake*.py' -v
 ```
 
 Supply an **existing source directory** and a **new, separate output directory**
 outside the source. The tool creates three local JSON files:
-`private_manifest.json` (relative filenames, byte sizes and SHA-256);
+`private_manifest.json` (relative filenames, byte sizes and optional SHA-256);
 `private_duplicate_groups.json` (matching full-file digests);
 and `summary.json` (aggregate-only statistics). All items default to
 `HOLD_UNREVIEWED`, regardless of filenames or claimed archive validation.
@@ -67,7 +75,15 @@ SQL Connectome V4 is not an installed runtime.
 
 **Confidentiality warning:** Default CLI output contains aggregate statistics
 only. The private manifest is written only with `--write-private-manifest`
-and `--output`. The tool does **not** enforce Windows DACLs or POSIX
-ownership/modes. Before opting in, verify the destination's inherited access
-controls are restricted to the intended operator. Merely using a local
-folder—especially under shared development roots—does not guarantee privacy.
+and `--output`. On supported POSIX hosts the writer holds no-follow directory
+descriptors, requires an owner-controlled immediate parent without group/other
+write bits, creates a fresh `0700` directory, and writes `0600` files relative
+to that held descriptor. It refuses unqualified Windows/WSL and unsupported
+POSIX descriptor operations. This is not proof against same-UID actors,
+bind-mount aliases, wider ancestor ACLs or concurrent directory mutation;
+verify destination custody before opting in. A local folder, especially under
+shared development roots, does not guarantee privacy.
+All three JSON payloads must serialize within the aggregate 16 MiB and chunk
+budgets *before* the output directory is created. A later I/O failure such as
+disk-full can still leave partial artifacts in the owner-only directory; they
+are deliberately not path-deleted after an ambiguous rename/symlink race.

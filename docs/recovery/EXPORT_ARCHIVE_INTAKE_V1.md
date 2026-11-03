@@ -1,5 +1,12 @@
 # Read-only export intake (source candidate)
 
+**Historical V1 note — superseded by
+`source_recovery/EXPORT_INTAKE.md`:** Current `export_intake.py` defaults to
+metadata-only and explicitly refuses native Windows/WSL scanning, byte opens, and private
+manifest writes pending native no-reparse/ACL qualification. The older
+Windows/Linux usage and eager hashing descriptions below are retained for
+provenance only and must not be used as current instructions.
+
 This tool builds a **local metadata inventory** of a user-selected folder. It is
 intended for recovery triage, not for automatic ingestion or publication.
 
@@ -57,7 +64,14 @@ malicious filesystem races. Use isolated read access for untrusted sources.
 
 **Confidentiality warning:** Default CLI output contains aggregate statistics
 only. The private manifest is written only with `--write-private-manifest`
-and `--output`. The tool does **not** enforce Windows DACLs or POSIX
-ownership/modes. Before opting in, verify the destination's inherited access
-controls are restricted to the intended operator. Merely using a local
-folder—especially under shared development roots—does not guarantee privacy.
+and `--output`. POSIX writing requires no-follow held directory descriptors, an
+owner-controlled immediate parent, a new `0700` directory and `0600` files.
+Windows and detected WSL remain refused. These checks do not qualify inherited
+ACLs, same-UID adversaries, bind-mount aliases or concurrent directory moves.
+Before opting in, verify the complete destination's access controls. Merely
+using a local folder, especially under shared development roots, does not
+guarantee privacy.
+The writer validates all three JSON outputs against an aggregate 16 MiB byte
+budget before creating a directory. Filesystem I/O errors after creation may
+leave partial files within the private directory; no unsafe recursive cleanup
+is attempted through a possibly replaced output pathname.
