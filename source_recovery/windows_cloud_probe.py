@@ -18,6 +18,7 @@ _CF_IN_SYNC = 0x08
 _CF_PARTIAL = 0x10
 _CF_PARTIALLY_ON_DISK = 0x20
 _CF_INVALID = 0xFFFFFFFF
+_CF_KNOWN_STATE_MASK = 0x3F  # All currently documented CF_PLACEHOLDER_STATE bits
 
 
 def classify_placeholder(attributes: int, state: int) -> dict[str, object]:
@@ -28,6 +29,8 @@ def classify_placeholder(attributes: int, state: int) -> dict[str, object]:
         raise ValueError("invalid Windows metadata range")
     if state == _CF_INVALID:
         status = "INVALID_STATE_HOLD"
+    elif state & ~_CF_KNOWN_STATE_MASK:
+        status = "UNKNOWN_STATE_BITS_HOLD"
     elif attributes & _OFFLINE_OR_RECALL:
         status = "OFFLINE_OR_RECALL_HOLD"
     elif state & (_CF_PARTIAL | _CF_PARTIALLY_ON_DISK):
