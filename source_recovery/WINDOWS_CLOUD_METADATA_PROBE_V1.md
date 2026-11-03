@@ -16,6 +16,10 @@ Windows metadata, using `FindFirstFileW`,
 even if normal file-attribute reporting suppresses the reparse point.
 Query failure remains UNKNOWN/HOLD, never an ordinary-file assertion.
 
+Unknown or future `CF_PLACEHOLDER_STATE` bits are explicitly
+`UNKNOWN_STATE_BITS_HOLD` rather than silently classified as a known synced
+placeholder. Microsoft's currently documented mask is `0x3F`.
+
 All returned records omit the supplied path and **always** carry
 `byte_read_authorized=false`. Offline, recall-on-read, partial, unknown
 reparse, inconsistent, and unverifiable sync-root states remain HOLD. Even an
@@ -25,8 +29,8 @@ open, hash, decompress, copy, download, train, or publish bytes.
 ## Reproduction and evidence
 
 - Exact BT2 source base `9354b9868d320da71cf2ab0382114f599687b3fb`.
-- Windows Python 3.12: 16 existing export-intake tests plus seven new CFAPI
-  tests and four existing adjudication-contract tests **27/27 passed**.
+- Windows Python 3.12: 16 existing export-intake tests plus eight new CFAPI
+  tests and four existing adjudication-contract tests **28/28 passed**.
 - TDD: the simple classifier first failed a synchronized-placeholder test;
   fixing the classifier exposed a Windows real-system false regular-file
   classification. A new regression reproduced the false-regular case, then
