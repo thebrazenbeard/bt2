@@ -44,7 +44,8 @@ class WindowsCloudMetadataTests(unittest.TestCase):
                 self.assertEqual(result["status"], "OFFLINE_OR_RECALL_HOLD")
 
     def test_cloud_sync_root_does_not_hide_behind_regular_file_attributes(self):
-        with patch.object(w, "_attributes_and_tag", return_value=(0x20, 0)), \
+        with patch.object(w, "_drive_type", return_value=3), \
+             patch.object(w, "_attributes_and_tag", return_value=(0x20, 0)), \
              patch.object(w, "_state_from_attributes_tag", return_value=0), \
              patch.object(w, "_is_cloud_sync_root", return_value=True):
             actual = w.probe_placeholder(r"C:\cloud-root\export.zip")
@@ -52,7 +53,8 @@ class WindowsCloudMetadataTests(unittest.TestCase):
         self.assertFalse(actual["byte_read_authorized"])
 
     def test_native_query_uses_only_metadata_and_never_exposes_source_path(self):
-        with patch.object(w, "_attributes_and_tag", return_value=(0x400, 0x9000001A)), \
+        with patch.object(w, "_drive_type", return_value=3), \
+             patch.object(w, "_attributes_and_tag", return_value=(0x400, 0x9000001A)), \
              patch.object(w, "_state_from_attributes_tag", return_value=0x09), \
              patch.object(w, "_is_cloud_sync_root", return_value=False), \
              patch("builtins.open", side_effect=AssertionError("payload open forbidden")):
@@ -62,7 +64,8 @@ class WindowsCloudMetadataTests(unittest.TestCase):
         self.assertFalse(result["byte_read_authorized"])
 
     def test_ctypes_marshalling_failure_is_a_metadata_hold(self):
-        with patch.object(w, "_attributes_and_tag", return_value=(0x400, 0x9000001A)), \
+        with patch.object(w, "_drive_type", return_value=3), \
+             patch.object(w, "_attributes_and_tag", return_value=(0x400, 0x9000001A)), \
              patch.object(w, "_state_from_attributes_tag",
                           side_effect=ctypes.ArgumentError("synthetic marshalling failure")):
             result = w.probe_placeholder(r"C:\synthetic-private\export.zip")
@@ -165,7 +168,7 @@ class WindowsCloudMetadataTests(unittest.TestCase):
             w._attributes_and_tag(HiddenGlob("*.zip"))
 
     def test_normal_pathlib_path_retains_literal_preflight_support(self):
-        self.assertEqual(w._literal_query_path(Path("local.zip")), "local.zip")
+        self.assertEqual(w._literal_query_path(Path("C:\local.zip")), "C:\\local.zip")
 
     def test_hostile_fspath_runtime_errors_are_structured_holds(self):
         for error_type in (RuntimeError, KeyError, AssertionError):
