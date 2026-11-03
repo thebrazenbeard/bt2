@@ -32,6 +32,13 @@ demonstrated all four passed path validation; the fixed test now verifies
 rejection before the native query seam, preventing unintended SMB/device access.
 Relative paths are rejected; callers must supply a fully qualified local
 drive-root path instead of relying on the working directory.
+The preflight also rejects reserved DOS device basenames (`CON`, `PRN`,
+`AUX`, `NUL`, `CONIN$`, `CONOUT$`, `COM1`–`COM9`, `LPT1`–`LPT9`, and
+Windows' superscript-digit `¹²³` variants) anywhere in the path, including
+before an extension. Empty or trailing-period/trailing-space components are
+rejected because Win32 may interpret them as different paths. These are
+syntactic rejection checks before the native metadata call, not a general
+Windows namespace proof.
 
 No directory-wide wildcard enumeration is authorized by this probe.
 
