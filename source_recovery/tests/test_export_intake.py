@@ -6,6 +6,9 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+import os
+from unittest.mock import patch
+from source_recovery import export_intake
 from source_recovery.export_intake import scan_folder, write_records, IntakeError
 
 class ExportIntakeTests(unittest.TestCase):
@@ -87,7 +90,9 @@ class ExportIntakeTests(unittest.TestCase):
     def test_default_metadata_only_never_opens_file_bytes(self):
         from unittest.mock import patch
         (self.root / "asset.bin").write_bytes(b"private bytes")
-        with patch("source_recovery.export_intake.os.open", side_effect=AssertionError("opened")):
+        # Secure traversal opens directory handles; file payloads still go
+        # exclusively through _open_local and must remain unopened by default.
+        with patch("source_recovery.export_intake._open_local", side_effect=AssertionError("read payload")):
             result = scan_folder(self.root)
         self.assertIsNone(result["private_manifest"][0]["sha256"])
         self.assertFalse(result["summary"]["byte_reads_opted_in"])
@@ -97,6 +102,68 @@ class ExportIntakeTests(unittest.TestCase):
             (self.root / f"empty_{index}").mkdir()
         with self.assertRaisesRegex(IntakeError, "entry count"):
             scan_folder(self.root, max_files=1)
+
+    @unittest.skipUnless(os.name == "posix", "POSIX descriptor traversal fixture")
+    def test_directory_swap_during_enumeration_cannot_escape_root(self):
+        nested = self.root / "nested"
+        nested.mkdir()
+        (nested / "local.bin").write_bytes(b"L")
+        outside = self.root.parent / "outside"
+        outside.mkdir()
+        (outside / "secret.bin").write_bytes(b"PRIVATE")
+        original_scandir = os.scandir
+        visits = 0
+
+        def racing_scandir(target):
+            nonlocal visits
+            visits += 1
+            if visits == 2:
+                nested.rename(self.root / "nested_moved")
+                nested.symlink_to(outside, target_is_directory=True)
+            return original_scandir(target)
+
+        with patch("source_recovery.export_intake.os.scandir", side_effect=racing_scandir):
+            try:
+                result = scan_folder(self.root)
+            except IntakeError:
+                return  # Fail-closed refusal also satisfies confinement.
+        names = [r["path"] for r in result["private_manifest"]]
+        self.assertNotIn("nested/secret.bin", names)
+
+    @unittest.skipUnless(os.name == "posix", "POSIX descriptor traversal fixture")
+    def test_symlinked_root_ancestor_is_rejected(self):
+        outside = self.root.parent / "outside"
+        (outside / "inner").mkdir(parents=True)
+        (outside / "inner" / "secret.bin").write_bytes(b"PRIVATE")
+        alias = self.root.parent / "alias"
+        alias.symlink_to(outside, target_is_directory=True)
+        with self.assertRaises(IntakeError):
+            scan_folder(alias / "inner")
+
+    @unittest.skipUnless(os.name == "posix", "POSIX descriptor traversal fixture")
+    def test_parent_swap_before_hash_never_hashes_outside_bytes(self):
+        nested = self.root / "nested"
+        nested.mkdir()
+        (nested / "private.bin").write_bytes(b"IN")
+        outside = self.root.parent / "outside"
+        outside.mkdir()
+        (outside / "private.bin").write_bytes(b"NO")
+        original_sha = export_intake._sha256
+        swapped = False
+
+        def racing_hash(*args, **kwargs):
+            nonlocal swapped
+            if not swapped:
+                swapped = True
+                nested.rename(self.root / "nested_moved")
+                nested.symlink_to(outside, target_is_directory=True)
+            return original_sha(*args, **kwargs)
+
+        with patch("source_recovery.export_intake._sha256", side_effect=racing_hash):
+            result = scan_folder(self.root, hash_local=True)
+        row = result["private_manifest"][0]
+        self.assertNotEqual(row["sha256"], hashlib.sha256(b"NO").hexdigest())
+        self.assertIn(row["read_status"], ("BOUNDED_LOCAL_BYTES", "SKIPPED_CHANGED_OR_UNSAFE_FILE"))
 
     def test_directory_iterator_stops_at_limit_before_full_materialization(self):
         from unittest.mock import patch
@@ -119,7 +186,7 @@ class ExportIntakeTests(unittest.TestCase):
     def test_large_file_is_skipped_without_hashing(self):
         from unittest.mock import patch
         (self.root / "large.bin").write_bytes(b"0" * (2 * 1024 * 1024))
-        with patch("source_recovery.export_intake.os.open", side_effect=AssertionError("opened")):
+        with patch("source_recovery.export_intake._open_local", side_effect=AssertionError("read payload")):
             result = scan_folder(self.root, hash_local=True, max_read_bytes=1024)
         self.assertEqual(result["private_manifest"][0]["read_status"], "SKIPPED_READ_SIZE_LIMIT")
         self.assertIsNone(result["private_manifest"][0]["sha256"])
@@ -133,7 +200,7 @@ class ExportIntakeTests(unittest.TestCase):
     def test_large_zip_is_skipped_before_open(self):
         from unittest.mock import patch
         (self.root / "large.zip").write_bytes(b"0" * (2 * 1024 * 1024 + 1))
-        with patch("source_recovery.export_intake.os.open", side_effect=AssertionError("opened")):
+        with patch("source_recovery.export_intake._open_local", side_effect=AssertionError("read payload")):
             result = scan_folder(self.root, inspect_zip_local=True, max_read_bytes=3 * 1024 * 1024)
         self.assertEqual(result["private_manifest"][0]["read_status"], "SKIPPED_READ_SIZE_LIMIT")
 

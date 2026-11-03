@@ -39,6 +39,25 @@ every file and inspected ZIPs even without user opt-in. New calls must pass
 behaviors. Do not use the pre-R203 version on a live OneDrive Files On-Demand
 directory: it can hydrate files and spend substantial disk/network resources.
 
+**R208 POSIX confinement extension (source-only):** On POSIX systems that
+support descriptor-relative opens, the scanner now holds the source directory
+descriptor and reopens each child with `O_DIRECTORY | O_NOFOLLOW` relative to
+that anchor. The initial root is itself opened component-by-component from
+the filesystem anchor, rejecting symlinks in any supplied ancestor and
+ambiguous `..` components. It checks directory and file identities and rejects changed
+entries. Synthetic tests reproduce both a queued-directory symlink swap and a
+parent swap immediately before hashing, plus a symlinked root ancestor;
+no outside-root names or bytes are
+accepted after the change. This is not a stable snapshot or a guarantee
+against in-place edits, unexpected mounts, or adversarial filesystem drivers.
+
+**Windows/WSL HOLD:** Windows currently retains the non-atomic path-based
+metadata traversal; Windows-native no-reparse directory handles and actual
+OneDrive Files On-Demand qualification are required before scanning an
+adversarial/concurrently mutable export directory. Under WSL, Linux `stat`
+does not independently establish Windows cloud hydration state. Never use
+this source-only POSIX result to justify optional byte reads on OneDrive.
+
 The new defaults are source-level safety properties, **not** evidence of a
 qualified Lappy Windows/OneDrive runtime, corpus rights, current installed
 ChatGPT Project package, protected evaluator, or GPU lease.
