@@ -168,7 +168,7 @@ class WindowsCloudMetadataTests(unittest.TestCase):
             w._attributes_and_tag(HiddenGlob("*.zip"))
 
     def test_normal_pathlib_path_retains_literal_preflight_support(self):
-        self.assertEqual(w._literal_query_path(Path("C:\local.zip")), "C:\\local.zip")
+        self.assertEqual(w._literal_query_path(Path(r"C:\local.zip")), r"C:\local.zip")
 
     def test_hostile_fspath_runtime_errors_are_structured_holds(self):
         for error_type in (RuntimeError, KeyError, AssertionError):
