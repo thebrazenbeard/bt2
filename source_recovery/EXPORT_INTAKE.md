@@ -5,16 +5,23 @@ directories. It does not migrate project instructions, import memory, run
 archive code, assign an authoritative repo, grant rights, or make public
 anything that it scans.
 
-**Platform gate:** The current source intentionally refuses *all* native
-Windows **and WSL** scans, including metadata-only enumeration, direct byte
+**Platform gate:** The current source refuses *all* native Windows scans
+and **detectable WSL** scans, including metadata-only enumeration, direct byte
 opens, and private manifest writes. Windows path traversal may cross an unverified reparse race;
 the installed interpreter's directory DACL behavior has not been verified.
 This is a source-only safety hold, not proof that any Lappy directory is unsafe.
 WSL also exposes Windows-mounted DrvFs paths without usable cloud/recall
-attributes; this conservative gate blocks even WSL's ordinary Linux files.
-No Windows/WSL/OneDrive inspection should be attempted until a native
+attributes; this conservative gate blocks even WSL's ordinary Linux files
+**when WSL indicators are visible**. The guard checks environment, uname,
+bounded `/proc/version`, and `/proc/self/mountinfo` evidence and fails closed
+on unreadable/oversized proc evidence. A custom-kernel WSL guest with all
+identifying markers removed can remain indistinguishable from native Linux;
+absence of markers is **not** positive host attestation. POSIX `O_NOFOLLOW`
+does not prevent traversal across mount points or independently certify the
+underlying filesystem provider. No Windows/WSL/OneDrive inspection should be attempted until a native
 no-reparse implementation and destination ACL custody are independently
-qualified. The examples below are for trusted, isolated POSIX directories.
+qualified. The examples below are for trusted, isolated Linux POSIX directories
+with available procfs evidence, not arbitrary POSIX operating systems.
 
 ```shell
 python -m source_recovery.export_intake --root ./synthetic-exports
