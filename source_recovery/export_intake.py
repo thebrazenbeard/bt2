@@ -25,6 +25,7 @@ _ZIP_UNCOMPRESSED_CAP = 128 * 1024 * 1024
 _ZIP_RATIO_CAP = 100
 _PRIVATE_OUTPUT_MAX_BYTES = 16 * 1024 * 1024
 _PRIVATE_JSON_MAX_CHUNKS = 200_000
+_PROC_HOST_EVIDENCE_LIMIT = 4 * 1024 * 1024
 
 class IntakeError(ValueError):
     """Unsafe input location or exceeded read-only inventory cap."""
@@ -37,9 +38,9 @@ def _require_qualified_host() -> None:
     if os.name == "nt":
         raise IntakeError("Windows intake unqualified: refuse traversal and private writes")
     # WSL is POSIX at Python's os.name boundary but can expose OneDrive paths
-    # through DrvFs (/mnt/c, /mnt/d), where cloud/recall attributes are not
-    # represented by POSIX st_file_attributes. Refuse the whole WSL runtime
-    # rather than guessing which mounted paths are safely local.
+    # through DrvFs, where cloud/recall attributes are not represented by
+    # POSIX st_file_attributes. Detect multiple independently visible WSL
+    # markers; their absence is NOT positive native-Linux attestation.
     if os.environ.get("WSL_INTEROP") or os.environ.get("WSL_DISTRO_NAME"):
         raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
     uname = getattr(os, "uname", None)
@@ -50,6 +51,25 @@ def _require_qualified_host() -> None:
             raise IntakeError("host qualification unavailable") from exc
         if "microsoft" in release or "wsl" in release:
             raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
+    # A custom kernel can strip the uname release marker; ordinary WSL
+    # configurations may still expose Microsoft in /proc/version or a DrvFs
+    # mount in mountinfo. Refuse unreadable or excessive proc evidence rather
+    # than silently treating missing probes as proof of a native host.
+    for proc_path in ("/proc/version", "/proc/self/mountinfo"):
+        try:
+            with open(proc_path, "r", encoding="utf-8", errors="replace") as proc:
+                evidence = proc.read(_PROC_HOST_EVIDENCE_LIMIT + 1)
+        except (OSError, UnicodeError) as exc:
+            raise IntakeError("host qualification unavailable") from exc
+        if len(evidence) > _PROC_HOST_EVIDENCE_LIMIT:
+            raise IntakeError("host qualification unavailable")
+        if proc_path == "/proc/version":
+            lowered = evidence.casefold()
+            if "microsoft" in lowered or "wsl" in lowered:
+                raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
+        elif any((" - drvfs " in line or " - 9p " in line)
+                 for line in evidence.casefold().splitlines()):
+            raise IntakeError("WSL-like mount unqualified: refuse traversal and private writes")
 
 def _cloud_or_reparse(metadata: os.stat_result) -> bool:
     attributes = getattr(metadata, "st_file_attributes", None)

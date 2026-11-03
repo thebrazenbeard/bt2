@@ -27,7 +27,68 @@ def _simulated_wsl_os(*, env: bool = False):
     })
 
 
+def _simulated_unmarked_linux_os():
+    return types.SimpleNamespace(**{
+        **vars(os), "name": "posix",
+        "uname": lambda: types.SimpleNamespace(release="6.8.7-custom"),
+        "environ": {},
+    })
+
+
 class WindowsIntakeQualificationTests(unittest.TestCase):
+    def test_proc_version_wsl_marker_rejects_custom_kernel_release(self):
+        linux_os = _simulated_unmarked_linux_os()
+        with patch.object(export_intake, "os", linux_os), \
+                patch("builtins.open", return_value=io.StringIO("Linux version 6.8.7 (Microsoft WSL)")), \
+                patch.object(Path, "lstat", side_effect=AssertionError("lstat called")):
+            with self.assertRaisesRegex(export_intake.IntakeError, "WSL.*unqualified"):
+                export_intake.scan_folder(Path("unused"))
+
+    def test_drvfs_mount_marker_rejects_stripped_wsl_release(self):
+        linux_os = _simulated_unmarked_linux_os()
+
+        def proc_open(path, *args, **kwargs):
+            if path == "/proc/version":
+                return io.StringIO("Linux version 6.8.7-custom\n")
+            if path == "/proc/self/mountinfo":
+                return io.StringIO("18 11 0:32 / /mnt/c rw - drvfs C: rw\n")
+            raise AssertionError(f"unexpected proc probe {path}")
+
+        with patch.object(export_intake, "os", linux_os), \
+                patch("builtins.open", side_effect=proc_open), \
+                patch.object(Path, "lstat", side_effect=AssertionError("lstat called")):
+            with self.assertRaisesRegex(export_intake.IntakeError, "WSL.*unqualified"):
+                export_intake.scan_folder(Path("unused"))
+
+    def test_unreadable_proc_host_evidence_fails_closed(self):
+        linux_os = _simulated_unmarked_linux_os()
+        with patch.object(export_intake, "os", linux_os), \
+                patch("builtins.open", side_effect=OSError("proc unavailable")):
+            with self.assertRaisesRegex(export_intake.IntakeError, "host qualification unavailable"):
+                export_intake._require_qualified_host()
+
+    def test_oversized_proc_host_evidence_fails_closed(self):
+        linux_os = _simulated_unmarked_linux_os()
+        with patch.object(export_intake, "os", linux_os), \
+                patch.object(export_intake, "_PROC_HOST_EVIDENCE_LIMIT", 8), \
+                patch("builtins.open", return_value=io.StringIO("longer than eight bytes")):
+            with self.assertRaisesRegex(export_intake.IntakeError, "host qualification unavailable"):
+                export_intake._require_qualified_host()
+
+    def test_unmarked_proc_evidence_keeps_existing_posix_behavior(self):
+        linux_os = _simulated_unmarked_linux_os()
+
+        def ordinary_linux_proc(path, *args, **kwargs):
+            if path == "/proc/version":
+                return io.StringIO("Linux version 6.8.7-custom\n")
+            if path == "/proc/self/mountinfo":
+                return io.StringIO("18 11 0:32 / / rw - ext4 /dev/sda rw\n")
+            raise AssertionError(f"unexpected proc probe {path}")
+
+        with patch.object(export_intake, "os", linux_os), \
+                patch("builtins.open", side_effect=ordinary_linux_proc):
+            export_intake._require_qualified_host()
+
     def test_wsl_host_refuses_before_metadata_enumeration(self):
         wsl_os = _simulated_wsl_os()
         wsl_os.scandir = Mock(side_effect=AssertionError("scandir called"))
