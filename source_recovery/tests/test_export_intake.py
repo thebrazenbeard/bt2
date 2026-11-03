@@ -2,12 +2,14 @@
 from __future__ import annotations
 import hashlib
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
 import zipfile
 from source_recovery.export_intake import scan_folder, write_records, IntakeError
 
+@unittest.skipIf(os.name == "nt", "Windows intake is held until native traversal/DACL qualification")
 class ExportIntakeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

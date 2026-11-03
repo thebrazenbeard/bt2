@@ -27,6 +27,28 @@ _ZIP_RATIO_CAP = 100
 class IntakeError(ValueError):
     """Unsafe input location or exceeded read-only inventory cap."""
 
+def _require_qualified_host() -> None:
+    # Python path-based enumeration/open cannot pin every ancestor against a
+    # Windows reparse-point swap, and creation modes do not attest the actual
+    # host DACL. A native, independently qualified Windows implementation is
+    # required before even metadata-only traversal or private output writes.
+    if os.name == "nt":
+        raise IntakeError("Windows intake unqualified: refuse traversal and private writes")
+    # WSL is POSIX at Python's os.name boundary but can expose OneDrive paths
+    # through DrvFs (/mnt/c, /mnt/d), where cloud/recall attributes are not
+    # represented by POSIX st_file_attributes. Refuse the whole WSL runtime
+    # rather than guessing which mounted paths are safely local.
+    if os.environ.get("WSL_INTEROP") or os.environ.get("WSL_DISTRO_NAME"):
+        raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
+    uname = getattr(os, "uname", None)
+    if callable(uname):
+        try:
+            release = uname().release.casefold()
+        except OSError as exc:
+            raise IntakeError("host qualification unavailable") from exc
+        if "microsoft" in release or "wsl" in release:
+            raise IntakeError("WSL intake unqualified: refuse traversal and private writes")
+
 def _cloud_or_reparse(metadata: os.stat_result) -> bool:
     attributes = getattr(metadata, "st_file_attributes", None)
     # Windows attribute absence is not evidence that a Files On-Demand path
@@ -35,6 +57,7 @@ def _cloud_or_reparse(metadata: os.stat_result) -> bool:
             or bool((attributes or 0) & _CLOUD_FLAGS))
 
 def _open_local(path: Path, expected_size: int, limit: int):
+    _require_qualified_host()
     if expected_size > limit:
         raise IntakeError("bounded local read limit exceeded")
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
@@ -106,6 +129,7 @@ def scan_folder(root: Path, *, max_files: int = 500,
     ``max_files`` is a global entry cap (files AND directories). Results are
     private Python data; only aggregate summary is printed by the CLI.
     """
+    _require_qualified_host()
     root = Path(root)
     if (max_files < 1 or max_zip_members < 1 or max_read_bytes < 1
             or max_total_read_bytes < 1):
@@ -213,6 +237,7 @@ def scan_folder(root: Path, *, max_files: int = 500,
             "summary": summary}
 
 def write_records(out: Path, root: Path, result: dict) -> None:
+    _require_qualified_host()
     source = Path(root).resolve()
     destination = Path(out).resolve()
     if destination == source or source in destination.parents:
