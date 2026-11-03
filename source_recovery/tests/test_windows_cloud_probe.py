@@ -127,6 +127,16 @@ class WindowsCloudMetadataTests(unittest.TestCase):
                 drive.assert_called_once_with("R:\\")
                 file_lookup.assert_not_called()
 
+    def test_drive_type_lookup_failures_hold_before_file_query(self):
+        for err in (OSError("unavailable drive"), ctypes.ArgumentError("bad native arg")):
+            with self.subTest(error=type(err).__name__), \
+                 patch.object(w, "_drive_type", side_effect=err), \
+                 patch.object(w, "_attributes_and_tag") as native:
+                report = w.probe_placeholder(r"D:\synthetic\export.zip")
+                self.assertEqual(report["status"], "METADATA_QUERY_FAILED_HOLD")
+                self.assertFalse(report["byte_read_authorized"])
+                native.assert_not_called()
+
     def test_fixed_root_only_enables_metadata_classification_not_file_bytes(self):
         with patch.object(w, "_drive_type", return_value=3) as drive, \
              patch.object(w, "_attributes_and_tag", return_value=(0x20, 0)), \
@@ -167,7 +177,7 @@ class WindowsCloudMetadataTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             w._attributes_and_tag(HiddenGlob("*.zip"))
 
-    def test_normal_pathlib_path_retains_literal_preflight_support(self):
+    def test_absolute_pathlib_path_retains_literal_preflight_support(self):
         self.assertEqual(w._literal_query_path(Path(r"C:\local.zip")), r"C:\local.zip")
 
     def test_hostile_fspath_runtime_errors_are_structured_holds(self):
