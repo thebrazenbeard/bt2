@@ -86,10 +86,27 @@ def _literal_query_path(path: str | Path) -> str:
     # the caller only intended a local metadata query.
     if normalized.startswith("\\\\"):
         raise ValueError("Windows metadata path must not be UNC or device")
-    if (len(normalized) >= 2 and normalized[1] == ":"
-            and (len(normalized) == 2 or normalized[2] != "\\")):
-        raise ValueError("Windows drive-relative metadata path is ambiguous")
+    if (len(normalized) < 3 or normalized[0] not in
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+            or normalized[1:3] != ":\\"):
+        raise ValueError("Windows metadata path requires absolute drive root")
+    segments = normalized[3:].split("\\")
+    if ":" in normalized[3:] or any(part in (".", "..") for part in segments):
+        raise ValueError("Windows metadata path contains ambiguous segments")
+    if "" in segments[:-1]:
+        raise ValueError("Windows metadata path has repeated separators")
     return literal
+
+
+def _drive_type(root: str) -> int:
+    """Ask Windows for root-drive type before querying a file path."""
+    if os.name != "nt":
+        raise OSError("Windows-only drive type probe")
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    query = kernel.GetDriveTypeW
+    query.argtypes = [wintypes.LPCWSTR]
+    query.restype = wintypes.UINT
+    return int(query(root))
 
 
 def _attributes_and_tag(path: str | Path) -> tuple[int, int]:
@@ -151,6 +168,10 @@ def probe_placeholder(path: str | Path) -> dict[str, object]:
     """Metadata-only and path-redacted; all read/publish authority stays HOLD."""
     try:
         literal = _literal_query_path(path)
+        root = literal[:3].replace("/", "\\")
+        if _drive_type(root) != 3:
+            return {"status": "REMOTE_OR_NONFIXED_VOLUME_HOLD",
+                    "byte_read_authorized": False}
         attributes, tag = _attributes_and_tag(literal)
         state = _state_from_attributes_tag(attributes, tag)
         result = classify_placeholder(attributes, state)
