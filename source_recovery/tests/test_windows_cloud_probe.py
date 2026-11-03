@@ -81,9 +81,9 @@ class WindowsCloudMetadataTests(unittest.TestCase):
     def test_unc_device_and_drive_relative_paths_never_reach_native_query(self):
         # FindFirstFileW on UNC paths can initiate unintended SMB/network I/O.
         rejected = (
-            r"\\\\server\\share\\archive.zip",
+            r"\\server\share\archive.zip",
             "//server/share/archive.zip",
-            r"\\\\.\\C:\\Windows\\file.zip",
+            r"\\.\C:\Windows\file.zip",
             "C:archive.zip",
         )
         for candidate in rejected:
