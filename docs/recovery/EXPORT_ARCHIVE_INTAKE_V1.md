@@ -1,5 +1,12 @@
 # Read-only export intake (source candidate)
 
+**Historical V1 note — superseded by
+`source_recovery/EXPORT_INTAKE.md`:** Current `export_intake.py` defaults to
+metadata-only and explicitly refuses native Windows/WSL scanning, byte opens, and private
+manifest writes pending native no-reparse/ACL qualification. The older
+Windows/Linux usage and eager hashing descriptions below are retained for
+provenance only and must not be used as current instructions.
+
 This tool builds a **local metadata inventory** of a user-selected folder. It is
 intended for recovery triage, not for automatic ingestion or publication.
 
