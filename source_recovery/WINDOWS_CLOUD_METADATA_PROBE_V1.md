@@ -25,6 +25,14 @@ interrupts such as `KeyboardInterrupt` or `SystemExit`.
 This intentionally also rejects Windows extended-length paths with a `\\?\`
 prefix until that namespace is explicitly validated. Native
 `ctypes.ArgumentError` marshalling failures also return metadata-query HOLD.
+Local-only native metadata calls now also reject UNC paths (both backslash
+and forward-slash forms), device paths such as `\\\\.\\`, and ambiguous
+drive-relative paths such as `C:archive.zip`. A pre-fix Windows test
+demonstrated all four passed path validation; the fixed test now verifies
+rejection before the native query seam, preventing unintended SMB/device access.
+Relative paths remain supported by the existing source contract, so callers
+must still use an authorized local working directory.
+
 No directory-wide wildcard enumeration is authorized by this probe.
 
 Unknown or future `CF_PLACEHOLDER_STATE` bits are explicitly
@@ -57,8 +65,15 @@ open, hash, decompress, copy, download, train, or publish bytes.
   runtime check is claimed for these follow-up changes.
 - Subsequent source-only hostile-string regression: a `str` subclass whose
   membership check hides `*` reached the native-query seam before hardening;
-  exact-string validation now blocks it. All 37 source-recovery tests passed
+  exact-string validation now blocks it. All 38 source-recovery tests passed
   on Linux/Python 3.12. This is not a Windows runtime or hydration witness.
+
+- **2026-11-03 Lappy Windows follow-up:** exact published PR source with
+  network/device/drive-relative path rejection was fetched from GitHub and
+  the entire source-recovery test suite passed **38/38**, exit 0.
+  An adversarial four-path test was observed failing before the repair, then
+  passed afterward. This is local Windows TEST evidence, not a formal proof
+  that no provider/network effect is possible under any OS condition.
 
 ## Hard limitations
 
