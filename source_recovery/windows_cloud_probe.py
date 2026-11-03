@@ -1,4 +1,4 @@
-"""Read-only Windows Cloud Files metadata probe; never opens file content.
+"""Windows Cloud Files metadata diagnostic; does not directly read payloads.
 
 This diagnostic only helps route files for later authorized review. A successful
 state classification is NOT proof of complete on-disk byte ranges or permission
@@ -67,7 +67,18 @@ class _FindDataW(ctypes.Structure):
     ]
 
 
+def _literal_query_path(path: str | Path) -> str:
+    """Reject Win32 search patterns before FindFirstFileW can enumerate them."""
+    literal = os.fspath(path)
+    if not isinstance(literal, str):
+        raise TypeError("Windows metadata path must be text")
+    if not literal or any(char in literal for char in ("*", "?", "\x00")):
+        raise ValueError("Windows metadata path must be a nonempty literal")
+    return literal
+
+
 def _attributes_and_tag(path: str | Path) -> tuple[int, int]:
+    literal = _literal_query_path(path)
     if os.name != "nt":
         raise OSError("Windows-only metadata probe")
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -78,7 +89,7 @@ def _attributes_and_tag(path: str | Path) -> tuple[int, int]:
     close.argtypes = [ctypes.c_void_p]
     close.restype = wintypes.BOOL
     data = _FindDataW()
-    handle = first(os.fspath(path), ctypes.byref(data))
+    handle = first(literal, ctypes.byref(data))
     if handle is None or handle == ctypes.c_void_p(-1).value:
         raise OSError("Windows attribute/tag query failed")
     try:
@@ -124,17 +135,19 @@ def _is_cloud_sync_root(path: str | Path) -> bool | None:
 def probe_placeholder(path: str | Path) -> dict[str, object]:
     """Metadata-only and path-redacted; all read/publish authority stays HOLD."""
     try:
-        attributes, tag = _attributes_and_tag(path)
+        literal = _literal_query_path(path)
+        attributes, tag = _attributes_and_tag(literal)
         state = _state_from_attributes_tag(attributes, tag)
         result = classify_placeholder(attributes, state)
         if result["status"] == "OFFLINE_OR_RECALL_HOLD":
             return result
-        root_state = _is_cloud_sync_root(path)
+        root_state = _is_cloud_sync_root(literal)
         if root_state is True:
             return {"status": "CLOUD_SYNC_ROOT_HOLD", "byte_read_authorized": False}
         if root_state is None and result["status"] in (
                 "REGULAR_FILE_METADATA_ONLY", "CLOUD_PLACEHOLDER_METADATA_ONLY"):
             return {"status": "SYNC_ROOT_UNVERIFIED_HOLD", "byte_read_authorized": False}
         return result
-    except (OSError, AttributeError, ValueError, TypeError):
+    except (OSError, AttributeError, ValueError, TypeError,
+            OverflowError, ctypes.ArgumentError):
         return {"status": "METADATA_QUERY_FAILED_HOLD", "byte_read_authorized": False}

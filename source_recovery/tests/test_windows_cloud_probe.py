@@ -1,4 +1,5 @@
 """Hostile contract tests: CFAPI classification never authorizes content reads."""
+import ctypes
 import unittest
 from unittest.mock import patch
 from source_recovery import windows_cloud_probe as w
@@ -58,6 +59,39 @@ class WindowsCloudMetadataTests(unittest.TestCase):
         self.assertEqual(result["status"], "CLOUD_PLACEHOLDER_METADATA_ONLY")
         self.assertNotIn("secret.zip", str(result))
         self.assertFalse(result["byte_read_authorized"])
+
+    def test_ctypes_marshalling_failure_is_a_metadata_hold(self):
+        with patch.object(w, "_attributes_and_tag", return_value=(0x400, 0x9000001A)), \
+             patch.object(w, "_state_from_attributes_tag",
+                          side_effect=ctypes.ArgumentError("synthetic marshalling failure")):
+            result = w.probe_placeholder(r"C:\synthetic-private\export.zip")
+        self.assertEqual(result, {"status": "METADATA_QUERY_FAILED_HOLD",
+                                  "byte_read_authorized": False})
+
+    def test_wildcard_paths_are_rejected_before_native_query(self):
+        for path in (r"C:\synthetic-private\*.zip", r"C:\synthetic-private\exp?rt.zip"):
+            with self.subTest(path=path), \
+                 patch.object(w, "_attributes_and_tag") as query:
+                result = w.probe_placeholder(path)
+                self.assertEqual(result, {"status": "METADATA_QUERY_FAILED_HOLD",
+                                          "byte_read_authorized": False})
+                query.assert_not_called()
+
+    def test_direct_findfirstfile_wrapper_rejects_wildcards(self):
+        # Reject before native boundary, including on a non-Windows test runner.
+        for path in ("*.zip", "exp?rt.zip"):
+            with self.subTest(path=path):
+                with self.assertRaises(ValueError):
+                    w._attributes_and_tag(path)
+
+    def test_empty_nul_and_binary_paths_fail_without_native_call(self):
+        for path in ("", "bad\x00name.zip", b"bytes.zip"):
+            with self.subTest(path=repr(path)), \
+                 patch.object(w, "_attributes_and_tag") as query:
+                self.assertEqual(w.probe_placeholder(path),
+                                 {"status": "METADATA_QUERY_FAILED_HOLD",
+                                  "byte_read_authorized": False})
+                query.assert_not_called()
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,12 +9,18 @@ be unsafe: Windows PowerShell reported a cloud export as a reparse point, while
 a Python application using `FindFirstFileW` saw ordinary-looking attributes.
 Windows Cloud Files can hide their reparse information from applications.
 
-`source_recovery.windows_cloud_probe.probe_placeholder(path)` queries only
+`source_recovery.windows_cloud_probe.probe_placeholder(path)` requests
 Windows metadata, using `FindFirstFileW`,
 `CfGetPlaceholderStateFromAttributeTag`, and, importantly,
 `CfGetSyncRootInfoByPath`. The last query detects cloud sync-root membership
 even if normal file-attribute reporting suppresses the reparse point.
 Query failure remains UNKNOWN/HOLD, never an ordinary-file assertion.
+Wildcard search paths containing `*` or `?`, empty paths, byte-string paths,
+and paths with embedded NUL characters fail closed before any native query.
+This intentionally also rejects Windows extended-length paths with a `\\?\`
+prefix until that namespace is explicitly validated. Native
+`ctypes.ArgumentError` marshalling failures also return metadata-query HOLD.
+No directory-wide wildcard enumeration is authorized by this probe.
 
 Unknown or future `CF_PLACEHOLDER_STATE` bits are explicitly
 `UNKNOWN_STATE_BITS_HOLD` rather than silently classified as a known synced
@@ -40,8 +46,18 @@ open, hash, decompress, copy, download, train, or publish bytes.
   `CLOUD_SYNC_ROOT_HOLD`. Both results explicitly deny byte-reading.
 - No byte stream was opened from the cloud-backed export. No output contains
   its pathname, payload, archive members, checksums, or personal content.
+- Local Linux Python 3.12 source-only follow-up (this patch): synthetic
+  marshalling-error and wildcard guards reproduced failing behavior before
+  the fix, then all 32 intake/adjudication/cloud tests passed. No Windows host
+  runtime check is claimed for these follow-up changes.
 
 ## Hard limitations
+
+The code makes no direct payload-read call, but a metadata API can have
+provider-dependent side effects; this source-only patch cannot demonstrate
+that no Cloud Files provider hydrated bytes in every host scenario. In
+particular, it does not establish a Windows-host non-hydration guarantee,
+and no live cloud-root test was performed for this patch.
 
 This is not a complete local-byte-range check. A cloud placeholder can be
 partially or fully present on disk; even an in-sync state is not proof of
