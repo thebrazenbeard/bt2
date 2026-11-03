@@ -3,15 +3,12 @@ name: Export Intake Source Contracts
 on:
   pull_request:
     paths:
-      - 'source_recovery/export_intake.py'
-      - 'source_recovery/EXPORT_INTAKE.md'
-      - 'source_recovery/tests/test_export_intake.py'
+      - 'source_recovery/**'
       - '.github/workflows/export-intake-contract.yml'
   push:
     branches: [main]
     paths:
-      - 'source_recovery/export_intake.py'
-      - 'source_recovery/tests/test_export_intake.py'
+      - 'source_recovery/**'
       - '.github/workflows/export-intake-contract.yml'
 
 permissions:
@@ -19,8 +16,12 @@ permissions:
 
 jobs:
   local-only-contracts:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -29,4 +30,4 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run source-only intake tests
-        run: python -m unittest discover -s source_recovery/tests -p 'test_export_intake.py' -v
+        run: python -m unittest discover -s source_recovery/tests -p 'test_*.py' -v
