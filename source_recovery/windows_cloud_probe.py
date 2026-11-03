@@ -81,6 +81,14 @@ def _literal_query_path(path: str | Path) -> str:
         raise TypeError("Windows metadata path must be text")
     if not literal or any(char in literal for char in ("*", "?", "\x00")):
         raise ValueError("Windows metadata path must be a nonempty literal")
+    normalized = literal.replace("/", "\\")
+    # UNC and device paths can trigger network, pipe or device I/O even when
+    # the caller only intended a local metadata query.
+    if normalized.startswith("\\\\"):
+        raise ValueError("Windows metadata path must not be UNC or device")
+    if (len(normalized) >= 2 and normalized[1] == ":"
+            and (len(normalized) == 2 or normalized[2] != "\\")):
+        raise ValueError("Windows drive-relative metadata path is ambiguous")
     return literal
 
 
