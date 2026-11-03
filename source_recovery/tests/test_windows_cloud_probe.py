@@ -96,6 +96,44 @@ class WindowsCloudMetadataTests(unittest.TestCase):
                     self.assertFalse(result["byte_read_authorized"])
                     query.assert_not_called()
 
+    def test_relative_or_ambiguous_paths_do_not_reach_windows_io(self):
+        rejected = (
+            "archive.zip",
+            r"\rooted\archive.zip",
+            r"C:\safe\..\archive.zip",
+            r"C:\safe\.\archive.zip",
+            r"C:\safe\archive.zip:stream",
+        )
+        for candidate in rejected:
+            with self.subTest(case=candidate):
+                with self.assertRaises(ValueError):
+                    w._literal_query_path(candidate)
+                with patch.object(w, "_attributes_and_tag") as native:
+                    report = w.probe_placeholder(candidate)
+                    self.assertEqual(report["status"], "METADATA_QUERY_FAILED_HOLD")
+                    native.assert_not_called()
+
+    def test_remote_and_unqualified_drive_types_stop_before_file_query(self):
+        for drive_type in (0, 1, 2, 4, 5, 6):
+            with self.subTest(drive_type=drive_type), \
+                 patch.object(w, "_drive_type", return_value=drive_type) as drive, \
+                 patch.object(w, "_attributes_and_tag") as file_lookup:
+                report = w.probe_placeholder(r"R:\export.zip")
+                self.assertEqual(report["status"], "REMOTE_OR_NONFIXED_VOLUME_HOLD")
+                self.assertFalse(report["byte_read_authorized"])
+                drive.assert_called_once_with("R:\\")
+                file_lookup.assert_not_called()
+
+    def test_fixed_root_only_enables_metadata_classification_not_file_bytes(self):
+        with patch.object(w, "_drive_type", return_value=3) as drive, \
+             patch.object(w, "_attributes_and_tag", return_value=(0x20, 0)), \
+             patch.object(w, "_state_from_attributes_tag", return_value=0), \
+             patch.object(w, "_is_cloud_sync_root", return_value=False):
+            result = w.probe_placeholder(r"C:\synthetic\export.zip")
+        drive.assert_called_once_with("C:\\")
+        self.assertEqual(result["status"], "REGULAR_FILE_METADATA_ONLY")
+        self.assertFalse(result["byte_read_authorized"])
+
     def test_direct_findfirstfile_wrapper_rejects_wildcards(self):
         # Reject before native boundary, including on a non-Windows test runner.
         for path in ("*.zip", "exp?rt.zip"):
