@@ -4,10 +4,13 @@
 inventory. It neither extracts ZIP members nor admits data for training or
 publication. The original export source remains private and historical.
 
-**Current qualification hold:** The native Windows and WSL scanner and
-private-manifest writer now fail closed before path traversal or output
-creation. The WSL hold includes otherwise-local Linux paths because DrvFs
-Windows mounts cannot be distinguished safely with this scanner. Earlier R203
+**Current qualification hold:** The native Windows scanner and
+private-manifest writer fail closed before path traversal or output creation.
+Detectable WSL environments also fail closed, including otherwise-local Linux
+paths, because DrvFs Windows mounts cannot be distinguished safely with this
+scanner. These heuristics cannot identify custom-kernel WSL when all observable
+markers are stripped; a native Linux host must be qualified independently
+before treating a POSIX scan as a byte-custody authority. Earlier R203
 attribute/size checks were not sufficient to defeat Windows ancestor-reparse
 races, and the actual destination DACL remains unverified. The commands below
 are for an isolated, authorized POSIX test directory only; do not run this
@@ -22,7 +25,7 @@ The default command reports aggregate counts only. Python callers can inspect
 the returned `private_manifest` in a trusted local process; it is **not safe
 to publish**, even though individual file contents are absent. Paths, sizes,
 hashes, names, extensions, and private metadata can identify personal data.
-On the supported POSIX path, to persist a private manifest the operator must explicitly pass both
+On the supported Linux POSIX path, to persist a private manifest the operator must explicitly pass both
 `--write-private-manifest` and `--output` to a new destination outside the
 source. Directory creation mode is not a substitute for readback of actual
 effective host access controls.

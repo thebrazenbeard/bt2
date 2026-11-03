@@ -116,6 +116,40 @@ class WindowsCloudMetadataTests(unittest.TestCase):
                     self.assertEqual(report["status"], "METADATA_QUERY_FAILED_HOLD")
                     native.assert_not_called()
 
+    def test_reserved_dos_devices_and_trailing_components_never_reach_native_query(self):
+        # Win32 may reinterpret a reserved name, even with an extension, as a
+        # device. Trailing periods/spaces also create path alias ambiguity.
+        rejected = (
+            r"C:\CON", r"C:\safe\NUL.txt", r"D:\safe\COM1",
+            r"D:\safe\LPT¹", r"C:\safe\com².zip", r"C:\PRN.backup",
+            r"C:\safe\CONIN$", r"C:\safe\CONOUT$",
+            r"C:\safe\conin$.txt", r"D:\safe\ConOut$.log",
+            r"C:\safe\aux", r"C:\safe\file.", "C:\\safe\\file ",
+            r"C:\safe\folder.\file.zip", "C:\\safe\\folder \\file.zip",
+            "C:\\",
+        )
+        for candidate in rejected:
+            with self.subTest(path=candidate), \
+                 patch.object(w, "_drive_type") as drive, \
+                 patch.object(w, "_attributes_and_tag") as native:
+                with self.assertRaises(ValueError):
+                    w._literal_query_path(candidate)
+                report = w.probe_placeholder(candidate)
+                self.assertEqual(report, {"status": "METADATA_QUERY_FAILED_HOLD",
+                                          "byte_read_authorized": False})
+                drive.assert_not_called()
+                native.assert_not_called()
+
+    def test_normal_names_similar_to_devices_keep_metadata_only_support(self):
+        valid = (
+            r"C:\safe\console.zip", r"C:\safe\commit1.zip",
+            r"C:\safe\prn_extra.txt", r"D:\folder.name\file.zip",
+            r"D:\safe\LPT10.txt", r"C:\safe\COM0.txt",
+        )
+        for candidate in valid:
+            with self.subTest(path=candidate):
+                self.assertEqual(w._literal_query_path(candidate), candidate)
+
     def test_remote_and_unqualified_drive_types_stop_before_file_query(self):
         for drive_type in (0, 1, 2, 4, 5, 6):
             with self.subTest(drive_type=drive_type), \
