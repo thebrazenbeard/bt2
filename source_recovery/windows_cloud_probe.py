@@ -19,6 +19,12 @@ _CF_PARTIAL = 0x10
 _CF_PARTIALLY_ON_DISK = 0x20
 _CF_INVALID = 0xFFFFFFFF
 _CF_KNOWN_STATE_MASK = 0x3F  # All currently documented CF_PLACEHOLDER_STATE bits
+_DOS_DEVICE_NAMES = frozenset(
+    ("CON", "PRN", "AUX", "NUL", "CONIN$", "CONOUT$")
+) | frozenset(
+    f"{prefix}{number}" for prefix in ("COM", "LPT")
+    for number in "123456789¹²³"
+)
 
 
 def classify_placeholder(attributes: int, state: int) -> dict[str, object]:
@@ -93,8 +99,10 @@ def _literal_query_path(path: str | Path) -> str:
     segments = normalized[3:].split("\\")
     if ":" in normalized[3:] or any(part in (".", "..") for part in segments):
         raise ValueError("Windows metadata path contains ambiguous segments")
-    if "" in segments[:-1]:
-        raise ValueError("Windows metadata path has repeated separators")
+    if any(not part or part.endswith((".", " ")) for part in segments):
+        raise ValueError("Windows metadata path has ambiguous components")
+    if any(part.partition(".")[0].upper() in _DOS_DEVICE_NAMES for part in segments):
+        raise ValueError("Windows metadata path contains reserved DOS device")
     return literal
 
 
