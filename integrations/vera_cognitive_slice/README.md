@@ -15,6 +15,10 @@ fresh-current qualification, run the optional read-only check:
 
 A nonzero exit means at least one source main moved or the check failed; review
 the upstream changes and deliberately refresh exact pins before requalifying.
+A successful check is a time-of-check observation across eight separate GitHub
+requests, **not an atomic cross-repository snapshot**. Source main could move
+immediately afterward; the executed qualification remains bound to exact
+immutable SHA pins, not to the claim that every upstream main stayed still.
 Never auto-update pins as part of the qualification itself. To create an
 isolated checkout set on Lappy:
 
