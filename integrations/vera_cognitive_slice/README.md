@@ -7,10 +7,26 @@ model, emotional competence measure, or proof of independent semantic accuracy.
 ## Source and Lappy reproducibility
 
 source_pins.json specifies eight exact commits. Checkouts must be at those
-heads, unmodified, or the runner fails closed before imports. To create an
+heads, unmodified, or the runner fails closed before imports. Pins are a frozen
+reproducibility boundary, not proof that GitHub main still matches. Before a
+fresh-current qualification, run the optional read-only check:
+
+    python integrations/vera_cognitive_slice/check_live_pins.py
+
+A nonzero exit means at least one source main moved or the check failed; review
+the upstream changes and deliberately refresh exact pins before requalifying.
+Never auto-update pins as part of the qualification itself. To create an
 isolated checkout set on Lappy:
 
     python integrations/vera_cognitive_slice/prepare_sources.py --out C:\Temp\bt2-cognitive-source-new
+
+The source preparer explicitly disables `core.autocrlf` in each checkout,
+including on Lappy. Manual Windows clones made with Git's global
+`core.autocrlf=true` can pass `git status` yet FAIL the raw-worktree-byte guard:
+line-ending conversion changes bytes without changing normalized Git blob IDs.
+Use `prepare_sources.py`, or explicitly clone with
+`git -c core.autocrlf=false clone ...` into a fresh isolated directory.
+Do not disable the raw-byte guard or reinterpret its failure as a runtime pass.
 
 Then set BT2_VERA_COGNITIVE_REPOS to that folder and execute:
 
