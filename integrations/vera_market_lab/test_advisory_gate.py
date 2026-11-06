@@ -47,6 +47,7 @@ class AdvisoryGateTests(unittest.TestCase):
             )
         with self.assertRaises(FrozenInstanceError):
             rejected.trade_authorized = True
+        self.assertFalse(hasattr(rejected, "__dict__"))
 
     def test_unprofitable_synthetic_case(self):
         decision = deterministic_gate(scenario())
