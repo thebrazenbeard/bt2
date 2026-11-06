@@ -1,6 +1,8 @@
 """Pure standard-library conformance tests; no external account or network."""
 
 import unittest
+import io
+from unittest.mock import patch
 
 from advisory_gate import SyntheticOpportunity, deterministic_gate, granite_note
 
@@ -53,6 +55,14 @@ class AdvisoryGateTests(unittest.TestCase):
     def test_model_endpoint_confined_to_loopback(self):
         with self.assertRaises(ValueError):
             granite_note("https://example.com", scenario())
+
+    def test_bounded_model_response(self):
+        class OversizedModelResponse(io.BytesIO):
+            status = 200
+
+        with patch("advisory_gate.urlopen", return_value=OversizedModelResponse(b"x" * 16385)):
+            with self.assertRaisesRegex(RuntimeError, "exceeds isolated advisory budget"):
+                granite_note("http://127.0.0.1:11435", scenario())
 
 
 if __name__ == "__main__":
