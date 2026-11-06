@@ -82,6 +82,7 @@ def granite_note(base_url: str, opportunity: SyntheticOpportunity, timeout: floa
     """
     if base_url not in {"http://127.0.0.1:11435", "http://localhost:11435"}:
         raise ValueError("only the explicitly observed local model is supported")
+    deterministic_gate(opportunity)  # Validate synthetic purpose and values before model I/O.
     payload = json.dumps({
         "messages": [
             {"role": "system", "content": "Discuss a synthetic trading example in one sentence. Advisory only; no orders."},
