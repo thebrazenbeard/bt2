@@ -10,12 +10,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 import json
+import math
 from typing import Literal
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 
 MAX_BPS = Decimal("100000")
 MAX_MODEL_RESPONSE_BYTES = 16384
+MAX_ADVISORY_TIMEOUT_SECONDS = 10.0
+
+
+class _RejectRedirect(HTTPRedirectHandler):
+    """Disable redirects even if the local model service is compromised."""
+
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        return None
+
+
+def _open_loopback(request: Request, timeout: float):
+    # Explicit empty proxy map avoids inheriting HTTP_PROXY for loopback.
+    return build_opener(ProxyHandler({}), _RejectRedirect()).open(request, timeout=timeout)
 
 
 def _bps(value: object) -> Decimal:
@@ -80,8 +94,15 @@ def granite_note(base_url: str, opportunity: SyntheticOpportunity, timeout: floa
     Only loopback is supported. Failure is a bounded advisory miss, not a gate
     error, and this deliberately has no retries or background activity.
     """
-    if base_url not in {"http://127.0.0.1:11435", "http://localhost:11435"}:
-        raise ValueError("only the explicitly observed local model is supported")
+    if base_url != "http://127.0.0.1:11435":
+        raise ValueError("only the explicitly observed numeric loopback model is supported")
+    if (
+        isinstance(timeout, bool)
+        or not isinstance(timeout, (int, float))
+        or not math.isfinite(float(timeout))
+        or not 0.5 <= float(timeout) <= MAX_ADVISORY_TIMEOUT_SECONDS
+    ):
+        raise ValueError("advisory timeout must be finite and between 0.5 and 10 seconds")
     deterministic_gate(opportunity)  # Validate synthetic purpose and values before model I/O.
     payload = json.dumps({
         "messages": [
@@ -104,7 +125,7 @@ def granite_note(base_url: str, opportunity: SyntheticOpportunity, timeout: floa
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with urlopen(request, timeout=timeout) as response:
+    with _open_loopback(request, timeout=float(timeout)) as response:
         if response.status != 200:
             raise RuntimeError("model request did not succeed")
         raw = response.read(MAX_MODEL_RESPONSE_BYTES + 1)
