@@ -6,7 +6,9 @@ Rezon-authenticated delegate, trading strategy, exchange quote, or order path.
 `advisory_gate.py` accepts only synthetic test-owned numbers, calculates exact
 round-trip fee/spread/slippage costs, and refuses to authorize *any* trade.
 Granite on VN2 may optionally supply an explicitly untrusted advisory note;
-model text cannot affect the deterministic result.
+model text cannot affect the deterministic result. Model access is limited to
+numeric `127.0.0.1:11435`, with redirects and inherited proxies disabled,
+an explicit finite 0.5–10 second timeout window, and a 16 KiB response cap.
 
 Run: `python3 -m unittest discover -s integrations/vera_market_lab -p 'test_*.py'`
 
