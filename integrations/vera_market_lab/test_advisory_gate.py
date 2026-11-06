@@ -3,6 +3,8 @@
 import unittest
 import io
 import json
+from dataclasses import FrozenInstanceError, asdict
+from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
 from unittest.mock import patch
@@ -12,6 +14,7 @@ from urllib.request import Request
 from advisory_gate import (
     _RejectRedirect,
     _open_loopback,
+    GateResult,
     SyntheticOpportunity,
     deterministic_gate,
     granite_note,
@@ -31,6 +34,20 @@ def scenario(**updates):
 
 
 class AdvisoryGateTests(unittest.TestCase):
+    def test_gate_result_cannot_claim_trade_authority(self):
+        rejected = deterministic_gate(scenario())
+        self.assertIs(rejected.trade_authorized, False)
+        self.assertIs(asdict(rejected)["trade_authorized"], False)
+        with self.assertRaises(TypeError):
+            GateResult(
+                status="COST_REJECT",
+                net_bps=Decimal("-87"),
+                total_cost_bps=Decimal("187"),
+                trade_authorized=True,
+            )
+        with self.assertRaises(FrozenInstanceError):
+            rejected.trade_authorized = True
+
     def test_unprofitable_synthetic_case(self):
         decision = deterministic_gate(scenario())
         self.assertEqual(str(decision.net_bps), "-87")
