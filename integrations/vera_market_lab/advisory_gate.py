@@ -54,7 +54,7 @@ class SyntheticOpportunity:
     purpose: Literal["SYNTHETIC_TEST"] = "SYNTHETIC_TEST"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class GateResult:
     status: Literal["COST_REJECT", "RESEARCH_ONLY"]
     net_bps: Decimal
