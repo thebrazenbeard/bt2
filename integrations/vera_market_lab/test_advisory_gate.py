@@ -56,6 +56,12 @@ class AdvisoryGateTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             granite_note("https://example.com", scenario())
 
+    def test_invalid_synthetic_input_never_reaches_model(self):
+        with patch("advisory_gate.urlopen") as remote:
+            with self.assertRaises(ValueError):
+                granite_note("http://127.0.0.1:11435", scenario(gross_move_bps="NaN"))
+            remote.assert_not_called()
+
     def test_bounded_model_response(self):
         class OversizedModelResponse(io.BytesIO):
             status = 200
