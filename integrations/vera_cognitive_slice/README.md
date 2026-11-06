@@ -69,6 +69,26 @@ in the manifest provider, and do not immunize a mutable filesystem against
 all race conditions or malicious checkout content.
 The check does not write or install anything into D:\VERA.
 
+## Optional model-agnostic evidence proposal
+
+`cognitive_advisory.propose(repos, AdvisoryRequest(...))` is a callable,
+read-only boundary that executes the **actual pinned Humility** likelihood
+revision method on caller-supplied `EvidenceSignal` records. It authenticates
+all eight worktree source snapshots (including tracked JSON and Markdown),
+rejects repeated evidence identities and dependence groups, and returns an
+immutable, serializable advisory with source pins. This API invokes Humility
+only; verifying the other seven source snapshots does not mean that all eight
+contributed to the resulting posterior. Meta's current parity-task method
+chooser has no justified general conversational interpretation and is not
+silently used as a dialogue policy.
+
+The returned posterior is *conditional mathematics over unverified likelihoods*.
+It is not an independently measured calibration, truth determination, memory
+admission, model identity, tool permission, or effect authority. The API never
+calls a model or writes a ledger. Callers must govern source, privacy and
+external label custody separately. The qualification uses synthetic inputs;
+production conversational improvement is unproven.
+
 Production activation, real model behavior, cross-host state persistence,
 source authentication, and rollout to VN1/VN2 remain separate qualification
 gates. Re-run with new exact source pins when a participating main changes.
@@ -81,8 +101,9 @@ It does not replace the immutable MESO core or qualify network/SMB locking.
 ## Hostile review qualification boundaries
 
 A source-bound hosted run rejects Python optimization, preloaded cognitive
-modules, source HEAD drift, modified tracked Python blobs, unexpected untracked
-Python files, Python bytecode, and a nonempty or directly linked state directory.
+modules, source HEAD drift, modified tracked Git blobs (code and data),
+unexpected untracked Python files, Python bytecode, and a nonempty or directly
+linked state directory.
 The trusted runner/Git executable and operating-system path ancestry are part
 of the host trust boundary; these checks do not authenticate a malicious
 operator who replaces Git or the source while it is executing.
