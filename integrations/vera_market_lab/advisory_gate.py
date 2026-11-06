@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 
 
 MAX_BPS = Decimal("100000")
+MAX_MODEL_RESPONSE_BYTES = 16384
 
 
 def _bps(value: object) -> Decimal:
@@ -105,6 +106,9 @@ def granite_note(base_url: str, opportunity: SyntheticOpportunity, timeout: floa
     with urlopen(request, timeout=timeout) as response:
         if response.status != 200:
             raise RuntimeError("model request did not succeed")
-        result = json.load(response)
+        raw = response.read(MAX_MODEL_RESPONSE_BYTES + 1)
+        if len(raw) > MAX_MODEL_RESPONSE_BYTES:
+            raise RuntimeError("model response exceeds isolated advisory budget")
+        result = json.loads(raw)
     return str(result["choices"][0]["message"]["content"])[:500]
 
