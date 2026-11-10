@@ -7,7 +7,7 @@ Only synthetic, test-owned scenarios are accepted by the demo runner.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 import json
 import math
@@ -54,12 +54,13 @@ class SyntheticOpportunity:
     purpose: Literal["SYNTHETIC_TEST"] = "SYNTHETIC_TEST"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class GateResult:
     status: Literal["COST_REJECT", "RESEARCH_ONLY"]
     net_bps: Decimal
     total_cost_bps: Decimal
-    trade_authorized: Literal[False] = False
+    # Authorization must not be an init argument: Literal is only a type hint.
+    trade_authorized: Literal[False] = field(default=False, init=False)
 
 
 def deterministic_gate(opportunity: SyntheticOpportunity) -> GateResult:
