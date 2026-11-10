@@ -7,10 +7,30 @@ model, emotional competence measure, or proof of independent semantic accuracy.
 ## Source and Lappy reproducibility
 
 source_pins.json specifies eight exact commits. Checkouts must be at those
-heads, unmodified, or the runner fails closed before imports. To create an
+heads, unmodified, or the runner fails closed before imports. Pins are a frozen
+reproducibility boundary, not proof that GitHub main still matches. Before a
+fresh-current qualification, run the optional read-only check:
+
+    python integrations/vera_cognitive_slice/check_live_pins.py
+
+A nonzero exit means at least one source main moved or the check failed; review
+the upstream changes and deliberately refresh exact pins before requalifying.
+A successful check is a time-of-check observation across eight separate GitHub
+requests, **not an atomic cross-repository snapshot**. Source main could move
+immediately afterward; the executed qualification remains bound to exact
+immutable SHA pins, not to the claim that every upstream main stayed still.
+Never auto-update pins as part of the qualification itself. To create an
 isolated checkout set on Lappy:
 
     python integrations/vera_cognitive_slice/prepare_sources.py --out C:\Temp\bt2-cognitive-source-new
+
+The source preparer explicitly disables `core.autocrlf` in each checkout,
+including on Lappy. Manual Windows clones made with Git's global
+`core.autocrlf=true` can pass `git status` yet FAIL the raw-worktree-byte guard:
+line-ending conversion changes bytes without changing normalized Git blob IDs.
+Use `prepare_sources.py`, or explicitly clone with
+`git -c core.autocrlf=false clone ...` into a fresh isolated directory.
+Do not disable the raw-byte guard or reinterpret its failure as a runtime pass.
 
 Then set BT2_VERA_COGNITIVE_REPOS to that folder and execute:
 
@@ -49,6 +69,26 @@ in the manifest provider, and do not immunize a mutable filesystem against
 all race conditions or malicious checkout content.
 The check does not write or install anything into D:\VERA.
 
+## Optional model-agnostic evidence proposal
+
+`cognitive_advisory.propose(repos, AdvisoryRequest(...))` is a callable,
+read-only boundary that executes the **actual pinned Humility** likelihood
+revision method on caller-supplied `EvidenceSignal` records. It authenticates
+all eight worktree source snapshots (including tracked JSON and Markdown),
+rejects repeated evidence identities and dependence groups, and returns an
+immutable, serializable advisory with source pins. This API invokes Humility
+only; verifying the other seven source snapshots does not mean that all eight
+contributed to the resulting posterior. Meta's current parity-task method
+chooser has no justified general conversational interpretation and is not
+silently used as a dialogue policy.
+
+The returned posterior is *conditional mathematics over unverified likelihoods*.
+It is not an independently measured calibration, truth determination, memory
+admission, model identity, tool permission, or effect authority. The API never
+calls a model or writes a ledger. Callers must govern source, privacy and
+external label custody separately. The qualification uses synthetic inputs;
+production conversational improvement is unproven.
+
 Production activation, real model behavior, cross-host state persistence,
 source authentication, and rollout to VN1/VN2 remain separate qualification
 gates. Re-run with new exact source pins when a participating main changes.
@@ -61,8 +101,9 @@ It does not replace the immutable MESO core or qualify network/SMB locking.
 ## Hostile review qualification boundaries
 
 A source-bound hosted run rejects Python optimization, preloaded cognitive
-modules, source HEAD drift, modified tracked Python blobs, unexpected untracked
-Python files, Python bytecode, and a nonempty or directly linked state directory.
+modules, source HEAD drift, modified tracked Git blobs (code and data),
+unexpected untracked Python files, Python bytecode, and a nonempty or directly
+linked state directory.
 The trusted runner/Git executable and operating-system path ancestry are part
 of the host trust boundary; these checks do not authenticate a malicious
 operator who replaces Git or the source while it is executing.
