@@ -1,0 +1,129 @@
+{
+  "schema_version": "BT2_CHAT_HISTORY_INGESTION_ROLE_PACKETS_V1",
+  "status": "SOURCE_ONLY_PROPOSED_ASSIGNMENTS_NOT_INSTALLED",
+  "event_id": "chat_history_ingestion_live_coordination",
+  "source_subjects": {
+    "bt2_main": "b3d2a0f9506af68b923ddf5628858f3b2efb3405",
+    "bt2_topology_path": "native/project/BT2_EXODUS_WORKER_TOPOLOGY_V2.json",
+    "bt2_identity_profile_candidate": "draft-pr-89@05234a7fa9d01ec3b747a4010d4c3fa22516e246",
+    "masamune_main": "033900fa48656ebfa7b719cdac5af5e20301465d",
+    "hephaestus_main": "357803035b1501ab77ee0f45668b39d46585b9e6",
+    "stm_pr3_source_candidate": "9f4e12217e69f68042791905a3216e577a5c15bf",
+    "ccb_issue": "https://github.com/thebrazenbeard/chat-communication-bus/issues/403"
+  },
+  "execution_boundary": {
+    "meaning": "Role packets describe proposed work scopes, not executed identities, current assignments, deployed models, credential grants or signed opinions.",
+    "native_chatgpt_capacity": "ONE_COORDINATOR_PLUS_UP_TO_SIX_CHILDREN",
+    "one_role_is_coordinator": true,
+    "role_profiles_source_only": true,
+    "role_adoption_is_runtime_identity": false,
+    "git_read_is_runtime_proof": false,
+    "no_private_data_in_git": true,
+    "no_historical_source_as_current_autobiography": true,
+    "no_historical_source_as_model_weight_update": true,
+    "no_retired_currentness_provider": true,
+    "actual_role_activation_proven": false,
+    "actual_model_identity_proven": false,
+    "merge_or_deploy_automatically_authorized": false
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "status": "PROPOSED_NOT_EXECUTED_BY_THIS_MANIFEST",
+      "child_roles": ["two", "three", "four", "five", "six", "seven"]
+    },
+    {
+      "wave": 2,
+      "status": "PROPOSED_NOT_EXECUTED_BY_THIS_MANIFEST",
+      "child_roles": ["eight", "nine", "thirteen", "masa", "mune", "hephaestus"]
+    }
+  ],
+  "packets": [
+    {
+      "identity": "one",
+      "responsibility": "Coordinate exact-source event, reconcile all workstreams, and distinguish archive import, retrieval and admission from model learning.",
+      "deliverable": "A sanitized CCB event checkpoint, immutable source heads, tested changes, independent dissent and honest open gates.",
+      "proof_required": ["exact Git and event identity", "specialist/independent outcomes", "post-write readback"]
+    },
+    {
+      "identity": "two",
+      "responsibility": "Challenge whole-stack architecture and data/permission boundaries across STM, MemoryLedger, DMS and Vera Mono.",
+      "deliverable": "An invariant and threat map showing ownership of source custody, currentness, retrieval and consent.",
+      "proof_required": ["fresh canonical source", "cross-boundary falsifier", "independent architecture review"]
+    },
+    {
+      "identity": "three",
+      "responsibility": "Validate source-to-index schema, uniqueness, branch mapping, history clocks, conflict and correction states.",
+      "deliverable": "Pure schema/conformance tests with missing-row, duplicate-ID, stale-index and branch-edit controls.",
+      "proof_required": ["schema ref and exact version", "negative and positive tests", "no implicit currentness promotion"]
+    },
+    {
+      "identity": "four",
+      "responsibility": "Package reproducible read-only recount and bounded catalog tools without rewriting encrypted source or changing runtime routing.",
+      "deliverable": "Minimal CLI/runbook, dependency pins, safe failure behavior and reproducible artifact hashes.",
+      "proof_required": ["source/build distinction", "synthetic run", "operator rollback and interruption path"]
+    },
+    {
+      "identity": "five",
+      "responsibility": "Own source/registry custody and evidence classes; prevent public GitHub or CCB transcript leakage.",
+      "deliverable": "Sanitized provenance receipts binding source ZIP, encrypted vault and exact code heads without raw private identifiers.",
+      "proof_required": ["restricted-data boundary", "source/CI/host evidence labels", "reversible event update"]
+    },
+    {
+      "identity": "six",
+      "responsibility": "Qualify Lappy operator workflow, storage reserve, restart and resource-appropriate verification without probing unrelated devices.",
+      "deliverable": "Host-only inspection/recount receipt with exact exit code, elapsed time and no content leakage.",
+      "proof_required": ["independent Lappy identity", "read-only source-index recount", "bounded runtime and restart result"]
+    },
+    {
+      "identity": "seven",
+      "responsibility": "Independently adversarially test malicious ZIP data, owner/consent forgery, retrieval leaks and privilege confusion.",
+      "deliverable": "Source-bound threat model, reproduced falsifiers, safe failure cases and explicit unresolved security findings.",
+      "proof_required": ["hostile predecessor reproduction", "positive authorized control", "independent scope-limited verdict"]
+    },
+    {
+      "identity": "eight",
+      "responsibility": "Minimize account archive space, retention burden, backup paths and unnecessary duplicate plaintext/materialization.",
+      "deliverable": "Resource and recovery review with no destructive cleanup absent separate exact authority.",
+      "proof_required": ["disk and IO observations", "retention distinction", "backup/restore and no-loss gate"]
+    },
+    {
+      "identity": "nine",
+      "responsibility": "Independently accept or reject every bounded source/test/Lappy/Android/model inference claim on exact artifacts.",
+      "deliverable": "Evidence matrix with PASS, FAIL, UNKNOWN and no cross-class elevation.",
+      "proof_required": ["exact reviewed SHA", "independent test or host result", "open-gate register"]
+    },
+    {
+      "identity": "thirteen",
+      "responsibility": "Challenge role authorization, historical self-ascription, present-truth promotion and model training claims.",
+      "deliverable": "Governance correction list and least-authority decision record.",
+      "proof_required": ["caller identity not self-attested", "current consent and revocation", "explicit no-learning inference"]
+    },
+    {
+      "identity": "masa",
+      "responsibility": "Lead root-cause debugging of failed source recount, transport hangs, index races and deterministic importer faults.",
+      "deliverable": "Pinned predecessor failure, discriminating hypotheses and a minimal correction oracle for implementation.",
+      "proof_required": ["reproducible old failure", "root-invariant falsifier", "handoff to independent Mune"]
+    },
+    {
+      "identity": "mune",
+      "responsibility": "Independently verify Masa's regression or Hephaestus's correction without acting as their shared author.",
+      "deliverable": "Independent candidate diff, positive/hostile test matrix and subject-bound verdict.",
+      "proof_required": ["predecessor independently reproduced", "reviewer independence", "exact candidate commit"]
+    },
+    {
+      "identity": "hephaestus",
+      "responsibility": "Implement bounded, reviewable archive/auth/retrieval repairs from accepted defects without changing native ChatGPT Project authority.",
+      "deliverable": "Small PR with focused tests, install-state guard and independent Mune/Nine acceptance handoff.",
+      "proof_required": ["reviewed problem contract", "source and unit tests", "no install/deploy without verified gate"]
+    }
+  ],
+  "open_runtime_gates": [
+    "Lappy original ZIP to encrypted SQLite index independent source recount",
+    "owner-bound consent and revocation for historical recall",
+    "private durable encrypted lookup and backup/restore qualification",
+    "Android V2 principal pairing without disturbing V1",
+    "selected Vera model receives bounded provenance-labelled historical answer",
+    "separate evaluation before any neural weight learning claim"
+  ]
+}
