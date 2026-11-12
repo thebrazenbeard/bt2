@@ -31,6 +31,28 @@ reconstructed, qualified, connected through the governed V4 interface, and
 separately installed as the active Project contract,
 `LANTERN_CURRENTNESS = UNKNOWN`.
 
+## Essential Vera AI runtime boundary (source candidate)
+
+For the operational subset of Vera and AI repositories, see the
+[exact-head essential integration graph](docs/bt2/ESSENTIAL_VERA_AI_STACK_20261025.md).
+It separates Vera Mono (runtime/effect fence), Rezon (optional reasoning),
+Intranel (typed receipts over authenticated transport), Project Runner (jobs),
+WIP (recovery), CCB (messaging), Blotter (activity), and DeepMemory (historical evidence).
+The graph deliberately excludes unrelated projects and marks unverified cross-host
+interfaces as future edges; passing source tests are not proof of an installed Vera.
+
+## Ecosystem integration checkpoint (source candidate)
+
+The active BT2 ecosystem execution record is the
+[2026-10-24 integration ledger](docs/bt2/ECOSYSTEM_INTEGRATION_LEDGER_20261024.md).
+It links a [78-public-repository role inventory](docs/bt2/PUBLIC_REPOSITORY_ROLE_INVENTORY_20261024.md)
+and an [exact-head public editor-task source manifest](docs/bt2/PUBLIC_VSCODE_TASK_EXPOSURE_MANIFEST_20261024.md).
+
+These documents belong to the reviewable integration branch until merged.
+Passing source/CI tests and GitHub PRs do not establish installation,
+production connectivity, protected-effect authorization, or AGI qualification.
+Restricted project/device/credential evidence stays outside this public tree.
+
 ## Repository shape
 
 Major working areas include:
