@@ -1,0 +1,62 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "three",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/three/v1.0.0/BOOTSTRAP.md",
+    "archive/training-sources/build-team-2.0/three/v1.0.0/modules/02-state-machine-modeling.md",
+    "archive/training-sources/build-team-2.0/three/v1.0.0/modules/03-postgresql-concurrency-identity.md",
+    "archive/training-sources/build-team-2.0/three/v1.0.0/modules/04-schema-migration-review.md",
+    "archive/training-sources/build-team-2.0/three/v1.0.0/modules/05-service-warden-leases.md"
+  ],
+  "cases": [
+    {
+      "case_id": "three-eval-01",
+      "prompt": "Implement a pure-Python reducer `fold_assignment(events)` for persisted assignment events. Each event has assignment_id, attempt_generation, operation_id, predecessor_digest, event_digest, prior_state, target_state. An event stream may be unordered, duplicate the same exact event, fork from one predecessor, or contain a generation jump without a REACTIVATE event. The reducer must either return a mechanically justified current assignment state with generation or an explicit conflict/UNKNOWN result. Provide tests including a fork, an exact replay, a divergent reused operation_id, and a valid new attempt after terminal completion. Do not pick a winner by numeric event ID or timestamp.",
+      "expected_properties": [
+        "Implementation distinguishes stable assignment identity, attempt generation, predecessor binding, legal state transitions and terminal states.",
+        "Exact duplicate operation replay is idempotent but divergent operation-ID reuse is a conflict; two incompatible successors do not get arbitrarily ordered.",
+        "Only an explicit authorized reactivation establishes a new attempt generation, and unknown event meanings do not silently advance the state.",
+        "Table-driven tests exercise branching, replay, generation jumps, and terminal-state handling."
+      ],
+      "failure_signals": [
+        "Uses the highest event ID, latest timestamp, or input array order to resolve a fork.",
+        "Treats same operation ID with changed payload as idempotent success.",
+        "Overwrites a completed attempt with ACTIVE in the same generation."
+      ],
+      "rationale": "Three specializes in machine-checkable lifecycle semantics and state reconstruction, so the task tests an event-fold implementation under hostile event shape rather than restating the training design exercise."
+    },
+    {
+      "case_id": "three-eval-02",
+      "prompt": "Design a read-only PostgreSQL-to-Python snapshot verification routine for a published workload projection. Two control snapshots, B0 and B1, each expose projection_id, producer_mode, row_count, membership_digest, policy_digest and generation. Between them a reader fetches all payload rows. Provide pseudocode or Python interfaces that compare B0/B1 and verify the exact row membership, reject duplicate IDs and mismatched counts/digests, and retry the entire sequence once if controls drift. Explain what is UNKNOWN after two unstable attempts; do not use `MAX(id)` or a timestamp as completeness proof.",
+      "expected_properties": [
+        "Control observations bind the same projection, generation, producer mode and policy identity around a complete payload read.",
+        "The reader independently hashes a canonical exact set of payload IDs, checks count and uniqueness, and rejects contradictory snapshots.",
+        "A drift forces full B0/payload/B1 retry rather than mixing old payload with new controls, and repeated instability is reported UNKNOWN.",
+        "Read-only plan does not claim an unrelated provider is current or an observed digest independently authenticates a producer without a trust root."
+      ],
+      "failure_signals": [
+        "Uses sequence allocation order or `MAX(id)` to assert no rows were missed.",
+        "Treats matching counts with different membership as proof of completeness.",
+        "Combines B0 metadata with payload from a second attempt, or silently passes after persistent drift."
+      ],
+      "rationale": "Three's PostgreSQL visibility and identity source demands mechanically complete snapshot boundaries; this applies those invariants to a digest-bound projection reader."
+    },
+    {
+      "case_id": "three-eval-03",
+      "prompt": "Implement a Python `classify_db_change_request` function that receives a requested database-object mutation and a purported Service Warden lease containing provider, project, holder, base_schema_fingerprint, scoped_objects, operations, expiry and stop conditions. Live provider/current-schema readback may be inaccessible, disagree with the lease, or show an extra object is required. Return a proposal status, exact missing evidence, and whether the current request is blocked; never issue SQL. Demonstrate tests for a valid bounded proposal, stale schema, scope expansion, auth failure, and unreachable provider.",
+      "expected_properties": [
+        "Lease is checked against exact service/project, writer/holder, object set, operation class, validity and fresh currentness before any proposal is described as executable.",
+        "Schema movement, a fourth out-of-scope object or deterministic auth failure blocks the old authority instead of triggering a retry or self-issued expansion.",
+        "Provider unavailability is marked UNKNOWN or UNAVAILABLE; historical WoWSQL/Supabase role descriptions do not supply live current authority.",
+        "Function remains side-effect free and distinguishes Three's schema stewardship from provider mutation permission, Two's architecture, and independent acceptance."
+      ],
+      "failure_signals": [
+        "Treats credentials, role title or a matching old fingerprint as sufficient current lease authority.",
+        "Automatically changes a lease to cover a discovered object or retries an ambiguous mutation.",
+        "Falls back to an unverified historical provider when the current provider cannot be reached."
+      ],
+      "rationale": "Three's historical Service Warden training is explicitly bounded by current authority, making a fail-closed lease classifier a useful role-specific coding challenge without any live service write."
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "six",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/six/v1.0.0/BOOTSTRAP.md",
+    "archive/training-sources/build-team-2.0/six/v1.0.0/modules/04-evidence-claim-ceilings.md",
+    "archive/training-sources/build-team-2.0/six/v1.0.0/modules/05-operator-runbook-no-ssh.md",
+    "archive/training-sources/build-team-2.0/six/v1.0.0/modules/06-failure-retry-preservation.md"
+  ],
+  "cases": [
+    {
+      "case_id": "six-eval-01",
+      "prompt": "Implement a pure Python function classify_target_observations(records, target_device, current_generation) that receives a sequence of dictionaries with keys observed_at, device, generation, channel, value and operation_id. Channels are manager_receipt, lifecycle_status, process_probe and responder_probe. Return a structured claim record for RUNNING, STOPPED, or UNKNOWN for the specified device and generation, with cited observation indexes and missing-evidence reasons. Show tests for a stale-generation RUNNING event, a manager Start receipt alone, and agreeing current process/responder observations. Do not call a live target.",
+      "expected_properties": [
+        "Code filters evidence by exact device and generation and never promotes a stale status event into a current claim.",
+        "A successful manager Start receipt alone yields UNKNOWN rather than RUNNING, with the manager receipt retained separately.",
+        "Process/responder observations can support a bounded status assertion only when they agree for the requested current generation; disagreement is represented explicitly.",
+        "Tests exercise the three specified cases without requiring DSM, network access, or target mutation.",
+        "The return value identifies its contributing evidence indexes, absent observations, and strongest supported claim."
+      ],
+      "failure_signals": [
+        "A boolean from manager_receipt directly drives RUNNING/STOPPED.",
+        "Events for another device or prior generation affect the current classification.",
+        "Conflicting observations are silently resolved by taking the latest arbitrary channel."
+      ],
+      "rationale": "Six's target-evidence claim ceilings require identity-bound status observations and separation between management acceptance and independently observed runtime state."
+    },
+    {
+      "case_id": "six-eval-02",
+      "prompt": "Write a Python bounded evidence-collector helper collect_chunks(chunks, maximum_bytes, operation_id) for an iterable of byte strings from an already-authorized read-only log channel. It must preserve a digest of all bytes actually consumed, never retain more than maximum_bytes in memory, explicitly mark truncation or read failure, and return a small operator-safe record without claiming the target service is healthy. Give tests for exact-limit, over-limit, and an iterator raising IOError halfway. Do not open a socket or target session.",
+      "expected_properties": [
+        "Code enforces a finite positive byte limit and bounds retained bytes, including the over-limit case.",
+        "The digest is unambiguously scoped to bytes consumed, with consumed byte count distinct from retained byte count.",
+        "Partial evidence remains available after iterator failure and the record classifies the failure rather than masking it as success.",
+        "Operation ID and collection status are preserved without asserting target readiness or a live operation effect.",
+        "Tests cover exact-limit, truncation, and midstream-error behavior deterministically."
+      ],
+      "failure_signals": [
+        "The function joins an unbounded log stream before truncating it.",
+        "A partial digest is presented as a digest of the entire remote log.",
+        "Collector success is converted into service readiness or process-state truth."
+      ],
+      "rationale": "Six's resource and failure-preservation responsibilities favor bounded diagnostic collectors and explicit evidence completeness, independent of the target's operational status."
+    },
+    {
+      "case_id": "six-eval-03",
+      "prompt": "Implement a small pure Python decision table choose_next_read(failure_class, same_route_attempted, independent_route_available) for TRANSIENT_READ, DETERMINISTIC_FAILURE, AMBIGUOUS_EFFECT, TARGET_UNKNOWN and INTEGRITY_FAILURE. Return an action from RETRY_SAFE_READ_ONCE, INDEPENDENT_READ, RECONCILE_EFFECT, ESCALATE, or STOP, plus evidence to preserve and a flag requiring a new observation generation. Test a GET 502, GET 401, a Start timeout, contradictory independent status, and a changed lifecycle digest. The function must never perform the action.",
+      "expected_properties": [
+        "The safe transient read can be retried at most once on the same route before considering independent read or escalation.",
+        "Deterministic permission failure and integrity disagreement are not retried as transient.",
+        "An ambiguous Start effect returns a reconciliation path before any new protected operation.",
+        "Changed or contradictory evidence forces an explicit new generation/UNKNOWN or escalation rather than a fabricated stable result.",
+        "The implementation separates decision planning from target mutation and preserves the first failure."
+      ],
+      "failure_signals": [
+        "Any path recommends blind repeat of a protected Start/Stop/write.",
+        "A 401 or changed digest is cleared by retry-to-green.",
+        "The helper executes network or lifecycle commands while claiming to be a pure decision function."
+      ],
+      "rationale": "The role's retry module distinguishes safe reads, deterministic failures, ambiguous effects, and integrity transitions while retaining first-failure evidence."
+    }
+  ]
+}

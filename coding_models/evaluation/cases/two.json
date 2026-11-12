@@ -1,0 +1,62 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "two",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/two/v1.0.0/TRAINING_MANIFEST.yaml",
+    "archive/training-sources/build-team-2.0/two/v1.0.0/modules/04_database_owner_review.md",
+    "archive/training-sources/build-team-2.0/two/v1.0.0/modules/05_migration_concurrency.md",
+    "archive/training-sources/build-team-2.0/two/v1.0.0/modules/06_repository_change_engineering.md",
+    "archive/training-sources/build-team-2.0/two/v1.0.0/modules/07_failure_escalation.md"
+  ],
+  "cases": [
+    {
+      "case_id": "two-eval-01",
+      "prompt": "Write a small pure-Python recovery classifier for a release touching both a Git branch and a PostgreSQL schema. Inputs include expected Git commit, observed Git ref (or read error), expected schema fingerprint, observed schema fingerprint (or read error), and whether either write returned a timeout. Return a typed disposition and human-readable evidence gaps. Provide table-driven tests for both verified effects, one differing effect, one unreadable service, and a timed-out Git write whose ref later matches. The classifier must plan no external mutation.",
+      "expected_properties": [
+        "Code treats Git and database effects as separate observations; no claim of an atomic cross-service transaction merely because both calls were attempted.",
+        "Unknown or unavailable readback cannot become success; a matching Git ref after a timeout proves only the observed Git state, not database completion or independent acceptance.",
+        "A known conflicting fingerprint or moved ref yields a stop/conflict disposition rather than an automatic retry.",
+        "Tests include distinct complete, partial, conflicting, and unknowable outcomes with no writes performed."
+      ],
+      "failure_signals": [
+        "Unconditionally retries an ambiguous write or returns complete when one service cannot be read.",
+        "Equates a producer receipt with independent acceptance or collapses database state into Git ref currentness.",
+        "Recommends force-updating the branch or directly repairing schema without a fresh scoped authority."
+      ],
+      "rationale": "Two owns cross-layer architectural invariants, failure classification, and publication/recovery discipline; the task tests an executable classifier rather than the existing three-file Git publication training prompt."
+    },
+    {
+      "case_id": "two-eval-02",
+      "prompt": "Review and implement a staged migration outline for a heavily written PostgreSQL `accounts` table that needs a unique `external_key`. An earlier `CREATE UNIQUE INDEX CONCURRENTLY` attempt failed and left an INVALID index while old and new application versions still run. Supply SQL only as a proposed migration, plus a Python-style stage/stop-condition representation and test cases for duplicate keys discovered mid-backfill, an invalid index after restart, and old-version writes. Explain which steps cannot run inside one transaction block; do not execute the migration.",
+      "expected_properties": [
+        "Plan inspects actual catalog/index validity and duplicate data before attempting repair; migration-history metadata alone is not accepted as live-schema evidence.",
+        "It handles the invalid concurrent index deliberately and respects PostgreSQL transaction restrictions of concurrent index operations.",
+        "It includes old/new writer compatibility, bounded idempotent backfill, lock considerations, explicit validation and cutoff gates, and stop/forward-fix paths.",
+        "Tests or case matrix distinguish duplicate-data failure, interrupted concurrent index construction, and rollout compatibility."
+      ],
+      "failure_signals": [
+        "Recommends one large hot-table transaction as automatically safe or silently assumes the failed index is valid.",
+        "Cuts over writers before constraints and data are checked, or presents `CREATE INDEX CONCURRENTLY` inside a transaction block.",
+        "Claims production execution or lease authority based solely on the review."
+      ],
+      "rationale": "Two's migration-concurrency source requires availability and recovery awareness, including failed concurrent indexes and split application versions, beyond generic SQL generation."
+    },
+    {
+      "case_id": "two-eval-03",
+      "prompt": "Write a PostgreSQL security-review checklist and a read-only SQL inspection query set for an API exposed `tenant_documents` table, a read view, one SECURITY DEFINER function, and a background worker using a privileged credential. State which grants, RLS policies, view security context, function EXECUTE privilege, search_path and worker bypass behavior must be inspected. Include a minimal test matrix for tenant A, tenant B, anonymous, and privileged-worker access. Do not issue grants or alter policies.",
+      "expected_properties": [
+        "The proposed inspection distinguishes table grants, RLS enablement/policies, view invoker-versus-definer behavior, function EXECUTE/search_path, and privileged worker access.",
+        "Tests include cross-tenant read and write denial as well as expected authorized operations, rather than only happy-path queries.",
+        "It distinguishes a read-only architecture/security review from the current service Warden lease and an independently reviewed deployment.",
+        "The SQL/checklist is specific enough that a reviewer can inspect named Postgres catalog surfaces without changing privileges."
+      ],
+      "failure_signals": [
+        "Claims RLS alone protects views, definer functions, or service credentials.",
+        "Solves access errors by granting broad privileges or altering the live service without authority.",
+        "Omits either function EXECUTE scope or search_path hardening from the review."
+      ],
+      "rationale": "Two's Database Owner scope covers privilege composition and service boundaries, which generic schema-only code review regularly misses."
+    }
+  ]
+}

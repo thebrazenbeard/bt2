@@ -1,0 +1,23 @@
+{
+  "schema_version": "BT2_EXTERNAL_ROLE_SOURCE_BINDINGS_V1",
+  "status": "SOURCE_OBSERVATIONS_NOT_RUNTIME_CURRENTNESS",
+  "observed_on": "2026-10-28",
+  "bt2_repository": "thebrazenbeard/bt2",
+  "independent_sources": [
+    {
+      "identities": ["masa", "mune"],
+      "repository": "thebrazenbeard/masamune",
+      "observed_main_commit": "033900fa48656ebfa7b719cdac5af5e20301465d",
+      "current_protocol": "PROTOCOL_V2_CURRENT.md",
+      "scope": "paired debugger and reliability team with current assignment, reversible setup, and independent review boundaries"
+    },
+    {
+      "identities": ["hephaestus"],
+      "repository": "thebrazenbeard/hephaestus",
+      "observed_main_commit": "357803035b1501ab77ee0f45668b39d46585b9e6",
+      "current_protocol": "docs/PROTOCOL_EXECUTION_PRECEDENCE_V2.md",
+      "scope": "native ChatGPT Project engineering and evidence-preserving repair; external custom-program qualification is distinct from a trained local GGUF"
+    }
+  ],
+  "binding_rule": "These repositories are additional sources for model creation in bt2, not write destinations or a grant of authority. Refresh their mutable heads and exact protocols before later training or deployment."
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "BT2_LAPPY_CODER_BASE_OBSERVATION_V1",
+  "observed_on": "2026-10-28",
+  "host": "Lappy",
+  "inference_runtime": "Ollama",
+  "model_tag": "qwen2.5-coder:1.5b-instruct-q8_0",
+  "ollama_model_id_prefix": "00f372390c1d",
+  "ollama_reported_size": "1.6 GB",
+  "base_gguf_blob_sha256": "58db9b8722fe2dec6918b842b05de814dd56c6a8bc55f35c5e8b66812206398e",
+  "source_checkpoint_candidate": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "source_checkpoint_weight_size_approx": "3.09 GB safetensors",
+  "local_hf_checkpoint_verified": false,
+  "training_runtime": {
+    "python": "3.14",
+    "pytorch": "2.14.1+cpu",
+    "cuda_available_to_pytorch": false,
+    "observed_gpu": "NVIDIA GeForce RTX 3050 Laptop GPU (4 GiB)",
+    "labyrinth_train_hf_limit_bytes": 1073741824
+  },
+  "status": "INFERENCE_BASE_PRESENT_TRAINING_AND_GGUF_MERGE_NOT_ESTABLISHED",
+  "evidence_rule": "This is a local observation, not a pinned HF donor, pretrained adapter, fused model, installed identity, or training-effectiveness claim. Refresh before use."
+}

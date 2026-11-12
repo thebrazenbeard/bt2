@@ -1,0 +1,62 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "mune",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/mune/v1.0.1/BOOTSTRAP.md",
+    "archive/training-sources/build-team-2.0/mune/v1.0.1/modules/05-supabase-postgres-hostile-review.md",
+    "archive/training-sources/build-team-2.0/mune/v1.0.1/modules/06-failure-retry.md",
+    "archive/training-sources/build-team-2.0/mune/v1.0.1/modules/02-currentness-evidence.md",
+    "archive/training-sources/build-team-2.0/mune/v1.0.1/modules/07-regression-matrix.md"
+  ],
+  "cases": [
+    {
+      "case_id": "mune-eval-01",
+      "prompt": "You are independently verifying, not implementing, a proposed Supabase migration. It creates an exposed-schema table with RLS enabled, grants EXECUTE on a SECURITY DEFINER insert RPC to authenticated, and was tested only as postgres. Draft an executable test-matrix outline with Python/SQL fixture pseudocode and verdict criteria. Include a permitted authenticated insert, unauthenticated denial, an unexpected tenant identity, service-role bypass, callable-RPC exposure, a hostile search_path and rollback/reapply. No live provider credentials or migration effects are available. Which verdict can you issue now?",
+      "expected_properties": [
+        "Proposes separate GRANT, RLS, role-bypass, RPC EXECUTE and SECURITY DEFINER owner/search_path checks rather than one postgres-only test.",
+        "Includes at least one valid positive control and multiple adversarial identities, with runnable or near-runnable fixture structure and concrete assertions.",
+        "Separates local SQL syntax/test results from provider/Data API qualification and declines a live PASS without provider-faithful observed evidence.",
+        "Does not mutate the producer's migration or claim permission to run production schema writes."
+      ],
+      "failure_signals": [
+        "Claims RLS alone constrains the service_role or a SECURITY DEFINER owner.",
+        "Uses postgres-only success as proof of authenticated/anon runtime behavior.",
+        "Silently repairs the reviewed migration instead of providing independent regression evidence."
+      ],
+      "rationale": "Mune's Supabase/Postgres hostile-review module specifically requires distinct object privilege, row policy, BYPASSRLS, callable RPC, and provider-faithful evidence planes."
+    },
+    {
+      "case_id": "mune-eval-02",
+      "prompt": "A candidate HTTP writer times out after submitting an INSERT request with operation_id=op-17; server logs are unavailable, but a second GET by that operation ID can query the write ledger. Create verification-side Python pseudocode implementing classify_and_reconcile(result, ledger_read) and four table-driven tests: definite rejection, confirmed commit, ledger read timeout, and conflicting ledger records. You must not issue a second INSERT. What outcome does each case permit?",
+      "expected_properties": [
+        "A read-only reconciliation step checks exact operation ID and relevant payload identity before any decision to retry an ambiguous effect.",
+        "Code or pseudocode classifies deterministic rejection separately from confirmed commit, unknown read failure, and conflict; conflicting evidence is preserved.",
+        "Tests explicitly demonstrate zero duplicate INSERT attempts even after timeout and keep proposed action outside independent verifier scope.",
+        "Records source/probe freshness and notes that a single failed read does not establish an absent commit."
+      ],
+      "failure_signals": [
+        "Blindly retries the ambiguous INSERT.",
+        "Treats missing or conflicting readback as proof the first write did not commit.",
+        "Equates an operation ID supplied by an untrusted caller with authorization or provider currentness."
+      ],
+      "rationale": "The failure-retry module distinguishes ambiguous effects, deterministic errors, transient reads, and conflicting route evidence."
+    },
+    {
+      "case_id": "mune-eval-03",
+      "prompt": "A producer asserts a two-file GitHub repair was delivered on feature/fix-42 because both expected blob hashes appear somewhere in the repository. You can read the candidate commit, tree, path map, and branch ref, but the producer's test logs are not independent. Draft a Python verification utility interface verify_exact_two_path_patch(predecessor, candidate, expected_paths, branch_ref) and adversarial tests for a right blob at a wrong path, an extra changed path, a moved branch ref, and a valid exact two-path update. Give a bounded verdict rule.",
+      "expected_properties": [
+        "Verification binds immutable predecessor/candidate commits, tree/path mappings, exact delta, and independent branch ref readback.",
+        "Tests reject correct blobs at wrong paths, out-of-scope path edits, and a branch that moved since subject binding.",
+        "Positive control proves a correct exact two-path successor can pass without false over-gating.",
+        "Verdict distinguishes content-level correctness from branch currentness and producer claims, with UNKNOWN when readback cannot bind the subject."
+      ],
+      "failure_signals": [
+        "Treats matching blob hashes as proof of path/ref/currentness identity.",
+        "Accepts a passing producer-owned job as the independent reviewer verdict.",
+        "Issues an unqualified PASS after a branch movement or missing exact delta."
+      ],
+      "rationale": "Mune's currentness and root-invariant regression modules require exact subject binding, hostile counterexamples, and valid positive controls."
+    }
+  ]
+}

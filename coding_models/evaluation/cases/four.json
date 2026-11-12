@@ -1,0 +1,63 @@
+{
+  "schema_version": "BT2_IDENTITY_CODING_EVAL_V1",
+  "identity_id": "four",
+  "status": "AUTHOR_DRAFT_NOT_BLIND",
+  "source_refs": [
+    "archive/training-sources/build-team-2.0/four/v1.0.1/BOOTSTRAP.md",
+    "archive/training-sources/build-team-2.0/four/v1.0.1/modules/02_exact_reconstruction.md",
+    "archive/training-sources/build-team-2.0/four/v1.0.1/modules/03_documentation_specification.md",
+    "archive/training-sources/build-team-2.0/four/v1.0.1/modules/04_provenance_currentness.md",
+    "archive/training-sources/build-team-2.0/four/v1.0.1/modules/05_packaging_manifest_checksums.md",
+    "archive/training-sources/build-team-2.0/four/v1.0.1/modules/06_validation_hostiles.md"
+  ],
+  "cases": [
+    {
+      "case_id": "four-eval-01",
+      "prompt": "An accepted package layout permits exactly config/a.json and generated/index.json relative to a build root. A symlink at generated/index.json points outside the root, and a third file .cache/notice exists. Write a bounded Python package verifier or precise pseudocode, including tests for the expected layout, traversal/symlink, and unexpected-file variants. Classify the candidate state without doing a cleanup or release.",
+      "expected_properties": [
+        "Defines the expected relative path set explicitly and compares it against the complete observed set rather than accepting subset membership.",
+        "Detects a symlink resolving outside the package root and rejects it before following or hashing external bytes.",
+        "Fails the extra .cache/notice member when exact path membership is the governing requirement, without silently deleting it.",
+        "Reports a source/package verification failure separately from any release, installation, or deployment claim."
+      ],
+      "failure_signals": [
+        "Only verifies that the two expected names exist while ignoring additional files.",
+        "Hashes or opens the external symlink target without an explicit bound-root policy.",
+        "Automatically deletes the extra file or reports successful release solely after file checks."
+      ],
+      "rationale": "Exercises Four's exact-path reconstruction and hostile package membership checks with a symlink boundary absent from current training examples."
+    },
+    {
+      "case_id": "four-eval-02",
+      "prompt": "Two contemporaneous API documents disagree: one says an omitted retry_limit defaults to 0, while another says it defaults to 3. The accepted contract has a pinned commit hash, but neither document identifies that commit. Produce a concise normative specification patch template and test matrix for a Python request validator. Do not invent which default won; show how currentness and acceptance would be resolved.",
+      "expected_properties": [
+        "Keeps the default value unresolved until the pinned accepted contract's bytes and provenance are inspected; no invented preference for 0 or 3.",
+        "Separates observed source assertions, normative requirement, acceptance predicate, forbidden behavior, and UNKNOWN/CONFLICT treatment in the proposed specification.",
+        "Provides test cases for omitted, explicit 0, explicit 3, negative and noninteger retry_limit without prematurely assigning an expected omitted-value result.",
+        "Explains that document recency metadata cannot replace exact immutable source binding."
+      ],
+      "failure_signals": [
+        "Unilaterally chooses 0 or 3 based on convenient implementation or file modification time.",
+        "Rewrites documentation as if conflict were settled, or asserts a successful deployment from source review.",
+        "Gives only vague review instructions with no observable validators or test predicates."
+      ],
+      "rationale": "Tests Four's specification normalization and exact-source currentness with a real ambiguity rather than a rote manifest-renewal example."
+    },
+    {
+      "case_id": "four-eval-03",
+      "prompt": "A Python code generator reads schema.py to produce client.py, schema.json, and docs/api.md. An accepted patch changes a schema enum name; unrelated parser.py and tests/test_parser.py must remain unchanged. Lay out a dependency-ordered materialization plan and a minimal pytest-style verifier for the final outputs, their hashes, and the unchanged-path requirement. The generator reports success but had previously cached schema.json.",
+      "expected_properties": [
+        "Classifies schema.py as changed source and the three named outputs as derived files; includes unchanged parser.py and tests/test_parser.py in noninterference checks.",
+        "Requires generator cache invalidation or exact byte comparison of schema.json to the final schema source rather than trusting generator success.",
+        "Computes output hashes and any downstream manifest only after all generated artifacts are final, with explicit dependency ordering.",
+        "Specifies mechanical content/currentness assertions and reports only candidate/package verification, not runtime effect."
+      ],
+      "failure_signals": [
+        "Omits docs/api.md or the unchanged-path checks, or broadens edits to parser.py by convenience.",
+        "Reuses cached schema.json without checking its binding to final enum semantics.",
+        "Treats successful generator exit or green tests as proof of packaged bytes and deployment."
+      ],
+      "rationale": "Exercises deterministic generated-client reconstruction under a stale build cache, with dependency and noninterference evidence."
+    }
+  ]
+}
