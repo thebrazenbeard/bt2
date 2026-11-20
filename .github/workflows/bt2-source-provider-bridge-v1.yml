@@ -22,6 +22,7 @@ jobs:
         run: |
           python3 -m unittest discover -s signal_ingest/tests -p 'test_*.py' -v
           python3 -m unittest discover -s signal_ingest/provider_bridge/tests -p 'test_*.py' -v
+          python3 -O -m unittest discover -s signal_ingest/provider_bridge/tests -p 'test_*.py' -v
           python3 -m signal_ingest.provider_bridge.v1 signal_ingest/provider_bridge/fixtures/synthetic_github_observation.json > /tmp/bridge-observation.json
           python3 - <<'PY'
           import json
