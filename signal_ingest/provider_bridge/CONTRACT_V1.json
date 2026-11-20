@@ -1,0 +1,84 @@
+{
+  "budgets": {
+    "gh_api_timeout_seconds": 15,
+    "gh_response_max_characters": 256000,
+    "maximum_bytes": 512000,
+    "maximum_output_replay_hashes": 512,
+    "maximum_receipts": 256,
+    "maximum_subjects": 128,
+    "maximum_supplied_replay_hashes": 512
+  },
+  "collector_transport": "EXPLICIT_GITHUB_API_SESSION_READONLY_NOT_INDEPENDENT_ATTESTATION",
+  "input": {
+    "kinds": [
+      "PR_HEAD_CHANGE",
+      "CI_RESULT"
+    ],
+    "provider_response_sha256": "lowercase SHA256 of exact JSON bytes returned from connected gh api",
+    "receipts_optional": [
+      "previous_head"
+    ],
+    "receipts_required": [
+      "event_id",
+      "repository",
+      "subject",
+      "kind",
+      "status",
+      "head",
+      "incident_key",
+      "observed_at",
+      "source_ref",
+      "provider_response_sha256",
+      "claimed_owner",
+      "claimed_reviewer",
+      "claims_authenticated",
+      "transport"
+    ],
+    "required": [
+      "schema",
+      "snapshot",
+      "receipts",
+      "seen_receipt_digests"
+    ],
+    "seen_receipt_digests": "caller supplied, NOT authenticated durable replay ledger",
+    "snapshot": "BT2_ECOSYSTEM_SIGNAL_INPUT_V1.snapshot",
+    "source_ref_rule": "exact canonical GitHub pull or Actions run URL under the subject's same owner/repo",
+    "transport": [
+      "GITHUB_API_SESSION_READONLY"
+    ]
+  },
+  "input_schema": "BT2_GITHUB_PROVIDER_BRIDGE_INPUT_V1",
+  "limits": [
+    "API caller may be authenticated but serialized receipt is not signed",
+    "source still cannot attest owner/reviewer",
+    "host control always denied by this adapter",
+    "github token/credentials never emitted",
+    "cross-process replay state requires external authorized store",
+    "semantic salience/empathy hints never establish truth consent memory or effects",
+    "Supabase provider requires its separate catalog/readback binding; GitHub-only V1 cannot accept SQL source references"
+  ],
+  "output": {
+    "fields": [
+      "schema",
+      "signal",
+      "accepted_receipt_digests",
+      "replay_suppressed",
+      "next_seen_receipt_digests",
+      "replay_scope",
+      "source_authentication",
+      "provider_transport_claim",
+      "independently_authenticated",
+      "memory_admission",
+      "semantic_truth",
+      "side_effects"
+    ],
+    "independently_authenticated": false,
+    "release_permission": false,
+    "replay_scope": "CALLER_PROVIDED_CACHE_NOT_INDEPENDENT",
+    "side_effects": [],
+    "signal": "unchanged BT2_ECOSYSTEM_SIGNAL_OUTPUT_V1 from actual signal_ingest.v1.normalize",
+    "source_authentication": "UNVERIFIED_NO_SIGNED_RECEIPT"
+  },
+  "output_schema": "BT2_GITHUB_PROVIDER_BRIDGE_OUTPUT_V1",
+  "schema": "BT2_GITHUB_PROVIDER_BRIDGE_CONTRACT_V1"
+}
