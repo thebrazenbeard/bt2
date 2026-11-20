@@ -405,7 +405,6 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
     return sorted(out,key=lambda x:(x.path,x.rule_id,x.incident_id))
 
 
-
 def scan_advisors(advisors: dict[str,Any], project_alias: str, snapshot_id: str) -> list[Finding]:
     """Model Supabase advisor notices without promoting them into privilege grants."""
     blob=json.dumps(advisors,sort_keys=True,ensure_ascii=True).encode()
