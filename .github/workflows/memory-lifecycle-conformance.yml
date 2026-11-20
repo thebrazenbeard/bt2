@@ -1,0 +1,32 @@
+name: Memory lifecycle conformance (source-only)
+on:
+  pull_request:
+    paths:
+      - 'conformance/memory_lifecycle/**'
+      - '.github/workflows/memory-lifecycle-conformance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deterministic-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Run synthetic memory lifecycle tests (no network dependencies)
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m unittest discover -s conformance/memory_lifecycle/tests -p 'test_*.py' -v
+          python3 conformance/memory_lifecycle/memory_lifecycle.py conformance/memory_lifecycle/fixtures/synthetic_current.json > /tmp/memory-lifecycle-output.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('/tmp/memory-lifecycle-output.json').read_text())
+          assert p['schema'] == 'BT2_MEMORY_LIFECYCLE_OUTPUT_V1'
+          assert p['runtime_currentness'] == 'UNKNOWN_NOT_PROBED'
+          assert p['side_effects']['memory_write'] == 'NONE'
+          assert p['side_effects']['release_authorization'] == 'NONE'
+          assert p['selected'][0]['independently_authenticated'] is False
+          print('MEMORY_LIFECYCLE_SYNTHETIC_CI_PASS')
+          PY
