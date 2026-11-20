@@ -27,6 +27,8 @@ def fake_runner(*args,**kwargs):
         done.stdout=json.dumps({
             "id":456,"head_sha":HEAD,"status":"completed","conclusion":"failure",
             "repository":{"full_name":"example/app"},
+            "event":"pull_request",
+            "pull_requests":[{"number":123,"head":{"sha":HEAD}}],
             "html_url":"https://github.com/example/app/actions/runs/456"})
     else:
         raise AssertionError("collector made unexpected API request")
@@ -80,7 +82,9 @@ class GitHubCollectorTest(unittest.TestCase):
         def older(*args,**kwargs):
             r=fake_runner(*args,**kwargs)
             payload=json.loads(r.stdout)
-            if payload.get("id")==456:payload["head_sha"]="b"*40
+            if payload.get("id")==456:
+                payload["head_sha"]="b"*40
+                payload["pull_requests"][0]["head"]["sha"]="b"*40
             r.stdout=json.dumps(payload)
             return r
         data=collect_pr("example/app",123,456,NOW,CUT,runner=older)
@@ -88,6 +92,41 @@ class GitHubCollectorTest(unittest.TestCase):
         older_reports=[x for x in result["signal"]["observations"] if x["head"]=="b"*40]
         self.assertEqual(len(older_reports),1)
         self.assertFalse(older_reports[0]["candidate_observation"])
+
+    def test_f_other_pr_same_head_cannot_borrow_ci_status(self):
+        def wrong_pr(*args,**kwargs):
+            r=fake_runner(*args,**kwargs)
+            data=json.loads(r.stdout)
+            if data.get("id")==456:
+                data["pull_requests"][0]["number"]=987
+                r.stdout=json.dumps(data)
+            return r
+        with self.assertRaises(CollectorError):
+            collect_pr("example/app",123,456,NOW,CUT,runner=wrong_pr)
+
+    def test_g_branch_push_without_explicit_pr_link_is_not_pr_ci(self):
+        def push_only(*args,**kwargs):
+            r=fake_runner(*args,**kwargs)
+            data=json.loads(r.stdout)
+            if data.get("id")==456:
+                data["event"]="push"
+                data["pull_requests"]=[]
+                r.stdout=json.dumps(data)
+            return r
+        with self.assertRaises(CollectorError):
+            collect_pr("example/app",123,456,NOW,CUT,runner=push_only)
+
+    def test_h_same_pr_number_but_conflicting_ci_head_is_rejected(self):
+        def forged_link(*args,**kwargs):
+            r=fake_runner(*args,**kwargs)
+            data=json.loads(r.stdout)
+            if data.get("id")==456:
+                data["pull_requests"][0]["head"]["sha"]="c"*40
+                r.stdout=json.dumps(data)
+            return r
+        with self.assertRaises(CollectorError):
+            collect_pr("example/app",123,456,NOW,CUT,runner=forged_link)
+
 
 if __name__=="__main__":
     unittest.main()
