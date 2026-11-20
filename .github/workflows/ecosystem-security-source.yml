@@ -37,5 +37,5 @@ jobs:
           SHA="$(git rev-parse HEAD)"
           python3 conformance/ecosystem_security/scanner.py \
             --root . --repo thebrazenbeard/bt2 --head "$SHA" \
-            --budget 4 --fail-on-critical > "$RUNNER_TEMP/ecosystem-security.json"
+            --budget 4 --fail-on-critical --require-git-head > "$RUNNER_TEMP/ecosystem-security.json"
           python3 -m json.tool "$RUNNER_TEMP/ecosystem-security.json" > /dev/null
