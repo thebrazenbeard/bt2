@@ -3,6 +3,7 @@ No source retrieval, identity verification, dispatch, provider or host effects.
 """
 from __future__ import annotations
 from hashlib import sha256
+from itertools import islice
 from typing import Iterable
 from urllib.parse import quote
 import re
@@ -29,11 +30,11 @@ def adapt(findings: Iterable[object], *, repository: str,
     require(type(current_head) is str and SHA.fullmatch(current_head) is not None, "INVALID_CURRENT_HEAD")
     require(type(subject) is str and IDENT.fullmatch(subject) is not None, "INVALID_SUBJECT")
     require(type(observed_at) is str and type(host_access_cutoff) is str, "INVALID_TIME")
-    rows=list(findings)
+    rows=list(islice(findings,MAX_FINDINGS+1))
     require(len(rows)<=MAX_FINDINGS, "TOO_MANY_FINDINGS_NO_SILENT_TRUNCATION")
     observations=[]
     severe=[]
-    seen_severe=set()
+    seen_severe={}
     for i,f in enumerate(rows):
         path,rule,digest,incident,severity=(field(f,k) for k in
             ("path","rule_id","source_digest","incident_id","severity"))
@@ -60,10 +61,13 @@ def adapt(findings: Iterable[object], *, repository: str,
             "source_ref":f"https://github.com/{repository}/blob/{observed_head}/{quote(path,safe='/._-')}",
             "evidence_class":"SOURCE","claimed_owner":"unverified-scanner",
             "claimed_reviewer":None,"claims_authenticated":False})
-        if severity in ("CRITICAL","HIGH") and key not in seen_severe:
-            seen_severe.add(key)
-            severe.append({"incident_key":key,"severity":severity,
-                           "rule":rule,"review_status":"INDEPENDENT_REVALIDATION_REQUIRED"})
+        if severity in ("CRITICAL","HIGH"):
+            if key not in seen_severe:
+                seen_severe[key]=len(severe)
+                severe.append({"incident_key":key,"severity":severity,
+                               "rule":rule,"review_status":"INDEPENDENT_REVALIDATION_REQUIRED"})
+            elif severity=="CRITICAL":
+                severe[seen_severe[key]]["severity"]="CRITICAL"
     doc={"schema":"BT2_ECOSYSTEM_SIGNAL_INPUT_V1",
          "snapshot":{"observed_at":observed_at,"host_access_cutoff":host_access_cutoff,
                      "subjects":[{"repository":repository,"subject":subject,
