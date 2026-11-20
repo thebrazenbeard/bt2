@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import subprocess
@@ -19,6 +20,21 @@ MAX_CONFIG = 256_000
 MAX_FONT = 2_000_000
 MAX_ADVISORS = 1_000_000
 MAX_ADVISOR_ENTRIES = 4096
+MAX_SCAN_FILES = 4096
+MAX_SCAN_ENTRIES = 8192
+MAX_SCAN_DEPTH = 8
+SKIP_DIRS = frozenset({
+    ".git", ".hg", ".svn", ".sources", "node_modules", ".venv", "venv",
+    "__pycache__", "dist", "build", "coverage", ".next", ".cache"
+})
+LIFECYCLE = frozenset({
+    "preinstall", "install", "postinstall", "prepare", "prepublish",
+    "prepublishOnly", "prepack", "postpack"
+})
+DANGEROUS_HOOK = re.compile(
+    r"(?is)(?:\b(?:node|python|deno|bun|powershell|pwsh)\s+[^\r\n;&|]{0,240}\.(?:ttf|woff2?|otf|eot)\b"
+    r"|\b(?:curl|wget)\b[^\r\n;]{0,220}\|\s*(?:ba)?sh\b)"
+)
 MAGIC = {
     '.ttf': (b'\x00\x01\x00\x00', b'true', b'ttcf', b'OTTO'),
     '.otf': (b'OTTO', b'ttcf'),
@@ -112,7 +128,7 @@ def _make(repo: str, head: str, path: str, rule: str, severity: str,
                    hashlib.sha256(binding).hexdigest()[:24])
 
 
-def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
+def _scan_root_workspace(root: Path, repo: str, head: str) -> list[Finding]:
     out: list[Finding] = []
     paths = ['.vscode/tasks.json', '.vscode/settings.json']
     loaded: dict[str, tuple[Any, bytes]] = {}
@@ -151,6 +167,11 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
         out.append(_make(repo,head,'.vscode/tasks.json','CONFIG_SCHEMA_INVALID','HIGH',
             'Workspace tasks array contains non-object entries',raw_tasks,
             ('expected=each-task:object',)))
+    labels=[t['label'] for t in tlist if isinstance(t,dict) and isinstance(t.get('label'),str)]
+    if len(labels)!=len(set(labels)):
+        out.append(_make(repo,head,'.vscode/tasks.json','CONFIG_SCHEMA_INVALID','HIGH',
+            'Task labels are ambiguous; dependency binding cannot be trusted',
+            raw_tasks,('duplicate_task_label',)))
     by_label = {t['label']:t for t in tlist if isinstance(t,dict) and isinstance(t.get('label'),str)}
     settings_auto = settings.get('task.allowAutomaticTasks') is True
     if settings_auto:
@@ -226,6 +247,165 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
     return sorted(out,key=lambda x:(x.path,x.rule_id,x.incident_id))
 
 
+def _enumerate_security_paths(root: Path, repo: str, head: str) -> list[Finding]:
+    """Bounded non-following traversal of relevant workspace and package surfaces.
+
+    The traversal enumerates evidence; it does not import or run repository code.
+    Unreadable and symlinked source that could conceal relevant content is a
+    hold rather than a clean scan.
+    """
+    out: list[Finding] = []
+    seen = 0
+    visited = 0
+    def on_walk_error(error: OSError) -> None:
+        # The OS may omit unreadable subtrees without raising to the caller.
+        out.append(_make(repo,head,'[unreadable-subtree]','CONFIG_UNREADABLE','HIGH',
+            'Operating system denied security source traversal',b'',
+            (type(error).__name__,)))
+    for current_str, dirnames, filenames in os.walk(root, topdown=True,
+                                                    followlinks=False,onerror=on_walk_error):
+        visited += 1 + len(dirnames) + len(filenames)
+        if visited > MAX_SCAN_ENTRIES:
+            out.append(_make(repo,head,'[traversal-limit]','SCAN_LIMIT_EXCEEDED','HIGH',
+                'Security source traversal exceeded bounded total entries',b'',
+                ('entry_limit',)))
+            return out
+        current = Path(current_str)
+        rel = current.relative_to(root)
+        depth = len(rel.parts)
+        if depth > MAX_SCAN_DEPTH:
+            out.append(_make(repo,head,str(rel),'SCAN_LIMIT_EXCEEDED','HIGH',
+                'Security scan exceeded the bounded directory depth',b'',('depth_limit',)))
+            dirnames.clear()
+            continue
+        for name in sorted(dirnames[:]):
+            if name in SKIP_DIRS:
+                dirnames.remove(name)
+            elif (current/name).is_symlink():
+                dirnames.remove(name)
+                sub=(current/name).relative_to(root).as_posix()
+                out.append(_make(repo,head,sub,'CONFIG_UNREADABLE','HIGH',
+                    'Untrusted directory symlink cannot be treated as clean source',b'',('symlink_directory',)))
+        dirnames.sort()
+        # The root .vscode is handled by the original editor scanner.
+        if rel.parts and '.vscode' in dirnames:
+            sub=current/'.vscode'
+            for finding in _scan_root_workspace(current,repo,head):
+                relative=(rel/finding.path).as_posix()
+                data=b''
+                try:
+                    data=_read(root,relative,MAX_FONT) or b''
+                except (OSError,ValueError):
+                    pass
+                out.append(_make(repo,head,relative,finding.rule_id,finding.severity,
+                    finding.message,data,finding.evidence))
+        if '.vscode' in dirnames:
+            dirnames.remove('.vscode')
+        for name in sorted(filenames):
+            path=current/name
+            if (current.name=='fonts' and current.parent.name=='public' and
+                    path.suffix.lower() in MAGIC):
+                if current == root/'public'/'fonts':
+                    continue  # already scanned by the root editor scanner
+                relative=path.relative_to(root).as_posix()
+                try:
+                    raw=_read(root,relative,MAX_FONT)
+                    if raw and not any(raw.startswith(magic) for magic in MAGIC[path.suffix.lower()]):
+                        out.append(_make(repo,head,relative,'FONT_MAGIC_MISMATCH','HIGH',
+                            'Nested font extension does not match source signature',raw,
+                            ('file_extension='+path.suffix.lower(),)))
+                except (OSError,ValueError) as error:
+                    out.append(_make(repo,head,relative,'CONFIG_UNREADABLE','HIGH',
+                        'Nested font candidate is unreadable or unsafe to traverse',b'',
+                        (type(error).__name__,)))
+                continue
+            if name not in ('package.json',) and not name.endswith('.code-workspace'):
+                continue
+            relative=path.relative_to(root).as_posix()
+            seen+=1
+            if seen > MAX_SCAN_FILES:
+                out.append(_make(repo,head,relative,'SCAN_LIMIT_EXCEEDED','HIGH',
+                    'Maximum security manifest count exceeded',b'',('file_limit',)))
+                return out
+            try:
+                raw=_read(root,relative)
+                if raw is None:
+                    raise ValueError('FILE_VANISHED')
+                doc=_jsonc(raw) if name.endswith('.code-workspace') else json.loads(raw)
+                if not isinstance(doc,dict):
+                    raise ValueError('INVALID_SCHEMA')
+            except (OSError,ValueError,UnicodeError,TypeError,json.JSONDecodeError) as exc:
+                out.append(_make(repo,head,relative,'CONFIG_UNREADABLE','HIGH',
+                    'Security-relevant manifest is unreadable or malformed',b'',
+                    (type(exc).__name__,)))
+                continue
+            if name=='package.json':
+                scripts=doc.get('scripts',{})
+                if not isinstance(scripts,dict):
+                    out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                        'Package scripts are not a mapping',raw,('scripts_not_object',)))
+                    continue
+                for key,command in sorted(scripts.items()):
+                    if key not in LIFECYCLE:
+                        continue
+                    if not isinstance(command,str):
+                        out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                            'Package lifecycle command is not a string',raw,(str(key),)))
+                    elif DANGEROUS_HOOK.search(command):
+                        out.append(_make(repo,head,relative,'PACKAGE_LIFECYCLE_EXECUTION','HIGH',
+                            'Package lifecycle hook executes a disguised asset or fetched shell script',
+                            raw,('hook='+key,'suspicious_signature_matched')))
+                    else:
+                        out.append(_make(repo,head,relative,'PACKAGE_LIFECYCLE_HOOK','INFO',
+                            'Package lifecycle hook executes code during dependency operations',
+                            raw,('hook='+key,)))
+                continue
+            settings=doc.get('settings',{})
+            tasks=doc.get('tasks',{})
+            if not isinstance(settings,dict) or not isinstance(tasks,dict):
+                out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                    'Workspace settings/tasks have an unsupported schema',raw,('expected_object',)))
+                continue
+            auto=settings.get('task.allowAutomaticTasks') is True
+            tasklist=tasks.get('tasks',[])
+            if not isinstance(tasklist,list):
+                out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                    'Workspace task list has an unsupported schema',raw,('expected_list',)))
+                continue
+            for task in tasklist:
+                if not isinstance(task,dict):
+                    out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                        'Workspace task entry has an unsupported schema',raw,('expected_object',)))
+                    continue
+                options=task.get('runOptions',{})
+                if not isinstance(options,dict):
+                    out.append(_make(repo,head,relative,'CONFIG_SCHEMA_INVALID','HIGH',
+                        'Workspace task options have an unsupported schema',raw,('expected_object',)))
+                    continue
+                if options.get('runOn')!='folderOpen':
+                    continue
+                has_command=any(isinstance(cfg,dict) and isinstance(cfg.get('command'),str)
+                    and bool(cfg['command'].strip()) for cfg in
+                    (task,task.get('windows'),task.get('linux'),task.get('osx')))
+                if has_command or task.get('dependsOn'):
+                    presentation=task.get('presentation') or {}
+                    concealed=task.get('hide') is True or (isinstance(presentation,dict)
+                        and presentation.get('reveal')=='never')
+                    out.append(_make(repo,head,relative,'WORKSPACE_FILE_AUTOEXEC',
+                        'CRITICAL' if concealed and auto else 'HIGH',
+                        'Code workspace can execute an automatic task on folder open',raw,
+                        (f'concealed={concealed}',f'automatic_setting={auto}')))
+    return out
+
+
+def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
+    """Inspect root and bounded nested source surfaces without executing them."""
+    out = _scan_root_workspace(root,repo,head)
+    out.extend(_enumerate_security_paths(root,repo,head))
+    return sorted(out,key=lambda x:(x.path,x.rule_id,x.incident_id))
+
+
+
 def scan_advisors(advisors: dict[str,Any], project_alias: str, snapshot_id: str) -> list[Finding]:
     """Model Supabase advisor notices without promoting them into privilege grants."""
     blob=json.dumps(advisors,sort_keys=True,ensure_ascii=True).encode()
@@ -287,6 +467,8 @@ def main()->int:
                     help='fail CI on critical source candidates or incomplete scans; never auto-fix')
     ap.add_argument('--fail-on-high',action='store_true',
                     help='fail CI on high/critical candidates or incomplete scans; never auto-fix')
+    ap.add_argument('--require-clean-source',action='store_true',
+                    help='reject dirty scanned source paths (local Git check only)')
     ap.add_argument('--require-git-head',action='store_true',
                     help='require on-disk Git checkout HEAD equals --head (not a full-byte attestation)')
     ap.add_argument('--advisors-snapshot',type=Path,help='sanitized advisor JSON, optional')
@@ -306,6 +488,16 @@ def main()->int:
                 ap.error('GIT_HEAD_MISMATCH_OR_WRONG_ROOT')
         except (subprocess.SubprocessError,OSError) as exc:
             ap.error('GIT_HEAD_UNAVAILABLE: '+type(exc).__name__)
+    if a.require_clean_source:
+        try:
+            changed=subprocess.run(['git','-C',str(root),'status','--porcelain',
+                '--untracked-files=all','--', '.vscode','public/fonts','packages',
+                ':(glob)**/.vscode/**','**/*.code-workspace','**/package.json'],
+                capture_output=True,text=True,timeout=15,check=True)
+            if changed.stdout.strip():
+                ap.error('SOURCE_TREE_DIRTY')
+        except (subprocess.SubprocessError,OSError) as exc:
+            ap.error('SOURCE_TREE_UNVERIFIED: '+type(exc).__name__)
     findings=scan_workspace(root,a.repo,a.head)
     if a.advisors_snapshot:
         if not a.provider_alias or len(a.provider_alias)>64:
@@ -320,7 +512,7 @@ def main()->int:
     # CI may gate promotion on unresolved critical source candidates.
     # Unparseable, oversized and incomplete scans must not silently green-light
     # CI even if their candidate severity is HIGH rather than CRITICAL.
-    unqualified={'CONFIG_UNREADABLE','CONFIG_SCHEMA_INVALID','DEPENDENCY_CHAIN_LIMIT'}
+    unqualified={'CONFIG_UNREADABLE','CONFIG_SCHEMA_INVALID','DEPENDENCY_CHAIN_LIMIT','SCAN_LIMIT_EXCEEDED'}
     return 2 if any(
         (a.fail_on_high and f.severity in ('HIGH','CRITICAL')) or
         (a.fail_on_critical and f.severity == 'CRITICAL') or
