@@ -26,7 +26,7 @@ Input shape: `CONTRACT_V1.json` (`BT2_MEMORY_LIFECYCLE_INPUT_V1`). A record uses
 
 ## Retrieval goal, algorithm, and budgets
 
-Every invocation requires a nonempty `goal.query`, bounded `goal.purpose`, caller-authorized privacy scopes and a caller-supplied `expected_heads` map. Filtering precedes lexical relevance: privacy, expiration, historical-only, injection flags, explicit supersession and exact head matching. Relevance is deterministic lexical-token overlap; default threshold **0.4**. Candidate cap **5**, input cap **256**, selected UTF-8 serialized bytes default **800**, max **4096**. Designed target **200 ms**/invocation on a small input, but no actual latency promise: `measured_latency_ms = null` until instrumented. External cost target **$0** because the pure function makes no model/network calls; output `measured_cost_usd = null` until host accounting. Model-token cost is NOT equal to UTF-8 bytes. If empty/stale/conflicted, returns no selected current record; it does not fabricate a replacement.
+Every invocation requires a nonempty `goal.query`, bounded `goal.purpose`, caller-authorized privacy scopes and a caller-supplied `expected_heads` map. Filtering precedes lexical relevance: privacy, expiration, historical-only, injection flags, explicit supersession and exact head matching. Unauthorized records are **not included in rejection diagnostics or structural-head output**; a hidden successor can still invalidate the visible predecessor without disclosing the hidden ID. Relevance is deterministic lexical-token overlap; default threshold **0.4**. Candidate cap **5**, input cap **256**, selected UTF-8 serialized bytes default **800**, max **4096**. Designed target **200 ms**/invocation on a small input, but no actual latency promise: `measured_latency_ms = null` until instrumented. External cost target **$0** because the pure function makes no model/network calls; output `measured_cost_usd = null` until host accounting. Model-token cost is NOT equal to UTF-8 bytes. If empty/stale/conflicted, returns no selected current record; it does not fabricate a replacement.
 
 ## Maintenance and stability
 
@@ -34,7 +34,7 @@ No mutation here. Corrections use an explicit linked `supersedes` chain; forks a
 
 ## Source-only evaluation
 
-`RED_LOG.txt` shows the original naive timestamp-based selector failing to reject an old head. `GREEN_LOG.txt` contains the same corrected test plus adversarial cases for privacy, cross-subject edges, forks, duplicate IDs, spoofed reviewers, unsupported runtime claims, prompt-injection, TTL, costs, budgets, and side effects. The suite is a synthetic regression, **not** independent host/runtime proof, continuous memory, or subjective experience.
+`RED_LOG.txt` shows the original naive timestamp-based selector failing to reject an old head. `PRIVACY_RED_LOG.txt` records two additional real assertion failures exposing private record IDs and private head projections. `GREEN_LOG.txt` contains both corrected tests plus adversarial cases for privacy, cross-subject edges, forks, duplicate IDs, spoofed reviewers, unsupported runtime claims, prompt-injection, TTL, costs, budgets, and side effects. The suite is a synthetic regression, **not** independent host/runtime proof, continuous memory, or subjective experience.
 
 ### Integration requirements (not implemented)
 
