@@ -113,7 +113,6 @@ class CrossRepoSecurityTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, "dirty source was treated as pinned HEAD")
             self.assertIn("SOURCE_TREE_DIRTY", result.stderr + result.stdout)
 
-
 class TraversalTrustTests(unittest.TestCase):
     def test_disguised_font_inside_package_directory_is_found(self):
         with tempfile.TemporaryDirectory() as tmp:
