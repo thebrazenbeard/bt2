@@ -70,3 +70,21 @@ class AdditionalBounds(unittest.TestCase):
                 'tasks':{'label':'unusual','runOn':'folderOpen','command':'./tools/bootstrap'}}))
             rules={f.rule_id for f in s.scan_workspace(Path(tmp),'x',HEAD)}
             self.assertIn('EDITOR_SETTINGS_AUTOEXEC',rules)
+
+class TypedSchemaTests(unittest.TestCase):
+    def test_top_level_array_tasks_must_fail_gate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d=Path(tmp)/'.vscode';d.mkdir()
+            (d/'settings.json').write_text(json.dumps({'task.allowAutomaticTasks':True}))
+            (d/'tasks.json').write_text('[]')
+            result=subprocess.run([sys.executable,str(Path(s.__file__)),'--root',tmp,'--repo','x',
+                '--head',HEAD,'--fail-on-critical'],capture_output=True,text=True)
+            self.assertEqual(result.returncode,2,'Wrong-shape task configuration silently passed CI')
+    def test_tasks_nonarray_field_must_fail_gate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d=Path(tmp)/'.vscode';d.mkdir()
+            (d/'settings.json').write_text(json.dumps({'task.allowAutomaticTasks':True}))
+            (d/'tasks.json').write_text('{"tasks": "opaque"}')
+            result=subprocess.run([sys.executable,str(Path(s.__file__)),'--root',tmp,'--repo','x',
+                '--head',HEAD,'--fail-on-critical'],capture_output=True,text=True)
+            self.assertEqual(result.returncode,2,'Wrong-shape tasks array silently passed CI')
