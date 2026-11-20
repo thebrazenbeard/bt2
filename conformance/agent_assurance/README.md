@@ -38,3 +38,10 @@ Before any real action controller could consume the recommendations, the owner w
 - Failure-closed status classification is intentionally coarse; operational actions require reviewed narrow adapters instead of relaxing this gate.
 
 This candidate does **not** modify Engineer A's scanner, Engineer B's signal ingest or memory-lifecycle PRs, any production service, the private recovered packets, or Lantern V4 currentness.
+
+## V1.1 hostile-input hardening (2026-11-20)
+
+- Reject inconsistent structured claims: `COMPLETE_VERIFIED` requires at least one counted complete conversation **and** a source-row-verification claim; `NONE` cannot declare complete conversations; `REJECT_CRITICAL_BLOCK_MISS` requires a positive miss count. These are **syntactic consistency checks, not independent authentication** of the supplied labels or the real records.
+- CLI input is restricted to an ordinary regular file and at most 100,000 bytes, with no-follow on POSIX and a precheck on Windows. The file may still change between path selection and open on systems without OS-level no-follow guarantees. The CLI outputs only `Rejected evidence input` for expected invalid inputs; the programmatic validators raise `ValueError`.
+- The gate does not parse or execute arbitrary action payloads, does not bind the caller-selected action ID to a trusted tool call, and **never grants action authority**. A caller can lie about the action identity. Only a separately authenticated dispatcher could establish such a binding; this is not that dispatcher.
+- The additional tests are `tests/test_ingress_hostile_v2.py` and `tests/test_cli_errors_v2.py`. The POSIX FIFO probe is skipped on Windows and must run on Linux hosted CI. Red/green development evidence lives in the draft PR and review notes.
