@@ -7,7 +7,9 @@ model learning. All outputs set action_authorized=False.
 from __future__ import annotations
 import argparse
 import json
+import os
 import re
+import stat
 from pathlib import Path
 
 SCHEMA = 'BT2_AGENT_ASSURANCE_INPUT_V1'
@@ -46,7 +48,7 @@ def parse_evidence(raw: bytes) -> dict:
     try:
         obj=json.loads(raw.decode('utf-8'), object_pairs_hook=_object_no_duplicate,
                        parse_constant=_nonfinite)
-    except (UnicodeError, json.JSONDecodeError) as exc:
+    except (UnicodeError, json.JSONDecodeError, RecursionError) as exc:
         raise ValueError('Invalid JSON evidence') from exc
     if not isinstance(obj,dict):
         raise ValueError('Root must be an object')
@@ -72,10 +74,11 @@ def _int(v):
 def _validate(evidence):
     _keys(evidence,('schema','operation','proposed_action_id','model_label',
                    'world_model','recovery','skillopt','authority'))
-    if (evidence['schema'] != SCHEMA or type(evidence['operation']) is not str
+    if (type(evidence['schema']) is not str or evidence['schema'] != SCHEMA
+            or type(evidence['operation']) is not str
             or evidence['operation'] not in OPERATIONS):
         raise ValueError('Unknown assurance schema or operation')
-    if evidence['model_label'] not in ('ALLOW','BLOCK','ASK'):
+    if type(evidence['model_label']) is not str or evidence['model_label'] not in ('ALLOW','BLOCK','ASK'):
         raise ValueError('Unknown model label')
     a=evidence['proposed_action_id']
     if type(a) is not str or len(a)>256:
@@ -93,13 +96,17 @@ def _validate(evidence):
         raise ValueError('Unknown recovery status')
     _int(r['complete_conversations'])
     _bool(r['source_rows_verified'])
-    if r['status'] in ('PARTIAL_FAILED_TURN','MISSING_POINTER_HISTORY_INDEXED','SOURCE_UNRESOLVED') and r['complete_conversations']:
+    if r['status'] in ('PARTIAL_FAILED_TURN','MISSING_POINTER_HISTORY_INDEXED','SOURCE_UNRESOLVED','NONE') and r['complete_conversations']:
         raise ValueError('Contradictory incomplete recovery evidence')
+    if r['status'] == 'COMPLETE_VERIFIED' and (not r['source_rows_verified'] or r['complete_conversations'] == 0):
+        raise ValueError('Complete recovery claim has no verified source rows or complete conversation')
     s=evidence['skillopt']
     _keys(s,('status','critical_block_miss_count'))
     if type(s['status']) is not str or s['status'] not in SKILLOPT_STATUSES:
         raise ValueError('Unknown SkillOpt status')
     _int(s['critical_block_miss_count'])
+    if s['status'] == 'REJECT_CRITICAL_BLOCK_MISS' and s['critical_block_miss_count'] == 0:
+        raise ValueError('Critical miss status must name at least one critical miss')
     p=evidence['authority']
     _keys(p,('owner_approval_verified','runtime_bound'))
     _bool(p['owner_approval_verified'])
@@ -141,12 +148,46 @@ def decide(evidence: dict) -> dict:
             'scope':'ADVISORY_ONLY_NO_RUNTIME_AUTHORITY'}
 
 
+def read_bounded_file(path: Path) -> bytes:
+    """Read only a regular file, bounded to MAX_INPUT_BYTES.
+
+    This is resource hygiene, not authentication or a protection against all
+    concurrent path substitution (notably on Windows without O_NOFOLLOW).
+    The caller still owns responsibility for trusted path selection.
+    """
+    if not isinstance(path, Path) or path.is_symlink():
+        raise ValueError('Not a regular, non-symlink evidence path')
+    flags = os.O_RDONLY | getattr(os, 'O_BINARY', 0)
+    flags |= getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0)
+    try:
+        fd = os.open(path, flags)
+    except OSError as exc:
+        raise ValueError('Cannot open evidence file') from exc
+    try:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode) or st.st_size > MAX_INPUT_BYTES:
+            raise ValueError('Nonregular or oversized evidence file')
+        with os.fdopen(fd, 'rb') as stream:
+            fd = -1
+            raw = stream.read(MAX_INPUT_BYTES + 1)
+        if len(raw) > MAX_INPUT_BYTES:
+            raise ValueError('Evidence file grew beyond limit')
+        return raw
+    finally:
+        if fd >= 0:
+            os.close(fd)
+
+
 def main():
     p=argparse.ArgumentParser(description='Offline, no-tools agent assurance advisory')
     p.add_argument('evidence_json',type=Path)
     args=p.parse_args()
-    raw=args.evidence_json.read_bytes()
-    print(json.dumps(decide(parse_evidence(raw)),sort_keys=True,separators=(',',':')))
+    try:
+        raw=read_bounded_file(args.evidence_json)
+        result=decide(parse_evidence(raw))
+    except (ValueError, OSError, RecursionError):
+        p.exit(2, 'Rejected evidence input\n')
+    print(json.dumps(result,sort_keys=True,separators=(',',':')))
 
 
 if __name__=='__main__':main()
