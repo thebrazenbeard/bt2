@@ -45,7 +45,8 @@
     "source_ref_rule": "exact canonical GitHub pull or Actions run URL under the subject's same owner/repo",
     "transport": [
       "GITHUB_API_SESSION_READONLY"
-    ]
+    ],
+    "ci_run_pr_link_rule": "Only completed pull_request events; run.pull_requests must contain the exact numeric PR, canonical api.github.com PR URL, and identical run.head_sha. A same-repo or same-SHA run alone is insufficient."
   },
   "input_schema": "BT2_GITHUB_PROVIDER_BRIDGE_INPUT_V1",
   "limits": [
@@ -55,7 +56,8 @@
     "github token/credentials never emitted",
     "cross-process replay state requires external authorized store",
     "semantic salience/empathy hints never establish truth consent memory or effects",
-    "Supabase provider requires its separate catalog/readback binding; GitHub-only V1 cannot accept SQL source references"
+    "Supabase provider requires its separate catalog/readback binding; GitHub-only V1 cannot accept SQL source references",
+    "Push-only, fork-head or ambiguous PR-run association is not qualified by this V1 collector; do not fabricate PR-specific CI evidence."
   ],
   "output": {
     "fields": [
