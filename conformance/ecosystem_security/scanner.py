@@ -248,6 +248,7 @@ def main()->int:
     ap.add_argument('--head',required=True)
     ap.add_argument('--format',choices=['json','sarif'],default='json')
     ap.add_argument('--budget',type=int,default=8)
+    ap.add_argument('--fail-on-critical',action='store_true',help='fail CI on source critical candidates; never auto-fix')
     ap.add_argument('--advisors-snapshot',type=Path,help='sanitized advisor JSON, optional')
     ap.add_argument('--provider-alias',help='nonsecret display alias; required with snapshot')
     a=ap.parse_args()
@@ -264,7 +265,7 @@ def main()->int:
         findings += scan_advisors(notices,a.provider_alias,'UNVERIFIED_PROVIDER_SNAPSHOT')
     result=sarif(findings) if a.format=='sarif' else advisory_gate(findings,a.budget)
     print(json.dumps(result,indent=2,sort_keys=True))
-    # Does not execute scanned code; high findings require review, not automated merge failure.
-    return 0
+    # CI may gate promotion on unresolved critical source candidates.
+    return 2 if a.fail_on_critical and any(f.severity=='CRITICAL' for f in findings) else 0
 
 if __name__=='__main__':sys.exit(main())
