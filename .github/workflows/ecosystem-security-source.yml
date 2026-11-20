@@ -1,27 +1,12 @@
 name: BT2 ecosystem security source scan (candidate)
 
+# Candidate source scan runs on EVERY PR and main push. Path filters made
+# unrelated source/workflow edits silently skip this check. This event coverage
+# is necessary but NOT an independent trusted-main required status check.
 on:
   pull_request:
-    paths:
-      - '.vscode/**'
-      - '**/.vscode/**'
-      - 'public/fonts/**'
-      - '**/public/fonts/**'
-      - '**/*.code-workspace'
-      - '**/package.json'
-      - 'conformance/ecosystem_security/**'
-      - '.github/workflows/ecosystem-security-source.yml'
   push:
     branches: [main]
-    paths:
-      - '.vscode/**'
-      - '**/.vscode/**'
-      - 'public/fonts/**'
-      - '**/public/fonts/**'
-      - '**/*.code-workspace'
-      - '**/package.json'
-      - 'conformance/ecosystem_security/**'
-      - '.github/workflows/ecosystem-security-source.yml'
   workflow_dispatch:
 
 permissions:
