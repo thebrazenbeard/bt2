@@ -189,6 +189,23 @@ class Batch:
     monitor_is_active: bool = False
     external_effects: bool = False
 
+    def public_record(self) -> dict:
+        """Explicit safe projection, not a generic dataclass serializer.
+
+        The raw Batch is an internal object: dropped duplicate signal IDs,
+        private subjects and original Decision fields must never be exported
+        through an unfiltered asdict/json serializer.
+        """
+        return {
+            # A masked private record still discloses the existence,
+            # domain and priority of a local-only finding.
+            "decisions": [d.public_record() for d in self.decisions
+                          if not d.private_subject],
+            "currentness_source_only": True,
+            "monitor_is_active": False,
+            "external_effects": False,
+        }
+
 
 def _score(s: Signal) -> float:
     return round((0.30 * s.severity + 0.25 * s.relevance

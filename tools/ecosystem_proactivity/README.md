@@ -44,3 +44,18 @@ implementation, or contacts a provider.
 This is NOT a deployed ingress integration, and synthetic tests do not prove
 compatibility with Engineer B's final implementation. Real authorized admission
 must establish provider, ownership, source/head and time separately.
+
+## Public batch projection
+
+The pure governor returns a rich internal Batch whose raw fields include
+Decision subjects, source heads, and dropped_duplicate_signal_ids.
+These fields can contain caller-controlled identifying text. Never send or
+JSON/dataclass-serialize the raw Batch outside its authorized process.
+
+Batch.public_record() is a deliberately narrower presentation surface:
+it omits private decisions entirely and calls Decision.public_record() for
+each remaining result. It includes only source-only/no-monitor/no-effects guards. It omits raw
+subjects, heads, references, next steps, duplicate IDs and raw observation
+counts. This is explicit opt-in safe projection, NOT a change to internal
+deduplication, any automatic serializer, upstream privacy classification,
+or authenticated notification authorization.
