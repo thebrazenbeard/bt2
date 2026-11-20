@@ -28,7 +28,7 @@ def fake_runner(*args,**kwargs):
             "id":456,"head_sha":HEAD,"status":"completed","conclusion":"failure",
             "repository":{"full_name":"example/app"},
             "event":"pull_request",
-            "pull_requests":[{"number":123,"head":{"sha":HEAD}}],
+            "pull_requests":[{"number":123,"url":"https://api.github.com/repos/example/app/pulls/123","head":{"sha":HEAD}}],
             "html_url":"https://github.com/example/app/actions/runs/456"})
     else:
         raise AssertionError("collector made unexpected API request")
@@ -126,6 +126,18 @@ class GitHubCollectorTest(unittest.TestCase):
             return r
         with self.assertRaises(CollectorError):
             collect_pr("example/app",123,456,NOW,CUT,runner=forged_link)
+
+
+    def test_i_pr_link_url_must_bind_repo_and_number(self):
+        def wrong_source(*args,**kwargs):
+            r=fake_runner(*args,**kwargs)
+            data=json.loads(r.stdout)
+            if data.get("id")==456:
+                data["pull_requests"][0]["url"]="https://api.github.com/repos/foreign/app/pulls/123"
+                r.stdout=json.dumps(data)
+            return r
+        with self.assertRaises(CollectorError):
+            collect_pr("example/app",123,456,NOW,CUT,runner=wrong_source)
 
 
 if __name__=="__main__":
