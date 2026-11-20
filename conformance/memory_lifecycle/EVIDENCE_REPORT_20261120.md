@@ -12,7 +12,8 @@
 
 - RED: naive timestamp-last selector returned record `C` (old head `111` restated late) instead of corrected record `B` (head `222`). The exact test failed with `AssertionError: 'C' != 'B'`, exit **1**.
 - GREEN: replace last-timestamp selection with explicit rooted supersession lineage, stale-head restatement suppression and conflict holding. Identical test passes.
-- Full synthetic `unittest` suite: **28 passed** (plus a CLI subprocess repro test), no external network/tools used.
+- Additional privacy **RED**: two assertions failed when unauthorized private record IDs and a private terminal head leaked through `rejected` / `structural_heads`. New fix omits unauthorized records from all diagnostics, while keeping hidden successors active for anti-revival decisions.
+- Full synthetic `unittest` suite: **30 passed** (plus a CLI subprocess repro test), no external network/tools used.
 - Exact fixture and report files are public-safe synthetic examples; no private identity/relational/journal content.
 
 ## Evidence ceilings
