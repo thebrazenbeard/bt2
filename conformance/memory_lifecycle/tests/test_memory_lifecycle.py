@@ -78,7 +78,8 @@ class AdversarialLifecycle(unittest.TestCase):
     def test_bad_privacy_scope_fails_closed(self):
         r=evaluate(envelope([record(privacy_scope="private-diary")]))
         self.assertFalse(r["selected"])
-        self.assertIn("UNAUTHORIZED_PRIVACY",r["rejected"][0]["reasons"])
+        self.assertFalse(r["rejected"],"Private identifiers must not appear in diagnostics")
+        self.assertFalse(r["structural_heads"],"Private-only subjects must not appear in head projection")
 
     def test_unauthorized_privacy_list_rejected(self):
         for scopes in ([],["synthetic-only","synthetic-only"]):
@@ -184,3 +185,21 @@ class AdversarialLifecycle(unittest.TestCase):
         b=subprocess.run(cmd,check=True,capture_output=True,text=True)
         self.assertEqual(a.stdout,b.stdout)
         self.assertEqual(json.loads(a.stdout)["schema"],"BT2_MEMORY_LIFECYCLE_OUTPUT_V1")
+
+
+class PrivacyProjectionHostile(unittest.TestCase):
+    def test_private_only_subject_and_id_not_disclosed_in_output(self):
+        e=envelope([record("private-secret-id",subject="private:diary",privacy_scope="private-diary")],heads={"private:diary":"111"})
+        result=evaluate(e)
+        self.assertEqual(result["selected"],[])
+        text=canonical_json(result)
+        self.assertNotIn("private-secret-id",text)
+        self.assertNotIn("private:diary",text)
+        self.assertNotIn("private-diary",text)
+
+    def test_hidden_successor_must_not_reactivate_visible_predecessor_or_leak_id(self):
+        e=envelope([record("A"),record("hidden-successor",head="222",supersedes="A",privacy_scope="private-diary")],heads={"repo:bt2":"111"})
+        result=evaluate(e)
+        self.assertEqual(result["selected"],[])
+        self.assertIsNone(result["structural_heads"].get("repo:bt2"))
+        self.assertNotIn("hidden-successor",canonical_json(result))
