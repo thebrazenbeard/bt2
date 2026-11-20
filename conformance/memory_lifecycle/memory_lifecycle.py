@@ -201,12 +201,14 @@ def evaluate(envelope: dict[str, Any]) -> dict[str, Any]:
     candidates: list[dict[str, Any]] = []
     rejected: list[dict[str, str]] = []
     for r in records:
+        # Privacy filtering precedes ranking and diagnostic construction.
+        # Even a rejected record ID or head is a privacy disclosure.
+        if r["privacy_scope"] not in allowed:
+            continue
         if r["record_id"] in seen:
             continue
         seen.add(r["record_id"])
         reasons = []
-        if r["privacy_scope"] not in allowed:
-            reasons.append("UNAUTHORIZED_PRIVACY")
         if r.get("expires_at") is not None and utc(r["expires_at"]) <= now:
             reasons.append("EXPIRED")
         if INJECTION.search(r["claim"]):
@@ -247,7 +249,14 @@ def evaluate(envelope: dict[str, Any]) -> dict[str, Any]:
         "schema":OUTPUT_SCHEMA, "goal":{"query":query,"purpose":purpose},
         "observed_at":envelope["observed_at"],
         "selected":included, "rejected":sorted(rejected,key=lambda x:(x["record_id"],x["reasons"])),
-        "structural_heads":{k:(v["record_id"] if v else None) for k,v in sorted(heads.items())},
+        # Suppress private-only subjects and redact private terminal IDs even
+        # when a visible predecessor in the lineage exists. We still compute
+        # full lineage internally so hidden successors cannot revive old heads.
+        "structural_heads":{
+            k: (v["record_id"] if v and v["privacy_scope"] in allowed else None)
+            for k,v in sorted(heads.items())
+            if any(r["subject"] == k and r["privacy_scope"] in allowed for r in records)
+        },
         "runtime_currentness":"UNKNOWN_NOT_PROBED", "independently_authenticated":False,
         "budget":{"max_input_records":max_records,"max_candidates":max_results,
                   "max_utf8_bytes":max_bytes,"used_utf8_bytes":used,
