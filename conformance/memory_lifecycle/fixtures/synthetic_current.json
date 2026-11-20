@@ -1,0 +1,11 @@
+{
+  "schema": "BT2_MEMORY_LIFECYCLE_INPUT_V1",
+  "observed_at": "2026-11-20T19:00:00Z",
+  "goal": {"query": "repo state", "purpose": "test exact source-only memory projection", "max_candidates": 5, "max_utf8_bytes": 800, "min_relevance": 0.5},
+  "authorized_privacy_scopes": ["synthetic-only"],
+  "expected_heads": {"repo:bt2": "111"},
+  "records": [
+    {"record_id": "fixture-1", "subject": "repo:bt2", "head": "111", "supersedes": null,
+     "source_ref": "synthetic://fixture-1", "source_kind": "STM_WORKING", "memory_class": "WORKING_PROJECT", "evidence_class": "TEST", "privacy_scope": "synthetic-only", "claim": "repo state is candidate evidence only", "extraction_confidence": 0.8, "claimed_actor": "test-fixture", "event_at": "2026-11-20T17:00:00Z", "recorded_at": "2026-11-20T18:00:00Z"}
+  ]
+}
