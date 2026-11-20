@@ -120,6 +120,20 @@ def collect_pr(
             outcome not in ("success","failure") or
             run.get("html_url") != f"https://github.com/{repository}/actions/runs/{run_id}"):
             raise CollectorError("PROVIDER_RUN_BINDING_MISMATCH")
+        # GitHub runs may share the same commit SHA without belonging to
+        # this pull request. Never assign a green or red CI status solely
+        # because the run was created in the same repo or on the same head.
+        links = run.get("pull_requests")
+        if (run.get("event") != "pull_request" or
+            type(links) is not list or not 1 <= len(links) <= 128 or
+            not any(
+                type(link) is dict and
+                type(link.get("number")) is int and link["number"] == pr_number and
+                link.get("url") == f"https://api.github.com/repos/{repository}/pulls/{pr_number}" and
+                type(link.get("head")) is dict and link["head"].get("sha") == run_head
+                for link in links
+            )):
+            raise CollectorError("CI_PR_ASSOCIATION_UNQUALIFIED")
         receipts.append({
             "event_id":f"github-run-{run_id}-{run_head[:16]}",
             "repository":repository,"subject":f"pr:{pr_number}",
