@@ -1,0 +1,23 @@
+name: BT2 Agent Assurance Source Conformance V1
+on:
+  pull_request:
+    paths:
+      - "conformance/agent_assurance/**"
+      - ".github/workflows/agent-assurance-source-v1.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Python conformance and negative tests
+        run: |
+          python3 --version
+          python3 -B -m unittest discover -s conformance/agent_assurance/tests -p 'test_*.py' -v
+          python3 -O -m unittest discover -s conformance/agent_assurance/tests -p 'test_*.py' -q
+          python3 -B conformance/agent_assurance/gate_v1.py conformance/agent_assurance/fixtures/synthetic_partial_hold_v1.json
