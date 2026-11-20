@@ -1,0 +1,162 @@
+{
+  "$defs": {
+    "tableGrants": {
+      "additionalProperties": false,
+      "properties": {
+        "delete": {
+          "type": "boolean"
+        },
+        "insert": {
+          "type": "boolean"
+        },
+        "select": {
+          "type": "boolean"
+        },
+        "update": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:bt2:memory-provider-access-input:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "functions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "anon_execute": {
+            "type": "boolean"
+          },
+          "authenticated_execute": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string"
+          },
+          "search_path_limited": {
+            "type": "boolean"
+          },
+          "security_definer": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "schema",
+          "name",
+          "security_definer",
+          "anon_execute",
+          "authenticated_execute",
+          "search_path_limited"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "type": "array"
+    },
+    "independently_authenticated": {
+      "type": "boolean"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "BT2_MEMORY_PROVIDER_ACCESS_INPUT_V1"
+    },
+    "schema_rights": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "anon_create": {
+            "type": "boolean"
+          },
+          "anon_usage": {
+            "type": "boolean"
+          },
+          "authenticated_create": {
+            "type": "boolean"
+          },
+          "authenticated_usage": {
+            "type": "boolean"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "anon_create",
+          "authenticated_create",
+          "anon_usage",
+          "authenticated_usage"
+        ],
+        "type": "object"
+      },
+      "maxItems": 8,
+      "type": "array"
+    },
+    "source_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "tables": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "anon": {
+            "$ref": "#/$defs/tableGrants"
+          },
+          "authenticated": {
+            "$ref": "#/$defs/tableGrants"
+          },
+          "force_rls": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rls_enabled": {
+            "type": "boolean"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "name",
+          "rls_enabled",
+          "force_rls",
+          "anon",
+          "authenticated"
+        ],
+        "type": "object"
+      },
+      "maxItems": 32,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "observed_at",
+    "source_ref",
+    "tables",
+    "functions"
+  ],
+  "title": "BT2 Memory Provider Access Snapshot V1 \u2014 untrusted read-only metadata",
+  "type": "object"
+}

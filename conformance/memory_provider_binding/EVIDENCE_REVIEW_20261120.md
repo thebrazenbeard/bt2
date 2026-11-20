@@ -56,3 +56,56 @@ remain unverified or NONE.
 Independent owner review is required before admission bridges or any
 Supabase/GitHub main mutation. This work is separate from BT2's
 insight governor and signal_ingest Draft PR #123.
+## Follow-up: real role privilege matrix and new false assurance corrections
+
+Fresh read-only catalog SQL on November 20 examined direct role grants,
+schema rights, search-path configuration and function execution mode,
+in addition to mere table/function presence. No content rows were read.
+
+Observed 8 matching relations, 22 matching routines, and two schemas.
+For the seven required memory tables, anon and authenticated had no
+SELECT/INSERT/UPDATE/DELETE object grants. Neither role could CREATE
+in public or semantic_atlas. The two required functions were
+SECURITY DEFINER, had pinned search_path settings, and neither client
+role could EXECUTE them. Wider function inventory found one unrelated
+immutable SECURITY INVOKER manifest-format routine with inherited EXECUTE
+rights but no client schema USAGE. That observation does NOT establish an
+exploitable exposure; classify as review/latent permission until schema
+API exposure and function semantics are independently qualified.
+
+Observed source RED -> GREEN cases: baseline privilege checker marked a
+public SELECT grant as catalog present; failed exact assertion before
+new access gate. An unlisted newly granted memory table/function was
+ignored and produced a misleading restricted result (two real FAILs),
+now fails closed. Missing schema write-grant evidence had falsely
+qualified the source surface; now UNKNOWN. An unlisted invoker routine
+with no schema USAGE was mislabeled proven exposure; source check now
+returns review rather than a breach claim. All tests use synthetic data
+and the live metadata snapshot remains private; no credential or row data
+is committed.
+
+## Connected provider access snapshot — exact local source evaluation
+
+The committed SELECT-only provider_access_probe.sql was executed against
+the connected Vera Supabase project. The returned metadata snapshot contained
+8 memory/Atlas relations, 22 matching functions and rights for 2 schemas.
+The snapshot was privately transferred to an isolated local Lappy file and
+read back by provider_access.py (no database client, credential, or write in
+the evaluator). The independent SHA256 of the private JSON fixture was
+A8634C2A21D4D7516FD4F4CB9610803C27BD984299564548F51B57754750DE0C.
+
+Observed evaluator output at 2026-11-20T21:20:38Z:
+verdict REVIEW_UNLISTED_SURFACES, missing tables/functions/schemas all zero,
+reason codes UNLISTED_EXECUTE_GRANT_NO_SCHEMA_USAGE,
+UNLISTED_MEMORY_FUNCTION_REVIEW, UNLISTED_MEMORY_TABLE_REVIEW.
+There was no role grant to CREATE in either inspected memory schema.
+One public inherited EXECUTE belongs to an invoker manifest formatter
+in a schema the client roles cannot USE. This is a follow-up review item,
+not a confirmed unauthorized invocation or data leak.
+Provider authenticity and present memory permission remain UNVERIFIED;
+memory read, write, admission, release and other effects remain NONE.
+
+The private provider snapshot is deliberately not copied to public GitHub.
+The source evaluator makes no Supabase network request. The provider
+execution and local evaluation are real observations, but the JSON
+transfer is not an independently signed identity receipt.

@@ -38,3 +38,18 @@ jobs:
               assert result['side_effects']==[]
           print('MEMORY_PROVIDER_METADATA_SOURCE_ONLY_PASS')
           PY
+          python3 conformance/memory_provider_binding/provider_access.py conformance/memory_provider_binding/fixtures/vera_access_synthetic_v1.json > /tmp/memory-access.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          access=json.loads(Path('/tmp/memory-access.json').read_text())
+          assert access['schema']=='BT2_MEMORY_PROVIDER_ACCESS_OUTPUT_V1'
+          assert access['verdict']=='ACCESS_SURFACE_RESTRICTED_UNQUALIFIED'
+          assert access['independently_authenticated'] is False
+          assert access['provider_authentication']=='UNKNOWN_NOT_INDEPENDENTLY_VERIFIED'
+          assert access['memory_read']=='NONE'
+          assert access['memory_admission']=='NONE'
+          assert access['release_authorization']=='NONE'
+          assert access['side_effects']==[]
+          print('MEMORY_PROVIDER_ACCESS_NEGATIVE_CI_PASS')
+          PY

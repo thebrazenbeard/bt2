@@ -69,3 +69,36 @@ Next independently qualify provider principal and grants, exact repo head
 readback, memory epoch CAS and separate privacy/admission authorization,
 latency/cost and negative replay, then owner-approved integration. This
 does not modify BT2 decision policy, STM, DMS, vera-mono or Supabase.
+## V1 privilege-surface qualification (separate from catalog presence)
+
+The source-only provider_access.py accepts a bounded
+BT2_MEMORY_PROVIDER_ACCESS_INPUT_V1 JSON snapshot and returns
+BT2_MEMORY_PROVIDER_ACCESS_OUTPUT_V1. The companion
+provider_access_probe.sql is SELECT-only and queries pg_catalog grants,
+RLS flags, function SECURITY DEFINER status, constrained search-path
+indicator, and schema CREATE/USAGE privileges. It never reads memory rows.
+
+The evaluator fails closed for missing required tables/functions/schema
+rights, public-role grants on expected sensitive memory objects, unsafe
+security-definer search-path configuration, or new callable memory endpoints.
+It now distinguishes an unlisted SECURITY INVOKER function with EXECUTE
+but *without schema USAGE* from a proven exposed callable endpoint:
+REVIEW_UNLISTED_SURFACES, not HOLD_PRIVILEGE_EXPOSURE. Review is still
+required. It does not imply safe API routing, function body review, present
+authentication, production authorization, or read access.
+
+Real provider observation, November 20, 2026: Vera contains 8 relevant
+memory/atlas relations and 22 matching functions under the wider probe.
+All seven exact required tables have RLS and no direct anon/authenticated
+DML grants. No CREATE grant for those roles on public or semantic_atlas.
+One additional semantic_atlas runtime_manifest_stream_v4 function has
+inherited EXECUTE for both client roles, but is SECURITY INVOKER and both
+roles lack semantic_atlas USAGE. This is a latent grant/review item, not
+a verified current disclosure. Do not revoke or expand grants without a
+function caller/dependency and API schema review.
+
+A JSON snapshot produced by this query can be edited or replayed. The
+source-only program ALWAYS reports independently_authenticated=false,
+runtime_currentness UNKNOWN, memory admission/read/release NONE. Live
+provider receipt authentication, principal-bound privacy authorization,
+readback and action decisions remain separate held work.
