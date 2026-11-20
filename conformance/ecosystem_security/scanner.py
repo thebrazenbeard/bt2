@@ -285,6 +285,8 @@ def main()->int:
     ap.add_argument('--budget',type=int,default=8)
     ap.add_argument('--fail-on-critical',action='store_true',
                     help='fail CI on critical source candidates or incomplete scans; never auto-fix')
+    ap.add_argument('--fail-on-high',action='store_true',
+                    help='fail CI on high/critical candidates or incomplete scans; never auto-fix')
     ap.add_argument('--require-git-head',action='store_true',
                     help='require on-disk Git checkout HEAD equals --head (not a full-byte attestation)')
     ap.add_argument('--advisors-snapshot',type=Path,help='sanitized advisor JSON, optional')
@@ -319,8 +321,11 @@ def main()->int:
     # Unparseable, oversized and incomplete scans must not silently green-light
     # CI even if their candidate severity is HIGH rather than CRITICAL.
     unqualified={'CONFIG_UNREADABLE','CONFIG_SCHEMA_INVALID','DEPENDENCY_CHAIN_LIMIT'}
-    return 2 if a.fail_on_critical and any(
-        f.severity=='CRITICAL' or f.rule_id in unqualified for f in findings
+    return 2 if any(
+        (a.fail_on_high and f.severity in ('HIGH','CRITICAL')) or
+        (a.fail_on_critical and f.severity == 'CRITICAL') or
+        ((a.fail_on_high or a.fail_on_critical) and f.rule_id in unqualified)
+        for f in findings
     ) else 0
 
 if __name__=='__main__':sys.exit(main())
