@@ -17,8 +17,7 @@ WITH tab AS (
  JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
  WHERE c.relkind IN ('r','p','v','m') AND (
    (n.nspname='public' AND c.relname LIKE 'vera_memory_%')
-   OR (n.nspname='semantic_atlas' AND
-       (c.relname LIKE 'runtime_%' OR c.relname LIKE 'capture_%' OR c.relname LIKE 'memory_%'))
+   OR n.nspname='semantic_atlas' -- cover all Atlas tables/views, not only historic prefixes
  )
  ORDER BY n.nspname,c.relname LIMIT 33
 ),
@@ -31,7 +30,8 @@ fn AS (
  JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
  WHERE (n.nspname='public' AND p.proname LIKE 'vera_memory_%')
     OR (n.nspname='semantic_atlas' AND (
-      p.proname LIKE 'search_current_%' OR p.proname LIKE 'runtime_%' OR p.proname LIKE 'memory_%'))
+      p.proname LIKE 'search_current_%' OR p.proname LIKE 'runtime_%' OR p.proname LIKE 'memory_%'
+      OR p.proname LIKE 'capture_semantic_%' OR p.proname LIKE 'record_semantic_capture_%'))
  ORDER BY n.nspname,p.proname LIMIT 33
 ),
 sch AS (

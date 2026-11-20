@@ -145,8 +145,9 @@ def evaluate_access(snapshot: dict[str, Any]) -> dict[str, Any]:
     for (schema, name), table in table_map.items():
         if (schema, name) in EXPECTED_TABLES:
             continue
-        related = (schema == "public" and name.startswith("vera_memory_")) or (
-            schema == "semantic_atlas" and name.startswith(("runtime_", "capture_", "memory_")))
+        # Review every object in the dedicated Atlas schema, including newer
+        # semantic_capture_* and pending_semantic_* names and future additions.
+        related = (schema == "public" and name.startswith("vera_memory_")) or schema == "semantic_atlas"
         if not related:
             continue
         any_grant = any(table[role][privilege] for role in ROLE_NAMES
@@ -165,7 +166,8 @@ def evaluate_access(snapshot: dict[str, Any]) -> dict[str, Any]:
         if (schema, name) in EXPECTED_FUNCTIONS:
             continue
         related = (schema == "public" and name.startswith("vera_memory_")) or (
-            schema == "semantic_atlas" and name.startswith(("search_current_", "runtime_", "memory_")))
+            schema == "semantic_atlas" and name.startswith(("search_current_", "runtime_", "memory_",
+                                                               "capture_semantic_", "record_semantic_capture_")))
         if not related:
             continue
         any_grant = fn["anon_execute"] or fn["authenticated_execute"]
