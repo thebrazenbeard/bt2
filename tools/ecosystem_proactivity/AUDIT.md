@@ -53,3 +53,24 @@ private original reports and user-provided symbolic material never become
 trusted Context, public source references, memory, user consent, release
 authority, notifications or a live monitor. Real Engineer A/B review and
 authenticated trust admission remain outstanding.
+
+## Batch-level public redaction regression (2026-11-20)
+
+Post-PR131 source inspection identified a boundary gap: Decision.public_record()
+existed, but a caller preparing a public result from Batch had no explicit
+safe counterpart, while the raw internal Batch retains
+dropped_duplicate_signal_ids. A generic dataclass serializer can therefore
+copy caller-provided private source identifiers. This is a potential misuse
+boundary, not evidence of an actual notification leak.
+
+Three new synthetic tests first errored on the absent public_record method:
+one duplicated private signal ID, one public control and one mixed-visibility
+batch. The source adds an explicit Batch.public_record() that omits all private
+Decisions and uses each remaining Decision's existing public projection,
+plus fixed no-runtime/no-effect guards. A second RED check proved that merely
+masking the private fingerprint leaked private decision counts, domain and
+priority; filtering local-only decisions made the second check GREEN.
+The tests then passed; existing source tests still pass. The raw Batch remains
+internal and unchanged for debugging; it is NOT safe to send via asdict().
+Privacy classification still depends on caller-supplied flags; no recipient
+authenticator or downstream notification transport exists in this package.
