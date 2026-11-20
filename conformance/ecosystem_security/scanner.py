@@ -128,10 +128,29 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
                 'Workspace execution configuration is unparseable or unsafe to read',raw,(type(exc).__name__,)))
     tasks, raw_tasks = loaded.get('.vscode/tasks.json', ({},b''))
     settings, raw_settings = loaded.get('.vscode/settings.json', ({},b''))
-    if not isinstance(tasks,dict): tasks = {}
-    if not isinstance(settings,dict): settings = {}
+    # Valid JSON with the wrong schema is not a qualified clean scan.
+    if not isinstance(tasks,dict):
+        if raw_tasks:
+            out.append(_make(repo,head,'.vscode/tasks.json','CONFIG_SCHEMA_INVALID','HIGH',
+                'Workspace tasks configuration has an unsupported top-level shape',
+                raw_tasks,('expected=object',)))
+        tasks = {}
+    if not isinstance(settings,dict):
+        if raw_settings:
+            out.append(_make(repo,head,'.vscode/settings.json','CONFIG_SCHEMA_INVALID','HIGH',
+                'Workspace settings configuration has an unsupported top-level shape',
+                raw_settings,('expected=object',)))
+        settings = {}
     tlist = tasks.get('tasks',[])
-    if not isinstance(tlist,list): tlist=[]
+    if not isinstance(tlist,list):
+        out.append(_make(repo,head,'.vscode/tasks.json','CONFIG_SCHEMA_INVALID','HIGH',
+            'Workspace tasks array has an unsupported shape',raw_tasks,
+            ('expected=tasks:list',)))
+        tlist=[]
+    elif any(not isinstance(t,dict) for t in tlist):
+        out.append(_make(repo,head,'.vscode/tasks.json','CONFIG_SCHEMA_INVALID','HIGH',
+            'Workspace tasks array contains non-object entries',raw_tasks,
+            ('expected=each-task:object',)))
     by_label = {t['label']:t for t in tlist if isinstance(t,dict) and isinstance(t.get('label'),str)}
     settings_auto = settings.get('task.allowAutomaticTasks') is True
     if settings_auto:
@@ -299,7 +318,7 @@ def main()->int:
     # CI may gate promotion on unresolved critical source candidates.
     # Unparseable, oversized and incomplete scans must not silently green-light
     # CI even if their candidate severity is HIGH rather than CRITICAL.
-    unqualified={'CONFIG_UNREADABLE','DEPENDENCY_CHAIN_LIMIT'}
+    unqualified={'CONFIG_UNREADABLE','CONFIG_SCHEMA_INVALID','DEPENDENCY_CHAIN_LIMIT'}
     return 2 if a.fail_on_critical and any(
         f.severity=='CRITICAL' or f.rule_id in unqualified for f in findings
     ) else 0
