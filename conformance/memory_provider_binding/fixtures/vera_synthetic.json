@@ -1,0 +1,61 @@
+{
+  "independently_authenticated": false,
+  "observation_time": "2026-11-20T20:00:00Z",
+  "provider_role": "VERA_MEMORY",
+  "relations": [
+    {
+      "kind": "r",
+      "name": "vera_memory_epoch_subjects_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "kind": "r",
+      "name": "vera_memory_epoch_events_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "kind": "r",
+      "name": "vera_memory_epoch_provider_receipts_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "kind": "r",
+      "name": "vera_memory_epoch_archive_receipts_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "kind": "r",
+      "name": "runtime_objects",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    },
+    {
+      "kind": "r",
+      "name": "runtime_snapshots",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    },
+    {
+      "kind": "r",
+      "name": "capture_policy",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    }
+  ],
+  "routines": [
+    {
+      "name": "vera_memory_epoch_get_status_v1",
+      "schema": "public"
+    },
+    {
+      "name": "search_current_runtime_objects_v11",
+      "schema": "semantic_atlas"
+    }
+  ],
+  "schema": "BT2_MEMORY_PROVIDER_CATALOG_INPUT_V1",
+  "source_ref": "synthetic://provider-catalog/vera"
+}

@@ -1,0 +1,87 @@
+{
+  "$id": "urn:bt2:memory-provider-catalog-input:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "independently_authenticated": {
+      "type": "boolean"
+    },
+    "observation_time": {
+      "format": "date-time",
+      "pattern": "Z$",
+      "type": "string"
+    },
+    "provider_role": {
+      "enum": [
+        "VERA_MEMORY",
+        "TATTLER_REVIEW"
+      ]
+    },
+    "relations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rls_enabled": {
+            "type": "boolean"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "name",
+          "kind",
+          "rls_enabled"
+        ],
+        "type": "object"
+      },
+      "maxItems": 256,
+      "type": "array"
+    },
+    "routines": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "schema": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "name"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "schema": {
+      "const": "BT2_MEMORY_PROVIDER_CATALOG_INPUT_V1"
+    },
+    "source_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "provider_role",
+    "observation_time",
+    "source_ref",
+    "relations",
+    "routines"
+  ],
+  "title": "BT2 Memory Provider Catalog Snapshot V1",
+  "type": "object"
+}
