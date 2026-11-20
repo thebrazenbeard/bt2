@@ -7,3 +7,21 @@ V2 false-silence: distinct subjects sharing fingerprint and Git head could both 
 Test-driven evidence in isolated Lappy source: baseline V3 43/43; new V4 subject/history tests initially failed (six failed assertions and four interface errors) before implementation. Portfolio helper tests failed until the writer was updated. A metric identity test initially scored zero of two same-fingerprint subjects before correction. V4 local 56/56 normal and optimized on Python 3.14, fictional demo exit 0. Same-author tests are NOT independent hostile review.
 
 Remaining holds: a hostile direct caller can still forge trusted Context fields, severity and time scores remain assertions, Git head can move, no durable authenticated notification log or emission, no cross-process exactly-once behavior, potential urgent alert starvation by daily budget, and no independent A/B approval or qualified runtime backend. No protected effects.
+
+
+## Private-local-only output boundary regression (2026-11-20)
+
+The merged V4 source treated either contains_private_data=True or
+externally_visible=False as private while scoring, but redacted identifiers,
+evidence refs and next steps only under the former flag. This could expose the
+fingerprint via Decision.public_record() and retain an internal evidence
+reference or next step in Decision for an externally invisible signal.
+
+Three test-first cases were added: two failed against the exact merged main
+and one public-signal control passed. The implementation now computes
+private_local = contains_private_data or not externally_visible once and
+uses it consistently for returned evidence refs, next step and public-record
+identifier masking. All 59 source tests pass locally under normal and
+optimized Python. This is scoped privacy hardening, NOT proof of upstream
+privacy classification, authenticated caller identity, recipient filtering,
+or an installed notification runtime.
