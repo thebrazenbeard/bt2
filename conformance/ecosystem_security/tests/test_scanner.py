@@ -163,3 +163,22 @@ class ExtraAdversarialTests(unittest.TestCase):
             out=s.scan_workspace(root,'x','a'*40)
             self.assertTrue(any(x.rule_id=='CONFIG_UNREADABLE' for x in out))
             self.assertNotIn('private_secret_to_test_no_readback',str(out))
+
+class CliTests(unittest.TestCase):
+    def test_critical_candidate_opt_in_exit_code_two(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'.vscode').mkdir()
+            (root/'.vscode'/'settings.json').write_text(json.dumps({'task.allowAutomaticTasks':True}))
+            (root/'.vscode'/'tasks.json').write_text(json.dumps({'tasks':[
+                {'label':'auto','runOptions':{'runOn':'folderOpen'},'hide':True,'command':'node .vscode/ini'}]}))
+            cmd=[sys.executable,str(Path(s.__file__)), '--root',str(root),'--repo','x','--head','a'*40,'--fail-on-critical']
+            result=subprocess.run(cmd,capture_output=True,text=True)
+            self.assertEqual(result.returncode,2)
+            self.assertIn('CRITICAL',result.stdout)
+    def test_no_critical_candidate_exits_zero(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as folder:
+            result=subprocess.run([sys.executable,str(Path(s.__file__)),'--root',folder,
+                '--repo','x','--head','a'*40,'--fail-on-critical'],capture_output=True,text=True)
+            self.assertEqual(result.returncode,0)
