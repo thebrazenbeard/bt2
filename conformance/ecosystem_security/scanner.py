@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import sys
+import subprocess
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,7 @@ from typing import Any
 MAX_CONFIG = 256_000
 MAX_FONT = 2_000_000
 MAX_ADVISORS = 1_000_000
+MAX_ADVISOR_ENTRIES = 4096
 MAGIC = {
     '.ttf': (b'\x00\x01\x00\x00', b'true', b'ttcf', b'OTTO'),
     '.otf': (b'OTTO', b'ttcf'),
@@ -139,8 +141,9 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
     # Some workspaces put an editor task directly in settings rather than tasks.json.
     nested=settings.get('tasks',{})
     if isinstance(nested,dict) and nested.get('runOn')=='folderOpen':
-        command=str(nested.get('command',''))
-        if EXE.search(command):
+        # A direct executable path is as relevant as a familiar interpreter.
+        command=nested.get('command','')
+        if isinstance(command,str) and command.strip():
             out.append(_make(repo,head,'.vscode/settings.json',
                 'EDITOR_SETTINGS_AUTOEXEC','HIGH',
                 'Editor settings contain an executable folderOpen task',raw_settings,
@@ -164,7 +167,15 @@ def scan_workspace(root: Path, repo: str, head: str) -> list[Finding]:
             for cfg in (item,item.get('windows'),item.get('linux'),item.get('osx')):
                 if not isinstance(cfg,dict):continue
                 parts.extend(str(cfg.get(k,'')) for k in ('command','args','type'))
-            executable |= any(EXE.search(part) for part in parts)
+            # VS Code can execute *any* command here, not merely a known interpreter.
+            # The previous interpreter-only regex missed executable scripts, binaries,
+            # and workspace-variable paths. We report execution candidates; a custom
+            # command is not evidence of malicious intent.
+            executable |= any(
+                isinstance(cfg,dict) and isinstance(cfg.get('command'),str)
+                and bool(cfg['command'].strip())
+                for cfg in (item,item.get('windows'),item.get('linux'),item.get('osx'))
+            )
             dep=item.get('dependsOn',[])
             if isinstance(dep,str):dep=[dep]
             if isinstance(dep,list):todo.extend(by_label[x] for x in dep if isinstance(x,str) and x in by_label)
@@ -203,7 +214,10 @@ def scan_advisors(advisors: dict[str,Any], project_alias: str, snapshot_id: str)
     entries=advisors.get('lints',[])
     if not isinstance(entries,list):raise ValueError('ADVISOR_SCHEMA_INVALID')
     result=[]
-    for lint in entries[:200]:
+    # Never silently discard tail security notices. Fail closed if a snapshot
+    # exceeds the bounded all-entry processing budget.
+    if len(entries)>MAX_ADVISOR_ENTRIES:raise ValueError('ADVISOR_ENTRY_LIMIT')
+    for lint in entries:
         if not isinstance(lint,dict):continue
         name=lint.get('name')
         if not isinstance(name,str):continue
@@ -224,7 +238,8 @@ def advisory_gate(findings: list[Finding], budget: int=8) -> dict[str,Any]:
     # Important: owner conflict, a budget, and optimistic model scores cannot erase criticals.
     high=[f for f in findings if f.severity in ('CRITICAL','HIGH')]
     low=[f for f in findings if f.severity not in ('CRITICAL','HIGH')]
-    return {'evidence':'SOURCE_ONLY', 'installed':False, 'actions_allowed':[],
+    return {'evidence':'SOURCE_ONLY', 'source_binding_verified':False,
+            'installed':False, 'actions_allowed':[],
             'critical_review_queue':[asdict(x) for x in high],
             'digest':[asdict(x) for x in low[:budget]],
             'digest_suppressed_count':max(0,len(low)-budget),
@@ -238,7 +253,8 @@ def sarif(findings:list[Finding]) -> dict[str,Any]:
         'results':[{'ruleId':f.rule_id,'level':'error' if f.severity in ('HIGH','CRITICAL') else 'note',
         'message':{'text':f.message},'locations':[{'physicalLocation':{'artifactLocation':{'uri':f.path}}}],
         'properties':{'incident_id':f.incident_id,'severity':f.severity,'independent_revalidation':f.independent_revalidation,
-        'authority':f.authority,'source_digest':f.source_digest}} for f in findings]}]}
+        'authority':f.authority,'source_digest':f.source_digest,
+        'source_binding_verified':False}} for f in findings]}]}
 
 
 def main()->int:
@@ -248,12 +264,27 @@ def main()->int:
     ap.add_argument('--head',required=True)
     ap.add_argument('--format',choices=['json','sarif'],default='json')
     ap.add_argument('--budget',type=int,default=8)
-    ap.add_argument('--fail-on-critical',action='store_true',help='fail CI on source critical candidates; never auto-fix')
+    ap.add_argument('--fail-on-critical',action='store_true',
+                    help='fail CI on critical source candidates or incomplete scans; never auto-fix')
+    ap.add_argument('--require-git-head',action='store_true',
+                    help='require on-disk Git checkout HEAD equals --head (not a full-byte attestation)')
     ap.add_argument('--advisors-snapshot',type=Path,help='sanitized advisor JSON, optional')
     ap.add_argument('--provider-alias',help='nonsecret display alias; required with snapshot')
     a=ap.parse_args()
     if not re.fullmatch(r'[0-9a-f]{40}',a.head):ap.error('--head must be exact 40-char lowercase SHA')
     root=a.root.resolve(strict=True)
+    if a.require_git_head:
+        # This is an additional local identity check, not a GitHub identity,
+        # signed commit, pristine worktree, runtime admission, or TOCTOU proof.
+        try:
+            completed=subprocess.run(
+                ['git','-C',str(root),'rev-parse','--show-toplevel','HEAD'],
+                capture_output=True,text=True,timeout=10,check=True)
+            lines=completed.stdout.strip().splitlines()
+            if len(lines)!=2 or Path(lines[0]).resolve()!=root or lines[1]!=a.head:
+                ap.error('GIT_HEAD_MISMATCH_OR_WRONG_ROOT')
+        except (subprocess.SubprocessError,OSError) as exc:
+            ap.error('GIT_HEAD_UNAVAILABLE: '+type(exc).__name__)
     findings=scan_workspace(root,a.repo,a.head)
     if a.advisors_snapshot:
         if not a.provider_alias or len(a.provider_alias)>64:
@@ -266,6 +297,11 @@ def main()->int:
     result=sarif(findings) if a.format=='sarif' else advisory_gate(findings,a.budget)
     print(json.dumps(result,indent=2,sort_keys=True))
     # CI may gate promotion on unresolved critical source candidates.
-    return 2 if a.fail_on_critical and any(f.severity=='CRITICAL' for f in findings) else 0
+    # Unparseable, oversized and incomplete scans must not silently green-light
+    # CI even if their candidate severity is HIGH rather than CRITICAL.
+    unqualified={'CONFIG_UNREADABLE','DEPENDENCY_CHAIN_LIMIT'}
+    return 2 if a.fail_on_critical and any(
+        f.severity=='CRITICAL' or f.rule_id in unqualified for f in findings
+    ) else 0
 
 if __name__=='__main__':sys.exit(main())
