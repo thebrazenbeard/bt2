@@ -1,0 +1,10 @@
+{
+  "schema": "BT2_AGENT_ASSURANCE_INPUT_V1",
+  "operation": "repair",
+  "proposed_action_id": "codex.repair_pointer",
+  "model_label": "ALLOW",
+  "world_model": {"status": "AGREEMENT_UNQUALIFIED", "grants_effect": false},
+  "recovery": {"status": "PARTIAL_FAILED_TURN", "complete_conversations": 0, "source_rows_verified": true},
+  "skillopt": {"status": "REJECT_CRITICAL_BLOCK_MISS", "critical_block_miss_count": 2},
+  "authority": {"owner_approval_verified": false, "runtime_bound": false}
+}
