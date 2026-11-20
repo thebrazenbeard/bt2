@@ -23,6 +23,13 @@ current observation timestamp and freshly determined access constraints.
 The collector only invokes gh api on a canonical pull and optional CI run,
 with bounded response, 15-second timeout, no shell and no writing.
 It validates repo, PR number, API head, run identity and source URL.
+For an optional PR-specific CI observation, the GitHub workflow run must
+have event `pull_request` and its `pull_requests[]` association must contain
+the exact requested PR number, canonical API PR URL and matching run head
+SHA. Merely sharing a SHA or repository does not establish association.
+Unassociated push-only CI, ambiguous links and fork-head PRs are not
+qualified by this narrow V1 collector; they require a separate, evidence-
+bound source adapter rather than a fabricated PR result.
 Even an authenticated GitHub CLI session is not a signed downstream
 receipt or proof of author/reviewer identity. It prints no token.
 
