@@ -455,6 +455,62 @@ def sarif(findings:list[Finding]) -> dict[str,Any]:
         'source_binding_verified':False}} for f in findings]}]}
 
 
+
+def _verify_tracked_security_bytes(root: Path) -> None:
+    """Cross-check tracked security-source bytes against HEAD, ignoring Git index hints.
+
+    This is a local snapshot consistency check, not remote source authentication,
+    proof of an atomic read, or evidence that execution was safe.
+    """
+    result=subprocess.run(['git','-C',str(root),'ls-tree','-rz','--full-tree','HEAD'],
+        capture_output=True,timeout=15,check=True)
+    if len(result.stdout)>8_000_000:
+        raise ValueError('GIT_TREE_LIST_LIMIT')
+    inspected=0
+    for entry in result.stdout.split(b'\0'):
+        if not entry:
+            continue
+        try:
+            metadata, name=entry.split(b'\t',1)
+            mode, kind, oid=metadata.split(b' ')
+            rel=os.fsdecode(name)
+            parts=Path(rel).parts
+        except (ValueError,UnicodeError):
+            raise ValueError('GIT_TREE_ENTRY_INVALID') from None
+        if not parts or Path(rel).is_absolute() or '..' in parts:
+            raise ValueError('GIT_TREE_PATH_INVALID')
+        lower=[part.casefold() for part in parts]
+        if any(part in SKIP_DIRS for part in lower):
+            continue
+        filename=lower[-1]
+        relevant=(
+            '.vscode' in lower or filename=='package.json' or
+            filename.endswith('.code-workspace') or
+            (len(lower)>2 and lower[-3:-1]==['public','fonts']) or
+            (len(lower)>2 and lower[:2]==['.github','workflows']) or
+            lower==['.gitattributes'] or lower[:2]==['conformance','ecosystem_security']
+        )
+        if not relevant:
+            continue
+        inspected+=1
+        if inspected>MAX_SCAN_FILES:
+            raise ValueError('GIT_SECURITY_FILE_LIMIT')
+        path=root.joinpath(*parts)
+        # Reject any symlink, missing source, nonregular entry or unreadable file.
+        cursor=root
+        for part in parts:
+            cursor=cursor/part
+            if cursor.is_symlink():
+                raise ValueError('GIT_SECURITY_SOURCE_SYMLINK')
+        if kind!=b'blob' or mode not in (b'100644',b'100755') or not path.is_file():
+            raise ValueError('GIT_SECURITY_SOURCE_NOT_REGULAR')
+        if path.stat().st_size>2_000_000:
+            raise ValueError('GIT_SECURITY_FILE_OVERSIZE')
+        raw=path.read_bytes()
+        blob=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+        if blob.encode()!=oid:
+            raise ValueError('SOURCE_TREE_TRACKED_BYTES_MISMATCH')
+
 def main()->int:
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--root',type=Path,required=True)
@@ -495,8 +551,9 @@ def main()->int:
                 capture_output=True,text=True,timeout=15,check=True)
             if changed.stdout.strip():
                 ap.error('SOURCE_TREE_DIRTY')
-        except (subprocess.SubprocessError,OSError) as exc:
-            ap.error('SOURCE_TREE_UNVERIFIED: '+type(exc).__name__)
+            _verify_tracked_security_bytes(root)
+        except (subprocess.SubprocessError,OSError,ValueError) as exc:
+            ap.error('SOURCE_TREE_UNVERIFIED: '+str(exc)[:100])
     findings=scan_workspace(root,a.repo,a.head)
     if a.advisors_snapshot:
         if not a.provider_alias or len(a.provider_alias)>64:
