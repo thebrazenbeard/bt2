@@ -1,0 +1,41 @@
+name: BT2 ecosystem security source scan (candidate)
+
+on:
+  pull_request:
+    paths:
+      - '.vscode/**'
+      - 'public/fonts/**'
+      - 'conformance/ecosystem_security/**'
+      - '.github/workflows/ecosystem-security-source.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.vscode/**'
+      - 'public/fonts/**'
+      - 'conformance/ecosystem_security/**'
+      - '.github/workflows/ecosystem-security-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Run isolated Python regression suite (no network clients)
+        run: python3 -m unittest discover -s conformance/ecosystem_security/tests -q
+      - name: Scan checked-out source without running scanned tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          python3 conformance/ecosystem_security/scanner.py \
+            --root . --repo thebrazenbeard/bt2 --head "$SHA" \
+            --budget 4 --fail-on-critical > "$RUNNER_TEMP/ecosystem-security.json"
+          python3 -m json.tool "$RUNNER_TEMP/ecosystem-security.json" > /dev/null
