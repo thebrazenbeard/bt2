@@ -33,6 +33,7 @@ def adapt(findings: Iterable[object], *, repository: str,
     require(len(rows)<=MAX_FINDINGS, "TOO_MANY_FINDINGS_NO_SILENT_TRUNCATION")
     observations=[]
     severe=[]
+    seen_severe=set()
     for i,f in enumerate(rows):
         path,rule,digest,incident,severity=(field(f,k) for k in
             ("path","rule_id","source_digest","incident_id","severity"))
@@ -59,7 +60,8 @@ def adapt(findings: Iterable[object], *, repository: str,
             "source_ref":f"https://github.com/{repository}/blob/{observed_head}/{quote(path,safe='/._-')}",
             "evidence_class":"SOURCE","claimed_owner":"unverified-scanner",
             "claimed_reviewer":None,"claims_authenticated":False})
-        if severity in ("CRITICAL","HIGH"):
+        if severity in ("CRITICAL","HIGH") and key not in seen_severe:
+            seen_severe.add(key)
             severe.append({"incident_key":key,"severity":severity,
                            "rule":rule,"review_status":"INDEPENDENT_REVALIDATION_REQUIRED"})
     doc={"schema":"BT2_ECOSYSTEM_SIGNAL_INPUT_V1",
