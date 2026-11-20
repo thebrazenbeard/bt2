@@ -282,10 +282,13 @@ def decide_one(s: Signal, c: Context, slots_used: int = 0) -> Decision:
         reasons.append("PROTECTED_EFFECT_REQUIRES_SEPARATE_AUTHORITY")
     if missing:
         reasons.append("MISSING_DEPENDENCY")
+    # Either explicit privacy condition makes the whole decision local-only.
+    # Externally invisible data cannot become public when another flag is absent.
+    private_local = s.contains_private_data or not s.externally_visible
     return Decision(s.fingerprint, s.subject, s.domain, action, priority,
-                    tuple(reasons), s.evidence_refs if not s.contains_private_data else (),
-                    s.concrete_next_step if not s.contains_private_data else "Review privately in authorized scope",
-                    s.owner_lane, s.exact_head, private_subject=s.contains_private_data)
+                    tuple(reasons), s.evidence_refs if not private_local else (),
+                    s.concrete_next_step if not private_local else "Review privately in authorized scope",
+                    s.owner_lane, s.exact_head, private_subject=private_local)
 
 
 def evaluate(signals: Sequence[Signal], context: Context, *, max_scan: int = 40) -> Batch:
