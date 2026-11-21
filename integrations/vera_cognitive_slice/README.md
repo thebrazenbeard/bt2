@@ -19,8 +19,24 @@ A successful check is a time-of-check observation across eight separate GitHub
 requests, **not an atomic cross-repository snapshot**. Source main could move
 immediately afterward; the executed qualification remains bound to exact
 immutable SHA pins, not to the claim that every upstream main stayed still.
-Never auto-update pins as part of the qualification itself. To create an
-isolated checkout set on Lappy:
+Never auto-update pins as part of the qualification itself.
+
+### Proposed current-source refresh (2026-11-21)
+
+A separate candidate, stacked on the editor-safe cognitive integration branch,
+updates the six source commits that moved since the frozen baseline:
+`meso-crct`, `meta`, `personification`, `pre-active`, `semanticatlas`, and
+`semiotics`. `humility` and `volition` retain their existing reviewed commits.
+The proposed exact eight-commit manifest is `source_pins.json`. On isolated
+Lappy source checkouts matching that manifest, the 17 source-bound synthetic
+tests passed without skips; the optional GitHub HEAD diagnostic matched 8/8
+at that point in time. The six changed repositories include security source
+containment and other changes; no claim of semantic equivalence, production
+adoption, real-world effect, or ongoing live currentness follows from these
+tests. A later refresh must rerun the complete qualification and independent
+source-security review, not simply replace SHA strings.
+
+To create an isolated checkout set on Lappy:
 
     python integrations/vera_cognitive_slice/prepare_sources.py --out C:\Temp\bt2-cognitive-source-new
 
