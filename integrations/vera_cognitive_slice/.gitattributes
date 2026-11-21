@@ -1,0 +1,2 @@
+# Pin manifest bytes must remain identical to the committed Git blob on all hosts.
+source_pins.json -text

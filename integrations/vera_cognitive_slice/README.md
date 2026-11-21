@@ -126,6 +126,11 @@ now use this shared gate. A manipulated manifest, symlink, missing Git object,
 invalid commit or pin shape fails before any donor checkout is admitted; a
 changed HEAD cannot reinterpret the captured manifest. Offline tests include
 a real two-commit manifest-swap fixture and a post-load adversarial read.
+`integrations/vera_cognitive_slice/.gitattributes` marks only
+`source_pins.json` as `-text` so Windows Git autocrlf checkout cannot
+rewrite the raw hash-bound bytes. A regression clones a real temporary Git
+repository with `core.autocrlf=true` and asserts committed-byte identity.
+The raw-byte guard remains strict rather than normalizing modified data.
 
 This does not authenticate a malicious Git executable, OS path ancestry,
 an attacker-controlled commit, or the GitHub source release process.

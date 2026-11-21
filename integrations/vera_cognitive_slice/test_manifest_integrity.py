@@ -24,9 +24,14 @@ class PinManifestIntegrityTests(unittest.TestCase):
         shutil.copyfile(Path(qualify.__file__), self.directory / "qualify.py")
         shutil.copyfile(Path(qualify.__file__).with_name("source_pins.json"),
                         self.directory / "source_pins.json")
+        attrs = Path(qualify.__file__).with_name(".gitattributes")
+        if attrs.is_file():
+            shutil.copyfile(attrs, self.directory / ".gitattributes")
         self.git("init", "-q")
         self.git("add", "integrations/vera_cognitive_slice/qualify.py",
                  "integrations/vera_cognitive_slice/source_pins.json")
+        if attrs.is_file():
+            self.git("add", "integrations/vera_cognitive_slice/.gitattributes")
         self.git("-c", "user.name=BT2 Synthetic",
                  "-c", "user.email=synthetic@invalid.local",
                  "commit", "-q", "-m", "frozen trusted manifest")
@@ -51,6 +56,22 @@ class PinManifestIntegrityTests(unittest.TestCase):
         with patch.object(qualify, "__file__", str(self.directory / "qualify.py")):
             with self.assertRaisesRegex(ValueError, "source pin manifest"):
                 qualify._verify_sources(self.fake_sources)
+    def test_autocrlf_checkout_keeps_exact_manifest_bytes(self):
+        with TemporaryDirectory(prefix="bt2-win-checkout-") as work:
+            clone = Path(work) / "checkout"
+            subprocess.run(
+                ["git", "-c", "core.autocrlf=true", "clone", "-q",
+                 str(self.repo), str(clone)],
+                capture_output=True, text=True, timeout=30, check=True,
+            )
+            checked = (clone / "integrations" / "vera_cognitive_slice"
+                       / "source_pins.json").read_bytes()
+            canonical = (self.directory / "source_pins.json").read_bytes()
+            self.assertEqual(
+                checked, canonical,
+                "autocrlf transformed a hash-bound manifest during checkout",
+            )
+
     def test_clean_manifest_reaches_normal_missing_donor_rejection(self):
         with patch.object(qualify, "__file__", str(self.directory / "qualify.py")):
             with self.assertRaisesRegex(ValueError, "missing source checkout"):
