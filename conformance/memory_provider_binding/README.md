@@ -163,3 +163,28 @@ PostgreSQL reference: https://www.postgresql.org/docs/current/sql-createfunction
 Supabase function guidance: https://supabase.com/docs/guides/database/functions
 Raw metadata remains in the authorized private host receipt folder,
 never in GitHub. Neither the probe nor this change alters the database.
+
+## November 21, 2026: implicit temporary-schema precedence correction
+
+The preceding source revision's accepted values (`search_path=` and
+`search_path=pg_catalog`) were **too permissive** for a SECURITY DEFINER
+search-path safeguard. PostgreSQL documents that when `pg_temp` is omitted,
+the temporary schema is searched first for relations and types, even before
+`pg_catalog`. A source metadata label must not silently treat that as a
+complete restricted lookup path. This corrects and supersedes the earlier
+accepted-value description, without rewriting the historical evidence.
+
+The bounded metadata check now recognizes only exact `pg_catalog,pg_temp`
+(with or without the space after comma). It rejects the empty setting,
+`pg_catalog` alone, additional schemas, a missing setting, and conflicting
+multiple search-path settings. This is conservative **review triage**, not
+a certificate that a function body or its callers are safe. An exact path
+label does not establish actual temporary-object usage, schema trust,
+provider identity, or RLS policy correctness.
+
+Primary PostgreSQL references:
+https://www.postgresql.org/docs/current/runtime-config-client.html
+https://www.postgresql.org/docs/current/sql-createfunction.html
+
+The associated synthetic source test was RED on the preceding PR head;
+no production functions, schema settings or grants are altered by this fix.

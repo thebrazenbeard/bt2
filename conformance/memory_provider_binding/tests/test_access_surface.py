@@ -74,9 +74,21 @@ class ProviderAccessHostile(unittest.TestCase):
         self.assertNotIn("LIKE 'search_path=pg_catalog%'",functions)
         self.assertIn("bool_and",functions)
         self.assertIn("unnest(p.proconfig)",functions)
-        self.assertIn("'search_path=pg_catalog'",functions)
+        self.assertNotIn("'search_path=pg_catalog',",functions)
+        self.assertIn("'search_path=pg_catalog, pg_temp'",functions)
         self.assertIn("'search_path=pg_catalog,pg_temp'",functions)
         self.assertNotIn("'search_path=pg_catalog,public'",functions)
+
+    def test_implicit_pg_temp_precedence_must_not_be_marked_limited(self):
+        # PostgreSQL searches pg_temp first for relations when omitted,
+        # even when pg_catalog appears in the explicit search_path.
+        sql=(Path(__file__).resolve().parents[1] / "provider_access_probe.sql").read_text(encoding="utf-8")
+        fn_cte=sql.split("fn AS (",1)[1].split("),\nsch AS",1)[0]
+        for unsafe in ("'search_path='","'search_path=pg_catalog'"):
+            with self.subTest(unsafe=unsafe):
+                self.assertNotIn(unsafe+",",fn_cte)
+        self.assertIn("'search_path=pg_catalog,pg_temp'",fn_cte)
+        self.assertIn("'search_path=pg_catalog, pg_temp'",fn_cte)
 
     def test_noncanonical_definer_path_is_hold_even_when_client_create_denied(self):
         data=snapshot()

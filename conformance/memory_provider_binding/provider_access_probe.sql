@@ -27,8 +27,6 @@ fn AS (
         has_function_privilege('authenticated',p.oid,'EXECUTE') AS authenticated_execute,
         COALESCE((
           SELECT bool_and(cfg.entry IN (
-            'search_path=',
-            'search_path=pg_catalog',
             'search_path=pg_catalog,pg_temp',
             'search_path=pg_catalog, pg_temp'
           ))
