@@ -1,0 +1,23 @@
+{
+  "currentness": "UNVERIFIED_AFTER_RETRIEVAL",
+  "effect_class": "SOURCE_INSPECTION_ONLY",
+  "schema": "BT2_MEMORY_PROVIDER_SOURCE_BINDINGS_V1",
+  "source_snapshot": {
+    "thebrazenbeard/bt2": {
+      "contract_path": "conformance/memory_lifecycle/README.md",
+      "head": "49c9c24387d12dbfa5c5f03ff789df2fa4a4f042"
+    },
+    "thebrazenbeard/deepmemorystorage": {
+      "contract_path": "architecture/DEEP_MEMORY_INTEGRATION_CONTRACT_V1.md",
+      "head": "dc4cf8ce6251a3b19d9c098c2807898a59429eba"
+    },
+    "thebrazenbeard/stm": {
+      "contract_path": "docs/architecture.md",
+      "head": "c40431c77e00a9b6b817641d07768d95bdd9c238"
+    },
+    "thebrazenbeard/vera-mono": {
+      "contract_path": "packages/vera_memory/src/vera_memory/ledger.py",
+      "head": "49a779017ded184c22712ec1a0dc7a8b558faf71"
+    }
+  }
+}

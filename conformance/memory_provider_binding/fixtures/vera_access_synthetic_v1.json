@@ -1,0 +1,168 @@
+{
+  "functions": [
+    {
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "name": "vera_memory_epoch_get_status_v1",
+      "schema": "public",
+      "search_path_limited": true,
+      "security_definer": true
+    },
+    {
+      "anon_execute": false,
+      "authenticated_execute": false,
+      "name": "search_current_runtime_objects_v11",
+      "schema": "semantic_atlas",
+      "search_path_limited": true,
+      "security_definer": true
+    }
+  ],
+  "independently_authenticated": true,
+  "observed_at": "2026-11-20T21:00:00Z",
+  "schema": "BT2_MEMORY_PROVIDER_ACCESS_INPUT_V1",
+  "schema_rights": [
+    {
+      "anon_create": false,
+      "anon_usage": true,
+      "authenticated_create": false,
+      "authenticated_usage": true,
+      "schema": "public"
+    },
+    {
+      "anon_create": false,
+      "anon_usage": false,
+      "authenticated_create": false,
+      "authenticated_usage": false,
+      "schema": "semantic_atlas"
+    }
+  ],
+  "source_ref": "synthetic://secure-access-test",
+  "tables": [
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": true,
+      "name": "vera_memory_epoch_subjects_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": true,
+      "name": "vera_memory_epoch_events_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": true,
+      "name": "vera_memory_epoch_provider_receipts_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": true,
+      "name": "vera_memory_epoch_archive_receipts_v1",
+      "rls_enabled": true,
+      "schema": "public"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": false,
+      "name": "runtime_objects",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": false,
+      "name": "runtime_snapshots",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    },
+    {
+      "anon": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "authenticated": {
+        "delete": false,
+        "insert": false,
+        "select": false,
+        "update": false
+      },
+      "force_rls": false,
+      "name": "capture_policy",
+      "rls_enabled": true,
+      "schema": "semantic_atlas"
+    }
+  ]
+}

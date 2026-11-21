@@ -1,0 +1,15 @@
+{
+  "observation_time": "2026-11-20T20:00:00Z",
+  "provider_role": "TATTLER_REVIEW",
+  "relations": [
+    {
+      "kind": "r",
+      "name": "masamune_webhook_delivery",
+      "rls_enabled": true,
+      "schema": "public"
+    }
+  ],
+  "routines": [],
+  "schema": "BT2_MEMORY_PROVIDER_CATALOG_INPUT_V1",
+  "source_ref": "synthetic://provider-catalog/tattler"
+}

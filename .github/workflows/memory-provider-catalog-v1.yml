@@ -1,0 +1,55 @@
+name: Memory provider catalog conformance (metadata-only)
+on:
+  pull_request:
+    paths:
+      - 'conformance/memory_provider_binding/**'
+      - '.github/workflows/memory-provider-catalog-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-source-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 pinned
+        with:
+          persist-credentials: false
+      - name: Run deterministic synthetic metadata-negative tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m unittest discover -s conformance/memory_provider_binding/tests -p 'test_*.py' -v
+          python3 conformance/memory_provider_binding/provider_catalog.py conformance/memory_provider_binding/fixtures/vera_synthetic.json > /tmp/vera-catalog.json
+          python3 conformance/memory_provider_binding/provider_catalog.py conformance/memory_provider_binding/fixtures/tattler_synthetic.json > /tmp/tattler-catalog.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          vera=json.loads(Path('/tmp/vera-catalog.json').read_text())
+          tattler=json.loads(Path('/tmp/tattler-catalog.json').read_text())
+          assert vera['verdict']=='CATALOG_PRESENT_UNQUALIFIED'
+          assert tattler['verdict']=='NOT_APPLICABLE_REVIEW_PROVIDER'
+          for result in (vera,tattler):
+              assert result['independently_authenticated'] is False
+              assert result['runtime_currentness']=='UNKNOWN_NOT_PROBED'
+              assert result['memory_read']=='NONE'
+              assert result['memory_admission']=='NONE'
+              assert result['release_authorization']=='NONE'
+              assert result['side_effects']==[]
+          print('MEMORY_PROVIDER_METADATA_SOURCE_ONLY_PASS')
+          PY
+          python3 conformance/memory_provider_binding/provider_access.py conformance/memory_provider_binding/fixtures/vera_access_synthetic_v1.json > /tmp/memory-access.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          access=json.loads(Path('/tmp/memory-access.json').read_text())
+          assert access['schema']=='BT2_MEMORY_PROVIDER_ACCESS_OUTPUT_V1'
+          assert access['verdict']=='ACCESS_SURFACE_RESTRICTED_UNQUALIFIED'
+          assert access['independently_authenticated'] is False
+          assert access['provider_authentication']=='UNKNOWN_NOT_INDEPENDENTLY_VERIFIED'
+          assert access['memory_read']=='NONE'
+          assert access['memory_admission']=='NONE'
+          assert access['release_authorization']=='NONE'
+          assert access['side_effects']==[]
+          print('MEMORY_PROVIDER_ACCESS_NEGATIVE_CI_PASS')
+          PY
