@@ -1,7 +1,7 @@
 # Engineer B — GitHub provider ingestion and semantic exchange
 
 State: SOURCE-ONLY TESTABLE CANDIDATE, NOT INSTALLED. Stacked on Draft
-BT2 PR123 HEAD 3449ce3a94084722454345485cc12a10f0c91883.
+BT2 PR123 HEAD 161ae030705fc6373774c57c4fc1b9d6ece8f788 (reconciled main).
 BT2 owns decisions; Engineer A owns scanner PR125. This package does not
 alter A code, BT2 governor, source memory, or any host service.
 
@@ -109,3 +109,6 @@ the separate provider-catalog contract, stacked on PR124 memory lifecycle.
 No Supabase DDL/DML, private rows, credentials, memory imports,
 GitHub main merge, service activation, notification or publication
 of private material is performed by this package.
+## Current stacked-source reconciliation (Nov 20 2026)
+
+The historical GitHub and semantic receipts above remain tied to their original SHA snapshots. PR #123 was later reconciled with BT2 main `7aed3b589a8a8f5370a0fe838d1ec571f1358346` through a two-parent source-only merge. Its current verified remote head is `161ae030705fc6373774c57c4fc1b9d6ece8f788`. PR #128 now merges that exact parent without rewriting original evidence or modifying Engineer A's branch. This changes source ancestry and test coverage, not authenticated provider trust, durable replay protection, or release permission.
