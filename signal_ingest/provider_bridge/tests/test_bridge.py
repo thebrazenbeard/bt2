@@ -261,5 +261,86 @@ class ProviderBridgeHostile(unittest.TestCase):
         self.assertFalse(outcome["signal"]["release_permission"])
 
 
+    def test_23_history_detects_old_event_id_after_empty_middle(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_history
+        first = packet()
+        middle = packet()
+        middle["receipts"] = []
+        middle["seen_receipt_digests"] = bridge(first)["next_seen_receipt_digests"]
+        middle["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        third = packet()
+        third["seen_receipt_digests"] = bridge(middle)["next_seen_receipt_digests"]
+        third["snapshot"]["observed_at"] = "2026-11-20T21:32:00Z"
+        third["receipts"][0]["observed_at"] = "2026-11-20T21:31:30Z"
+        third["receipts"][0]["status"] = "PASSED"
+        # Legacy two-document helper still cannot detect the A -> C
+        # event-ID equivocation after empty B; the full supplied history can.
+        from signal_ingest.provider_bridge.v1 import bridge_with_predecessor
+        assert bridge_with_predecessor(middle, third)["memory_admission"] == "NONE"
+        with self.assertRaisesRegex(BridgeError, "MULTIBATCH_EVENT_ID_CONFLICT"):
+            bridge_with_history([first, middle], third)
+
+    def test_24_history_valid_three_documents_exact_v1_output(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_history
+        first = packet()
+        middle = packet()
+        middle["receipts"] = []
+        middle["seen_receipt_digests"] = bridge(first)["next_seen_receipt_digests"]
+        middle["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        third = packet()
+        third["snapshot"]["observed_at"] = "2026-11-20T21:32:00Z"
+        third["seen_receipt_digests"] = bridge(middle)["next_seen_receipt_digests"]
+        third["receipts"][0]["event_id"] = "ci-third"
+        third["receipts"][0]["incident_key"] = "new-incident-302"
+        third["receipts"][0]["source_ref"] = "https://github.com/example/app/actions/runs/302"
+        third["receipts"][0]["observed_at"] = "2026-11-20T21:31:30Z"
+        actual = bridge_with_history([first, middle], third)
+        self.assertEqual(actual, bridge(third))
+        self.assertEqual(len(actual["accepted_receipt_digests"]), 1)
+        self.assertEqual(actual["memory_admission"], "NONE")
+        self.assertFalse(actual["independently_authenticated"])
+        self.assertFalse(actual["signal"]["release_permission"])
+
+    def test_25_history_rejects_omitted_or_reordered_middle(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_history
+        first = packet()
+        middle = packet()
+        middle["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        middle["seen_receipt_digests"] = bridge(first)["next_seen_receipt_digests"]
+        final = packet()
+        final["snapshot"]["observed_at"] = "2026-11-20T21:32:00Z"
+        final["seen_receipt_digests"] = bridge(middle)["next_seen_receipt_digests"]
+        with self.assertRaisesRegex(BridgeError,"MULTIBATCH_HISTORY_REQUIRED"):
+            bridge_with_history([], final)
+        with self.assertRaisesRegex(BridgeError,"CROSS_BATCH_SNAPSHOT_CLOCK_ROLLBACK"):
+            bridge_with_history([middle, first], final)
+
+    def test_26_history_cap_rejects_unbounded_caller_chain(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_history
+        doc = packet()
+        with self.assertRaisesRegex(BridgeError,"MULTIBATCH_HISTORY_BOUNDS"):
+            bridge_with_history([doc]*9, doc)
+        with self.assertRaisesRegex(BridgeError,"MULTIBATCH_HISTORY_REQUIRED"):
+            bridge_with_history(None, doc)
+
+    def test_27_consistently_forged_history_does_not_gain_authentication(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_history
+        forged_first = packet()
+        forged_first["receipts"][0]["status"] = "PASSED"
+        forged_middle = packet()
+        forged_middle["receipts"] = []
+        forged_middle["seen_receipt_digests"] = bridge(forged_first)["next_seen_receipt_digests"]
+        forged_middle["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        forged_final = packet()
+        forged_final["receipts"] = []
+        forged_final["seen_receipt_digests"] = bridge(forged_middle)["next_seen_receipt_digests"]
+        forged_final["snapshot"]["observed_at"] = "2026-11-20T21:32:00Z"
+        result = bridge_with_history([forged_first, forged_middle], forged_final)
+        self.assertFalse(result["independently_authenticated"])
+        self.assertEqual(result["source_authentication"], "UNVERIFIED_NO_SIGNED_RECEIPT")
+        self.assertEqual(result["memory_admission"], "NONE")
+        self.assertEqual(result["side_effects"], [])
+
+
 if __name__=="__main__":
     unittest.main()

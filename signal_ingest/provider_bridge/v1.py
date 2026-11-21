@@ -232,6 +232,35 @@ def bridge_with_predecessor(previous: dict, current: dict) -> dict:
     return following
 
 
+def bridge_with_history(history: list[dict], current: dict) -> dict:
+    """Opt-in bounded consistency check across ALL supplied prior documents.
+
+    These documents and their event IDs remain caller-controlled. This
+    is neither an authenticated history provider nor a persistent ledger:
+    replacing the whole supplied chain can still pass. Existing V1 source
+    output and authority limits are preserved without side effects.
+    """
+    require(type(history) is list and bool(history),
+            "MULTIBATCH_HISTORY_REQUIRED")
+    require(len(history) <= 8, "MULTIBATCH_HISTORY_BOUNDS")
+    # Check every adjacency, not just last->current. The original bridge
+    # validates each document's canonical timestamps, subjects and receipts.
+    for previous, successor in zip(history, history[1:]):
+        bridge_with_predecessor(previous, successor)
+    output = bridge_with_predecessor(history[-1], current)
+    # Digests alone do not preserve event-ID attribution across an empty
+    # middle batch. Check each original event ID against ALL supplied steps.
+    all_ids = {}
+    for document in [*history, current]:
+        for receipt in document["receipts"]:
+            digest = sha256(canonical(receipt)).hexdigest()
+            old = all_ids.get(receipt["event_id"])
+            require(old is None or old == digest,
+                    "MULTIBATCH_EVENT_ID_CONFLICT")
+            all_ids[receipt["event_id"]] = digest
+    return output
+
+
 def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict:
     out = {}
     for key,value in pairs:

@@ -237,3 +237,41 @@ training or production activation was added. Review this as a
 source-only adjacent-batch consistency improvement, and preserve
 the three-batch falsifier as a release blocker for any claimed
 persistent replay or autobiographical continuity.
+
+
+## 2026-11-21 — opt-in bounded multi-batch source consistency
+
+The prior two-document `bridge_with_predecessor` can miss an event ID
+that appears in A, disappears from B's report list (while its digest
+remains in the caller's seen cache), then reappears with changed
+contents in C. The earlier three-batch negative control demonstrated
+this gap. This turn adds `bridge_with_history(history, current)` as
+a **separate optional, pure source-only** check; no original V1
+bridge behavior, field, adapter, provider or consumer is changed.
+
+It accepts **1–8 explicitly caller-supplied predecessor documents**,
+validates every adjacency using the existing two-batch helper
+(including snapshot ordering and digest continuity), then refuses
+a repeated event ID whose canonical report digest differs anywhere
+in the *supplied* chain. For a valid chain, it returns **exactly**
+`bridge(current)` unchanged. It never claims persistent independent
+authentication, trusted timestamps, action permission, or
+memory admission.
+
+Five new TDD fixtures initially RED due to the missing function,
+then GREEN: previously invisible A/B/C event-ID substitution;
+valid three-batch newest-report and exact V1 output; empty,
+malordered or over-eight history; and a deliberately **passing**
+fully fabricated but self-consistent sequence whose resulting
+authentication, memory and permission status all remain negative.
+The original two-batch negative test remains a meaningful expected
+limitation of that earlier API.
+
+**Unresolved falsifier:** If the caller omits an entire historical
+batch, supplies a manufactured history, or reuses an older event
+ID outside the bounded eight-document window, this function cannot
+establish authenticity or detect it. A host-owned independently
+authenticated durable history/checkpoint and real producer identity
+are needed before claims about persistent replay safety or Vera
+continuity. The method is **not** installed into Radar/Bus or
+memory admission; PR remains source research only.
