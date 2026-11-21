@@ -107,12 +107,16 @@ production conversational improvement is unproven.
 
 ### Execution-byte binding (source-only candidate)
 
-The read-only advisory now resolves the immutable Git HEAD tree blob for its
-own `qualify.py` and for the pinned Humility `humility/core.py` immediately
-before loading. The exact bytes compiled are checked against those committed
-blob IDs. A source file exchanged after the initial eight-checkout verification
-is refused rather than executed; an absent or malformed binding fails closed.
-Synthetic unit and post-verification swap tests exercise this boundary.
+The read-only advisory captures its own Git commit before executing
+`qualify.py`, then resolves the exact blob in that captured tree. After the
+eight-source verification, Humility's `core.py` blob is resolved using the
+already-verified exact Humility commit returned by the guard, **not** a new
+mutable `HEAD` lookup. The exact bytes compiled are checked against those
+committed blob IDs. A source file exchanged after verification, or an upstream
+checkout HEAD moved to another valid commit between verification and execution,
+cannot redefine the expected blob. Missing or malformed bindings fail closed.
+Synthetic unit tests cover swaps, and a real offline two-commit Git repository
+exercises the moved-HEAD case.
 
 This closes the verified-to-executed byte gap at these two module loads; it
 does not authenticate a malicious Git executable, OS path ancestry, an
