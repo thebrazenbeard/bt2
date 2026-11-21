@@ -179,3 +179,32 @@ untyped caller values; adapters must validate source inputs and construct
 the documented types without granting any new authority. Correct types do
 not authenticate a source, owner, evidence, dependency, recipient, or
 currentness backend. All decisions remain read-only proposals, not effects.
+
+
+## Exact-incident conflicts fail closed (2026-11-21)
+
+Previously the governor grouped reports with identical
+(fingerprint, subject, exact_head) by first-arrival-wins. If two reports
+disagreed on severity, trust assertion, visibility or release inputs,
+reversing the input order could silently change a severe notification
+proposal to stay_silent or vice versa. Exact incident IDs are not
+sufficient proof that the reports' claims are equivalent.
+
+The governor now groups same-incident reports before evaluation. It
+coalesces a benign duplicate only if all policy-relevant fields match
+and both reporter IDs have the same membership in the operator-supplied
+verified_signal_ids set. IDs and evidence-reference locations may differ
+for benign duplicates; their representative is chosen by stable ordering
+rather than arrival order. Conflicting reports produce one private
+review-only DRAFT with a constant priority zero and
+EXACT_INCIDENT_CONFLICT reason. No public Decision is generated,
+even if each conflicting source claims public visibility. The existing
+internal coalesced-ID audit field is preserved, with deterministic IDs;
+it remains private and must not be serialized as a public Batch.
+
+This is deliberately conservative. An adversary who can inject an
+equal-incident report may block a public proposal by forcing a conflict.
+The remedy is independent authenticated provider and incident admission,
+not silently trusting the higher-scored report. Source authentication,
+recipient permission, release qualification, runtime monitoring,
+notifier delivery and qualified Lantern currentness are still absent.

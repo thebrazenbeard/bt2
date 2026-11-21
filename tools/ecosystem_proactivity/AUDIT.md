@@ -209,3 +209,37 @@ be explicitly vetted and converted under a separate authenticated owner
 contract, never silently promoted into trusted state. No notifier,
 scheduler, qualified Lantern backend, memory admission, external
 publication or live execution has been installed by this code.
+
+
+## Exact-incident first-input-wins source finding and quarantine (2026-11-21)
+
+Reviewed exact canonical BT2 main source
+1225db13202a5c0aee58cabff68b715e534c4631. Engineer A independently
+reproduced an order-dependent same-incident suppression defect and
+reported it on BT2 PR137 and Bus #423. We re-established red on an
+isolated exact-head Lappy clone: six first-round tests, five failures,
+one distinct-incident collision control passing. A low-score unverified
+report before a severe verified report yielded stay_silent; reversing
+the order yielded notify. These are model-evaluated source proposals,
+not real notifications or runtime leaks.
+
+A local implementation grouped exact incident reports and compared
+all decision-relevant Signal dataclass fields except reporter ID and
+evidence-reference location; reporter ID verification-membership must
+also agree. Exact-key discrepancies quarantine into a fixed private
+DRAFT (zero priority; no public projection, external effects false).
+A benign duplicate retains the existing report coalescing behavior with
+deterministic representative. Extended seven-test suite verified
+all three-report permutations. The first implementation erroneously
+removed conflicting coalesced IDs from the internal audit field and
+caused three full-suite regression failures; we preserved the existing
+internal audit contract and the full suite returned green. The
+conflict status is recorded on the internal Decision reason, never as
+authenticated evidence.
+
+Evidence: focused 7/7, full 110/110 normal and optimized locally.
+Exact-head CI and independent review of this new repair remain separate
+gates. Negative assurance: an untrusted conflicting report can force
+review hold, so this is not an authenticated event resolution system.
+No live provider, notifier, scheduler, memory, source-currentness,
+recipient permission, branch protection or deployment was changed.
