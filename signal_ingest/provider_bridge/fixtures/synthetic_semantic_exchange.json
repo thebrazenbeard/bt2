@@ -1,0 +1,63 @@
+{
+  "empathy": {
+    "authority": "NONE",
+    "confidence_band": "HIGH_SCORE",
+    "consumer": "RESPONSE_POLICY_ONLY",
+    "effect_authority": false,
+    "focus_needed": false,
+    "persistence": "EPHEMERAL",
+    "policy": "PRESERVE_PLAY",
+    "reason_code": "CURRENT_MUTUAL_UPTAKE",
+    "schema": "EMPATHY_RESPONSE_POLICY_HINT_V1",
+    "superseded_hypothesis_ids": [],
+    "supporting_evidence_ids": [
+      "ev_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    ],
+    "volition_want_authority": false
+  },
+  "schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_INPUT_V1",
+  "source": {
+    "empathy_head": "dddddddddddddddddddddddddddddddddddddddd",
+    "empathy_ref": "https://github.com/thebrazenbeard/empathy/blob/dddddddddddddddddddddddddddddddddddddddd/empathy_research/integration_contract.py",
+    "empathy_repository": "thebrazenbeard/empathy",
+    "evidence_class": "SOURCE",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "repository": "thebrazenbeard/semanticatlas",
+    "source_ref": "https://github.com/thebrazenbeard/semanticatlas/blob/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/schemas/semantic_atlas_v0.1.schema.json",
+    "surface": "RESEARCH_STAGING",
+    "vsns_head": "cccccccccccccccccccccccccccccccccccccccc",
+    "vsns_ref": "https://github.com/thebrazenbeard/vera/blob/cccccccccccccccccccccccccccccccccccccccc/runtime_cohesion/vsns_reception.py",
+    "vsns_repository": "thebrazenbeard/vera"
+  },
+  "vsns": {
+    "action_effect": "NONE",
+    "authority_effect": "NONE",
+    "behavioral_qualification": "NOT_ESTABLISHED",
+    "calibration": "DETERMINISTIC_HEURISTIC_NOT_EMPIRICALLY_VALIDATED",
+    "candidates": [
+      {
+        "boundary_tension": 0.95,
+        "claimed_evidence_class": "SYNTHETIC_TEST",
+        "domain": "RELATIONAL",
+        "evidence_origin_trust": "UNVERIFIED_CALLER_ASSERTION",
+        "meaning_id": "salience.test",
+        "salience": 0.98,
+        "semantic_relevance": 0.99,
+        "uncertainty": 0.1
+      }
+    ],
+    "claim_ceiling": "SEMANTIC_SALIENCE_ADVISORY_ONLY",
+    "consent_effect": "NONE",
+    "decision_effect": "NONE",
+    "event_class": "PROPOSED_ONLY",
+    "identity_effect": "NONE",
+    "interpretation_status": "SINGLE_CANDIDATE_UNVERIFIED",
+    "interrupt_suggested": true,
+    "memory_admission_effect": "NONE",
+    "phenomenology": "UNRESOLVED",
+    "provider_currentness": "UNVERIFIED",
+    "reality_layer": "CONVERSATIONAL_SYMBOLIC",
+    "schema": "VERA_VSNS_RECEPTION_RESULT_V0_1",
+    "speech_act": "SHARING"
+  }
+}

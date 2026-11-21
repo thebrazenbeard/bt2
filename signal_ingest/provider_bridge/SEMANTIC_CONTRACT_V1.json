@@ -1,0 +1,32 @@
+{
+  "boundaries": [
+    "high VSNS salience is an attention heuristic, not evidence of truth",
+    "Empathy response policy is ephemeral and not consent or volition",
+    "Semantic Atlas staging is not canonical adjudication",
+    "source repo and head string is NOT independently authenticated",
+    "no automatic write to STM, DeepMemoryStorage, vera-mono or Supabase",
+    "source heads for all three repos are preserved, but freshness/authentication requires live provider readback"
+  ],
+  "fixed_output_effects": {
+    "action_authority": "NONE",
+    "autobiographical_admission": "NONE",
+    "consent": "NOT_GRANTED",
+    "identity_assertion": "NONE",
+    "independently_authenticated": false,
+    "memory_admission": "NONE",
+    "phenomenology": "UNRESOLVED",
+    "side_effects": [],
+    "truth": "NOT_DETERMINED"
+  },
+  "input_schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_INPUT_V1",
+  "inputs": {
+    "empathy": "EMPATHY_RESPONSE_POLICY_HINT_V1 typed ephemeral hint",
+    "private_person_ids": "FORBIDDEN",
+    "raw_utterances": "FORBIDDEN",
+    "source": "three independent EXACT DECLARED pinned GitHub source locators for Semantic Atlas, VSNS Vera and Empathy; no signed receipt",
+    "vsns": "VERA_VSNS_RECEPTION_RESULT_V0_1 typed advisory, 1..8 candidates"
+  },
+  "output_meaning_ids": "response-local candidate_1..candidate_8 aliases in input order, never raw caller meaning_id or reversible/guessable digest, not stable across sessions",
+  "output_schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_OUTPUT_V1",
+  "schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_CONTRACT_V1"
+}
