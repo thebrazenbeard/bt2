@@ -183,8 +183,15 @@ class Decision:
     private_subject: bool = False
 
     def public_record(self):
-        """A structural summary: never expose private refs/next-step or source text."""
-        return {"fingerprint": "" if self.private_subject else self.fingerprint, "domain": self.domain,
+        """Public projection only; private Decisions get a constant sentinel.
+
+        Masking the fingerprint alone leaks a private classification through
+        domain, priority, action and reason codes. Those fields are never
+        included for private/local-only Decisions.
+        """
+        if self.private_subject:
+            return {"redacted": True, "effect_authority": False, "emitted": False}
+        return {"fingerprint": self.fingerprint, "domain": self.domain,
                 "action": self.action.value, "priority": self.priority,
                 "reason_codes": list(self.reasons), "effect_authority": False,
                 "emitted": False}

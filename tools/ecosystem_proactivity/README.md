@@ -106,3 +106,26 @@ proposal and the governor has no authenticated recipient, active monitor,
 notification emitter, qualified runtime currentness or memory admission.
 Use Batch.public_record() only when the caller has independently
 established the public classification; never serialize the raw Batch.
+
+
+## Private individual Decision projection (2026-11-20)
+
+Decision.public_record() is now fail-closed for a private/local-only
+Decision. It returns the same fixed redaction marker regardless of that
+Decision's action, domain, priority, reason codes, subject, source head or
+other metadata. Masking only the fingerprint was not sufficient: a direct
+caller could learn or publish private classification details through the
+remaining fields, even though Batch.public_record() filtered private
+Decisions out correctly.
+
+The untrusted B dry-run ingress remains an INTERNAL local-review interface,
+not a public transport. It now explicitly returns only an empty fingerprint
+and draft/stay_silent action per private proposal, without calling
+Decision.public_record() or disclosing private domain, priority or reasons.
+This does NOT authorize sending that local review to others. The returned
+reviewed_count and action may themselves reveal that a caller submitted a
+proposal; handle within the already authorized local review scope. For public
+exposure use the conservative Batch.public_record() boundary, not a raw
+Batch or the B dry-run record. Upstream privacy classification is still
+a caller claim, not independent authentication, and Lantern live currentness
+is UNKNOWN.
