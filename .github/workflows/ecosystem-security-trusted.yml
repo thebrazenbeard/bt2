@@ -1,0 +1,82 @@
+# This workflow executes code from the trusted BASE checkout only.
+# The PR source checkout is INPUT DATA; never run a shell, installer, build or
+# test module from it. Once merged into main, pull_request_target uses the
+# base-branch workflow definition, not the PR's modified workflow file.
+#
+# This does not configure protected-branch required checks or authenticate the
+# PR author's intentions, and it is not a complete malware/code audit.
+name: BT2 trusted-base ecosystem source gate
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  trusted-base-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout trusted base policy (no persisted token)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .trusted
+          persist-credentials: false
+          submodules: false
+          lfs: false
+      - name: Checkout untrusted PR source strictly as data
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: .candidate
+          persist-credentials: false
+          submodules: false
+          lfs: false
+      - name: Verify exact base and candidate source identities
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          set -euo pipefail
+          [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$HEAD_REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          test "$(git -C .trusted rev-parse HEAD)" = "$BASE_SHA"
+          test "$(git -C .candidate rev-parse HEAD)" = "$HEAD_SHA"
+      - name: Protect trusted executable policy from PR replacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Fail closed when a PR replaces any workflow or source security
+          # implementation/test path. Changes need separately authorized
+          # policy-owner review and ruleset handling, not self-approval.
+          for path in .github/workflows conformance/ecosystem_security; do
+            expected="$(git -C .trusted rev-parse "HEAD:$path")"
+            actual="$(git -C .candidate rev-parse "HEAD:$path" 2>/dev/null || true)"
+            if [[ "$expected" != "$actual" ]]; then
+              echo "::error::Candidate attempts to change trusted security policy: $path"
+              exit 2
+            fi
+          done
+      - name: Exercise scanner tests from trusted base ONLY
+        working-directory: .trusted
+        run: python3 -m unittest discover -s conformance/ecosystem_security/tests -q
+      - name: Scan candidate source without executing its code
+        shell: bash
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          set -euo pipefail
+          test "$(git -C .candidate rev-parse HEAD)" = "$HEAD_SHA"
+          python3 .trusted/conformance/ecosystem_security/scanner.py \
+            --root .candidate --repo "$HEAD_REPO" --head "$HEAD_SHA" \
+            --fail-on-high --require-git-head --require-clean-source \
+            --format json > "$RUNNER_TEMP/verified-source-findings.json"
+          python3 -m json.tool "$RUNNER_TEMP/verified-source-findings.json" >/dev/null
