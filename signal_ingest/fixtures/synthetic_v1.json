@@ -1,0 +1,168 @@
+{
+  "observations": [
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "CI",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "run-fail",
+      "incident_key": "rfb-input-frame",
+      "kind": "CI_RESULT",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/app/actions/runs/21",
+      "status": "FAILED",
+      "subject": "pr:101"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "BUS_REPORT",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "bus-same-failure",
+      "incident_key": "rfb-input-frame",
+      "kind": "COORDINATION",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/bus/issues/423#issuecomment-1",
+      "status": "DUPLICATE_ALERT",
+      "subject": "pr:101"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "CI",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "id": "old-ci",
+      "incident_key": "previous-ci-failure",
+      "kind": "CI_RESULT",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/app/actions/runs/19",
+      "status": "FAILED",
+      "subject": "pr:101"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "SOURCE",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "head-change",
+      "incident_key": "head-moved",
+      "kind": "PR_HEAD_CHANGE",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "previous_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/app/pull/101",
+      "status": "CHANGED",
+      "subject": "pr:101"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "CI",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "ci-green",
+      "incident_key": "passing-workflow",
+      "kind": "CI_RESULT",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/app/actions/runs/22",
+      "status": "PASSED",
+      "subject": "pr:101"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": true,
+      "evidence_class": "BUS_REPORT",
+      "head": null,
+      "id": "lantern-status",
+      "incident_key": "lantern-claim",
+      "kind": "RUNTIME_GAP",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/bt2",
+      "source_ref": "https://github.com/example/bt2/issues/200",
+      "status": "REPORTED_QUALIFIED",
+      "subject": "lantern"
+    },
+    {
+      "claimed_owner": "trusted-owner",
+      "claimed_reviewer": "reviewer-A",
+      "claims_authenticated": true,
+      "evidence_class": "BUS_REPORT",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "spoofed-review",
+      "incident_key": "spoofed-review",
+      "kind": "COORDINATION",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/bt2",
+      "source_ref": "https://github.com/example/bt2/issues/200",
+      "status": "REVIEW_PENDING",
+      "subject": "pr:200"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "DEPENDENCY_REPORT",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "id": "security-change",
+      "incident_key": "dependency-drift",
+      "kind": "SECURITY_DEPENDENCY_CHANGE",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/bt2",
+      "source_ref": "https://github.com/example/bt2/security/advisories/GHSA-123",
+      "status": "INVALIDATED",
+      "subject": "pr:200"
+    },
+    {
+      "claimed_owner": "untrusted-reporter",
+      "claimed_reviewer": null,
+      "claims_authenticated": false,
+      "evidence_class": "BUS_REPORT",
+      "head": null,
+      "id": "missing-host",
+      "incident_key": "missing-lantern",
+      "kind": "RUNTIME_GAP",
+      "observed_at": "2026-11-20T18:25:00Z",
+      "repository": "example/bt2",
+      "source_ref": "https://github.com/example/bt2/issues/201",
+      "status": "MISSING",
+      "subject": "lantern"
+    }
+  ],
+  "schema": "BT2_ECOSYSTEM_SIGNAL_INPUT_V1",
+  "snapshot": {
+    "host_access_cutoff": "2026-11-20T18:00:00Z",
+    "observed_at": "2026-11-20T18:30:00Z",
+    "subjects": [
+      {
+        "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "reported_runtime_status": "UNKNOWN",
+        "repository": "example/app",
+        "runtime_required": false,
+        "subject": "pr:101"
+      },
+      {
+        "head": null,
+        "reported_runtime_status": "UNKNOWN",
+        "repository": "example/bt2",
+        "runtime_required": true,
+        "subject": "lantern"
+      },
+      {
+        "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "reported_runtime_status": "UNKNOWN",
+        "repository": "example/bt2",
+        "runtime_required": false,
+        "subject": "pr:200"
+      }
+    ]
+  }
+}
