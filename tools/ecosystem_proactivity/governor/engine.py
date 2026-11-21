@@ -96,6 +96,23 @@ class Signal:
         )
         if any(type(getattr(self, name)) is not bool for name in boolean_fields):
             raise ValueError("signal boolean flags require actual booleans")
+        # Numeric policy thresholds are discrete. Boolean is a subclass of
+        # int, while fractional values change scoring and urgency semantics.
+        integer_fields = ("freshness_hours", "hours_to_impact",
+                          "severity", "relevance", "actionability", "confidence")
+        if any(type(getattr(self, name)) is not int for name in integer_fields):
+            raise ValueError("signal policy scores and time windows require integers")
+        # Bare strings iterate by character in Python. For release
+        # prerequisites this can falsely satisfy a claimed capability.
+        if type(self.needed_capabilities) is not tuple or any(
+            type(cap) is not str or ISO_KEY.fullmatch(cap) is None
+            for cap in self.needed_capabilities
+        ):
+            raise ValueError("needed capabilities require bounded tuple IDs")
+        if type(self.evidence_refs) is not tuple or type(self.evidence_classes) is not tuple:
+            raise ValueError("evidence containers require tuples")
+        if type(self.concrete_next_step) is not str:
+            raise ValueError("next step requires text")
         if not all(ISO_KEY.fullmatch(v or "") for v in
                    (self.signal_id, self.fingerprint, self.subject, self.cause, self.owner_lane)):
             raise ValueError("invalid non-identifying ID")
@@ -135,6 +152,31 @@ class Context:
     feedback: tuple[tuple[str, str, str, str], ...] = ()  # fingerprint, subject, head, label ACCEPTED|NOISY
 
     def __post_init__(self):
+        # These context fields carry operator policy and alleged independent
+        # trust readbacks. Python permits substring membership against a
+        # plain string: "s1" in "s1" is True. Reject malformed containers
+        # instead of silently promoting a caller's string to an allowlist.
+        set_fields = (
+            "known_observations", "muted_domains", "qualified_capabilities",
+            "verified_head_bindings", "owner_lanes", "verified_signal_ids",
+            "trusted_owner_ack_keys",
+        )
+        if any(type(getattr(self, field_name)) is not frozenset
+               for field_name in set_fields):
+            raise ValueError("context policy sets require frozenset")
+        for field_name in ("muted_domains", "qualified_capabilities",
+                           "owner_lanes", "verified_signal_ids"):
+            if any(type(value) is not str or ISO_KEY.fullmatch(value) is None
+                   for value in getattr(self, field_name)):
+                raise ValueError("context policy set members require valid strings")
+        if any(type(value) is not tuple or len(value) != 2
+               or type(value[0]) is not str or type(value[1]) is not str
+               for value in self.verified_head_bindings):
+            raise ValueError("verified head bindings require subject/head pairs")
+        if type(self.notification_log) is not tuple or type(self.feedback) is not tuple:
+            raise ValueError("context history and feedback require tuples")
+        if type(self.daily_notification_limit) is not int or type(self.same_subject_cooldown_hours) is not int:
+            raise ValueError("context numeric policy limits require integers")
         parse_time(self.now)
         if not 0 <= self.daily_notification_limit <= 3:
             raise ValueError("notification limit 0..3")

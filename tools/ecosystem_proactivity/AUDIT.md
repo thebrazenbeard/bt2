@@ -152,3 +152,60 @@ so it must not be confused with an authenticated externally publishable
 record. Neither API proves privacy classification, source authenticity,
 recipient permission, owner acknowledgment, qualified runtime currentness,
 notification delivery or memory admission. No runtime service activated.
+
+
+## Strict Context trust-type gate regression (2026-11-20)
+
+Original exact BT2 main: a43a1bfd93263c26ba5e337f11e4718b140e1608.
+The governor's Signal flags were typed and visibility was default-private
+after PR134, but the operator Context had type annotations only. Values such
+as verified_signal_ids="s1" and owner_lanes="SECURITY" could satisfy Python
+membership tests because "s1" in "s1" and "SECURITY" in "SECURITY" are True.
+A malformed plain string could therefore bypass expected container
+validation and contribute to a NOTIFY decision when other caller trust
+claims were present. This is a SOURCE input contract failure, not
+evidence of an active emitter or real unauthorized notification.
+
+Six new synthetic test methods ran first on exact source before repair:
+16 assertion failures and two type errors for strings/tuples replacing
+frozen policy sets, mixed-type members, numeric booleans and history
+lists; one valid frozenset control passed. The minimal fix enforces exact
+frozenset/tuple container types, valid string members, subject/head
+pair shape, and integer limits before consulting membership. After
+repair: focused 6/6, full 95/95 normal and 95/95 optimized Python
+source tests passed locally. Same-model tests do not replace Engineer
+A/B independent review, live provider verification, owner signoff or
+runtime qualification. Existing B untrusted ingress continues to
+construct Context with empty trusted sets and no authority.
+
+Old callers may need an explicit separately authorized input-schema
+migration, not a silent conversion of legacy JSON lists into trusted
+runtime facts. No host, scheduling, memory or notification effects.
+
+
+## Signal type admission and release-prerequisite character spoof (2026-11-21)
+
+Prior exact BT2 main: 9d24177bebad09c9720f5338ec202c3c8be6f3a3.
+Context trust containers were hardened in PR136, but Signal policy
+scores/time windows were not checked as true integers. Python accepted
+True/False and fractional floats in score/time comparisons. Signal
+needed_capabilities also permitted bare strings, which Python iterates
+character-by-character. When purported release prerequisite "abc" was
+passed as a string, an unrelated qualified-capability set containing
+a,b,c could make the release dependency appear satisfied. Source
+input-contract flaw, not an observed real released artifact or deployment.
+
+Eight new adversarial synthetic test methods on original exact main were
+RED with 24 assertion failures; one valid typed urgent signal control
+passed. A minimal patch enforces actual integer types for six numeric
+fields, tuple evidence containers, bounded tuple capability IDs and a
+real string next-step. After fix, eight focused tests passed and full
+103/103 normal and optimized source tests passed locally. Same-model
+author/test verification is not independent review or runtime proof.
+
+Intentional fail-closed compatibility break: caller JSON arrays, bare
+strings, boolean/float numeric values and mutable evidence lists must
+be explicitly vetted and converted under a separate authenticated owner
+contract, never silently promoted into trusted state. No notifier,
+scheduler, qualified Lantern backend, memory admission, external
+publication or live execution has been installed by this code.

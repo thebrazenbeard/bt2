@@ -129,3 +129,53 @@ exposure use the conservative Batch.public_record() boundary, not a raw
 Batch or the B dry-run record. Upstream privacy classification is still
 a caller claim, not independent authentication, and Lantern live currentness
 is UNKNOWN.
+
+
+## Strict Context trust and policy container admission (2026-11-20)
+
+Operator-supplied Context does **not** become authenticated merely because
+a field has a trust-oriented name. The governor now rejects malformed
+Python container types for its seven typed frozenset policy/history fields.
+In particular, a string can no longer replace verified_signal_ids,
+owner_lanes, or qualified_capabilities: Python considers substring
+membership against a string true, silently making malformed caller input
+look like a verified-id, owner, or qualified-capability allowlist. The
+required sets must be real frozensets; text member values must satisfy
+the bounded incident-ID grammar, and verified head bindings must be
+subject/head pairs. Feedback and notification logs must be tuples.
+Policy limit numbers must be actual integers, not Python boolean values.
+
+This is a **breaking fail-closed source-input validation** for callers
+that previously supplied lists, tuples, strings, sets or untyped JSON
+directly. Such callers must explicitly validate and construct the
+documented Python types using independent authenticated authority
+before creating Context. Do not coerce bad inputs into trusted sets.
+The synthetic demo and untrusted-B dry run already build correctly
+typed Context. Syntax is not attestation: verified_signal_ids and
+other trusted fields must still come from a separately verified
+authorized host. No producer, notifier or live currentness backend
+is created by this source change.
+
+
+## Signal integer, evidence, and release-capability admission (2026-11-21)
+
+The Signal dataclass now fails closed on malformed values in six discrete
+numeric policy fields (four 0..5 scores, freshness_hours, hours_to_impact).
+Boolean values are not valid integers for these fields, and fractional
+floats cannot silently change urgency thresholds.
+
+Release dependency IDs must be a tuple of bounded string IDs. Python
+iterates a bare string by character; a caller supplying
+needed_capabilities="abc" could incorrectly satisfy a release prerequisite
+when Context.qualified_capabilities contained the unrelated individual
+letters a, b, and c. Bare-string prerequisites and invalid tuple members
+are now rejected before decide_one runs. A valid tuple ("abc",) still
+requires the actual capability "abc" in the separately provided Context.
+Evidence references and evidence classes require tuple containers rather
+than accepting a string or mutable list; next steps must be actual text.
+
+This is a SOURCE input-contract change. It may intentionally reject older
+untyped caller values; adapters must validate source inputs and construct
+the documented types without granting any new authority. Correct types do
+not authenticate a source, owner, evidence, dependency, recipient, or
+currentness backend. All decisions remain read-only proposals, not effects.
