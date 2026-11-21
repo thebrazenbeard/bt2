@@ -135,6 +135,31 @@ class Context:
     feedback: tuple[tuple[str, str, str, str], ...] = ()  # fingerprint, subject, head, label ACCEPTED|NOISY
 
     def __post_init__(self):
+        # These context fields carry operator policy and alleged independent
+        # trust readbacks. Python permits substring membership against a
+        # plain string: "s1" in "s1" is True. Reject malformed containers
+        # instead of silently promoting a caller's string to an allowlist.
+        set_fields = (
+            "known_observations", "muted_domains", "qualified_capabilities",
+            "verified_head_bindings", "owner_lanes", "verified_signal_ids",
+            "trusted_owner_ack_keys",
+        )
+        if any(type(getattr(self, field_name)) is not frozenset
+               for field_name in set_fields):
+            raise ValueError("context policy sets require frozenset")
+        for field_name in ("muted_domains", "qualified_capabilities",
+                           "owner_lanes", "verified_signal_ids"):
+            if any(type(value) is not str or ISO_KEY.fullmatch(value) is None
+                   for value in getattr(self, field_name)):
+                raise ValueError("context policy set members require valid strings")
+        if any(type(value) is not tuple or len(value) != 2
+               or type(value[0]) is not str or type(value[1]) is not str
+               for value in self.verified_head_bindings):
+            raise ValueError("verified head bindings require subject/head pairs")
+        if type(self.notification_log) is not tuple or type(self.feedback) is not tuple:
+            raise ValueError("context history and feedback require tuples")
+        if type(self.daily_notification_limit) is not int or type(self.same_subject_cooldown_hours) is not int:
+            raise ValueError("context numeric policy limits require integers")
         parse_time(self.now)
         if not 0 <= self.daily_notification_limit <= 3:
             raise ValueError("notification limit 0..3")

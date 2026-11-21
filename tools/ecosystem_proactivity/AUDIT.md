@@ -152,3 +152,32 @@ so it must not be confused with an authenticated externally publishable
 record. Neither API proves privacy classification, source authenticity,
 recipient permission, owner acknowledgment, qualified runtime currentness,
 notification delivery or memory admission. No runtime service activated.
+
+
+## Strict Context trust-type gate regression (2026-11-20)
+
+Original exact BT2 main: a43a1bfd93263c26ba5e337f11e4718b140e1608.
+The governor's Signal flags were typed and visibility was default-private
+after PR134, but the operator Context had type annotations only. Values such
+as verified_signal_ids="s1" and owner_lanes="SECURITY" could satisfy Python
+membership tests because "s1" in "s1" and "SECURITY" in "SECURITY" are True.
+A malformed plain string could therefore bypass expected container
+validation and contribute to a NOTIFY decision when other caller trust
+claims were present. This is a SOURCE input contract failure, not
+evidence of an active emitter or real unauthorized notification.
+
+Six new synthetic test methods ran first on exact source before repair:
+16 assertion failures and two type errors for strings/tuples replacing
+frozen policy sets, mixed-type members, numeric booleans and history
+lists; one valid frozenset control passed. The minimal fix enforces exact
+frozenset/tuple container types, valid string members, subject/head
+pair shape, and integer limits before consulting membership. After
+repair: focused 6/6, full 95/95 normal and 95/95 optimized Python
+source tests passed locally. Same-model tests do not replace Engineer
+A/B independent review, live provider verification, owner signoff or
+runtime qualification. Existing B untrusted ingress continues to
+construct Context with empty trusted sets and no authority.
+
+Old callers may need an explicit separately authorized input-schema
+migration, not a silent conversion of legacy JSON lists into trusted
+runtime facts. No host, scheduling, memory or notification effects.
