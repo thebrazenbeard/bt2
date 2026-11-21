@@ -5,7 +5,7 @@
   "source_snapshot": {
     "thebrazenbeard/bt2": {
       "contract_path": "conformance/memory_lifecycle/README.md",
-      "head": "a832363060b9cc6fd457ca1c3a9686a6a7da03b0"
+      "head": "49c9c24387d12dbfa5c5f03ff789df2fa4a4f042"
     },
     "thebrazenbeard/deepmemorystorage": {
       "contract_path": "architecture/DEEP_MEMORY_INTEGRATION_CONTRACT_V1.md",

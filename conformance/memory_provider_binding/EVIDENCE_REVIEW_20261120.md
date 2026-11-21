@@ -109,3 +109,9 @@ The private provider snapshot is deliberately not copied to public GitHub.
 The source evaluator makes no Supabase network request. The provider
 execution and local evaluation are real observations, but the JSON
 transfer is not an independently signed identity receipt.
+
+## 2026-11-20 integration-currentness addendum (preserves original historical receipt)
+
+The initial PR #124 source-binding above records the original observed head only. Engineer B subsequently reconciled PR #124 with BT2 main `7aed3b589a8a8f5370a0fe838d1ec571f1358346` using a two-parent, no-rewrite merge. Its new observed exact head is `49c9c24387d12dbfa5c5f03ff789df2fa4a4f042`, verified on the remote. `SOURCE_BINDINGS_V1.json` and the negative-control regression now pin that new parent, and PR #126 merges the updated parent rather than pretending it was present at the original snapshot.
+
+The newer parent includes dormant BT2 governor source. That inclusion grants no trusted-provider authentication, memory admission, independent reviewer approval, background consumer, or runtime authority. Provider catalog observations remain read-only and role-scoped; they must be reverified after any future provider or repo-head changes.

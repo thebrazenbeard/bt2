@@ -176,5 +176,5 @@ class BoundSourceRevision(unittest.TestCase):
         root=Path(__file__).resolve().parents[1]
         manifest=json.loads((root/"SOURCE_BINDINGS_V1.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["source_snapshot"]["thebrazenbeard/bt2"]["head"],
-                         "a832363060b9cc6fd457ca1c3a9686a6a7da03b0",
-                         "PR124-only contract must never be attributed to BT2 main")
+                         "49c9c24387d12dbfa5c5f03ff789df2fa4a4f042",
+                         "PR124-only contract must be bound to current reviewed parent, not historic main")
