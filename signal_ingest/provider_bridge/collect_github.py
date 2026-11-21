@@ -27,7 +27,8 @@ class CollectorError(ValueError):
 
 def _parse(raw: str) -> dict[str, Any]:
     try:
-        obj=json.loads(raw,object_pairs_hook=reject_duplicate_keys)
+        obj=json.loads(raw,object_pairs_hook=reject_duplicate_keys,
+                       parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
     except (ValueError,TypeError,RecursionError) as exc:
         raise CollectorError("INVALID_PROVIDER_JSON") from None
     if type(obj) is not dict:
@@ -81,7 +82,8 @@ def collect_pr(
     pr,pr_digest=_get(repository,f"pulls/{pr_number}",runner)
     head=pr.get("head")
     base=pr.get("base")
-    if (pr.get("number") != pr_number or type(head) is not dict or
+    if (type(pr.get("number")) is not int or pr["number"] != pr_number or
+        type(head) is not dict or
         type(base) is not dict or type(head.get("repo")) is not dict or
         type(base.get("repo")) is not dict or
         head["repo"].get("full_name") != repository or
@@ -112,7 +114,8 @@ def collect_pr(
         run,digest=_get(repository,f"actions/runs/{run_id}",runner)
         run_head=run.get("head_sha")
         outcome=run.get("conclusion")
-        if (run.get("id") != run_id or type(run.get("repository")) is not dict or
+        if (type(run.get("id")) is not int or run["id"] != run_id or
+            type(run.get("repository")) is not dict or
             run["repository"].get("full_name") != repository or
             type(run_head) is not str or
             re.fullmatch(r"[0-9a-f]{40}",run_head) is None or

@@ -140,5 +140,76 @@ class GitHubCollectorTest(unittest.TestCase):
             collect_pr("example/app",123,456,NOW,CUT,runner=wrong_source)
 
 
+    def test_j_provider_pr_number_must_be_strict_integer_even_for_pr_one(self):
+        """Python True == 1 and 1.0 == 1 must never bind a provider PR."""
+        from types import SimpleNamespace
+        for forged_number in (True, 1.0):
+            def fake_one(argv, **kw):
+                data = {"number": forged_number,
+                        "head": {"sha": HEAD, "repo": {"full_name":"example/app"}},
+                        "base": {"repo": {"full_name":"example/app"}},
+                        "html_url": "https://github.com/example/app/pull/1"}
+                return SimpleNamespace(stdout=json.dumps(data))
+            with self.subTest(forged=repr(forged_number)):
+                with self.assertRaisesRegex(CollectorError, "PROVIDER_PR_BINDING_MISMATCH"):
+                    collect_pr("example/app",1,None,NOW,CUT,runner=fake_one)
+
+    def test_k_provider_run_id_must_be_strict_integer_even_for_run_one(self):
+        """A boolean or float provider run ID is not the requested run."""
+        from types import SimpleNamespace
+        for forged_id in (True, 1.0):
+            def fake_one(argv, **kw):
+                if argv[2].endswith("/pulls/1"):
+                    data = {"number":1,"head":{"sha":HEAD,"repo":{"full_name":"example/app"}},
+                            "base":{"repo":{"full_name":"example/app"}},
+                            "html_url":"https://github.com/example/app/pull/1"}
+                else:
+                    data = {"id":forged_id,"head_sha":HEAD,"status":"completed",
+                            "conclusion":"success","repository":{"full_name":"example/app"},
+                            "event":"pull_request","pull_requests":[{
+                                "number":1,"url":"https://api.github.com/repos/example/app/pulls/1",
+                                "head":{"sha":HEAD}}],
+                            "html_url":"https://github.com/example/app/actions/runs/1"}
+                return SimpleNamespace(stdout=json.dumps(data))
+            with self.subTest(forged=repr(forged_id)):
+                with self.assertRaisesRegex(CollectorError, "PROVIDER_RUN_BINDING_MISMATCH"):
+                    collect_pr("example/app",1,1,NOW,CUT,runner=fake_one)
+
+    def test_l_nonfinite_provider_json_is_rejected_before_receipt(self):
+        """Nonstandard JSON constants cannot be silently hashed as evidence."""
+        from signal_ingest.provider_bridge.collect_github import _parse
+        for token in ("NaN", "Infinity", "-Infinity"):
+            with self.subTest(token=token):
+                with self.assertRaisesRegex(CollectorError, "INVALID_PROVIDER_JSON"):
+                    _parse('{"id":' + token + '}')
+
+
+    def test_m_integer_pr_and_run_one_still_accept_valid_provider_response(self):
+        """The strict types must not exclude actual integer identity 1."""
+        from types import SimpleNamespace
+        def valid_one(argv, **kw):
+            if argv[2].endswith("/pulls/1"):
+                payload = {"number":1, "head":{"sha":HEAD,"repo":{"full_name":"example/app"}},
+                           "base":{"repo":{"full_name":"example/app"}},
+                           "html_url":"https://github.com/example/app/pull/1"}
+            elif argv[2].endswith("/actions/runs/1"):
+                payload = {"id":1,"head_sha":HEAD,"status":"completed",
+                           "conclusion":"success","repository":{"full_name":"example/app"},
+                           "event":"pull_request","pull_requests":[{
+                               "number":1,"url":"https://api.github.com/repos/example/app/pulls/1",
+                               "head":{"sha":HEAD}}],
+                           "html_url":"https://github.com/example/app/actions/runs/1"}
+            else:
+                raise AssertionError("unapproved provider read")
+            return SimpleNamespace(stdout=json.dumps(payload))
+        result=collect_pr("example/app",1,1,NOW,CUT,runner=valid_one)
+        self.assertEqual(len(result["receipts"]),2)
+        self.assertEqual(result["receipts"][1]["status"],"PASSED")
+        normalized=bridge(result)
+        self.assertFalse(normalized["independently_authenticated"])
+        self.assertFalse(normalized["signal"]["release_permission"])
+        self.assertEqual(normalized["memory_admission"],"NONE")
+
+
 if __name__=="__main__":
     unittest.main()

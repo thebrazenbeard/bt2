@@ -116,3 +116,50 @@ The historical GitHub and semantic receipts above remain tied to their original 
 ## Private meaning-ID projection (2026-11-20 source correction)
 
 The semantic exchange previously echoed `vsns.candidates[].meaning_id` unchanged into `candidate_meaning_ids`. A typed caller could hide a personal name or location in that freeform ID and obtain it back despite the no-person-identifiers contract. A synthetic adversarial test reproduced this output leak on the prior exact branch source. The revised exchange validates uniqueness of the incoming IDs internally but emits only response-local ordinal aliases `candidate_1` through `candidate_8` in candidate order, never original ID strings or deterministic hashes that may be guessed. Aliases **do not support cross-call identity matching**. Inputs must still omit personal text, should never be logged raw, and no inference of consent, identity, truth, autobiographical memory or runtime integration is authorized by the change. This is a source privacy-boundary fix, not a deployed or signed provider.
+
+
+## 2026-11-21 — strict GitHub response identity and JSON validity
+
+Exact prior PR128 head `06529e94243420a8588b6723d6c081c58e7d3b9f`:
+the read-only `collect_github.py` collector compared provider `pr.number`
+and `run.id` with requested integer IDs using equality alone. In Python,
+`True == 1` and `1.0 == 1`, so syntactically malformed JSON identity
+fields for PR/run number 1 passed the expected GitHub provider binding.
+The same parser permitted nonstandard JSON `NaN`, `Infinity`, and
+`-Infinity` values in otherwise parseable provider responses. No
+successful exploit or memory read was observed; this is a source input
+validation defect.
+
+Three additional tests were recorded **RED** on the prior exact source,
+with seven rejected-case assertions failing: bool/float PR identity,
+bool/float run identity, and three nonfinite JSON constants. The
+new source requires `type(...) is int` on both provider IDs *before*
+testing identity equality, and rejects nonfinite JSON constants in
+`_parse`. Existing duplicate-key validation remains in place. A
+separate **positive control** passes authentic integer PR/run 1 through
+the collector and full offline bridge, preserving `memory_admission =
+NONE`, `independently_authenticated = false`, and
+`release_permission = false`.
+
+Verification on an isolated Lappy checkout: bridge **46/46 tests**
+normal and optimized, parent signal normalizer **21/21 tests**
+normal and optimized, compileall and git diff --check PASS. An additional
+**actual read-only GitHub API** collection against current BT2 PR #128
+and its previously completed workflow run `44935096176` observed
+two associated receipts at source HEAD
+`06529e94243420a8588b6723d6c081c58e7d3b9f`, CI status PASSED,
+`memory_admission = NONE`, `release_permission = false`, and
+`external_effects = []`. The request was executed with the already
+authenticated GitHub CLI, but does **not** establish a signed downstream
+actor identity, persistent replay fence, or runtime admission. The
+observed input/output digests were
+`f38cad81b2d76bdb50d332ddeec10d97ae93ad5ab27213b0308f927ef3dbe0ef`
+and
+`e314bca7bb0487b52fe8629c5f719d064d7ac1d659cb6d0f4415fd723d040b9b`
+respectively. Source-head and timestamp changes would produce different
+digests. This is **SOURCE/TEST/READ-ONLY_PROVIDER_OBSERVATION**, not
+merged code or a qualified memory provider.
+
+Do not turn GitHub CI, semantic salience, Empathy policy hint, raw
+feedback, or historical source into a memory, current preference,
+consent, release permission, or runtime attestation on this evidence.
