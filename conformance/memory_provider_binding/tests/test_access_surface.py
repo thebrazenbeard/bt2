@@ -68,6 +68,24 @@ class ProviderAccessHostile(unittest.TestCase):
         self.assertEqual(result["verdict"],"HOLD_PRIVILEGE_EXPOSURE")
         self.assertIn("AUTHENTICATED_CREATE_ON_MEMORY_SCHEMA",result["reason_codes"])
 
+    def test_live_sql_does_not_approve_arbitrary_search_path_suffixes(self):
+        sql=(Path(__file__).resolve().parents[1] / "provider_access_probe.sql").read_text(encoding="utf-8")
+        functions=sql.split("fn AS (",1)[1].split("),\nsch AS",1)[0]
+        self.assertNotIn("LIKE 'search_path=pg_catalog%'",functions)
+        self.assertIn("bool_and",functions)
+        self.assertIn("unnest(p.proconfig)",functions)
+        self.assertIn("'search_path=pg_catalog'",functions)
+        self.assertIn("'search_path=pg_catalog,pg_temp'",functions)
+        self.assertNotIn("'search_path=pg_catalog,public'",functions)
+
+    def test_noncanonical_definer_path_is_hold_even_when_client_create_denied(self):
+        data=snapshot()
+        data["functions"][1]["search_path_limited"]=False
+        result=evaluate_access(data)
+        self.assertEqual(result["verdict"],"HOLD_PRIVILEGE_EXPOSURE")
+        self.assertIn("SECURITY_DEFINER_SEARCH_PATH_NOT_PINNED",result["reason_codes"])
+        self.assertEqual(result["memory_admission"],"NONE")
+
     def test_definer_search_path_without_pinning_is_hold(self):
         data=snapshot()
         data["functions"][1]["search_path_limited"]=False

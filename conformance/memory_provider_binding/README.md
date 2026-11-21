@@ -132,3 +132,34 @@ attestation. Private data rows, function bodies, policy predicates,
 authoritative producer identity, Data API exposure and provider memory
 admission were NOT examined or authorized. Full raw metadata receipts
 remain outside the repository on the private authorized host.
+
+## November 21, 2026: search-path prefix false clearance
+
+Security-definer routine metadata previously used
+`array_to_string(proconfig, ',') LIKE 'search_path=pg_catalog%'`.
+That marked paths beginning with `pg_catalog` as limited even when
+additional schemas were present. A live read-only expression test reproduced
+the prefix false-positive on `pg_catalog,public` and an arbitrary appended
+schema. This is a metadata-classification defect, not a verified exploit.
+
+The read-only SQL now examines **every** `search_path=` entry in the
+function-local configuration and accepts only an exact restricted setting:
+empty search path, `pg_catalog`, or `pg_catalog, pg_temp` (either spacing).
+Any omitted setting, additional schema or conflicting entries fail the
+conservative source classification. A limited string is never equivalent
+to a reviewed function body, temp-object lookup safety, signed producer,
+provider authentication or memory admission.
+
+Live metadata on 2026-11-21 showed 47 security-definer routines: eight
+with exact `pg_catalog` paths, 35 with `pg_catalog, semantic_atlas` and
+four adding `extensions`. The corrected probe classified 39 as not
+limited and the local evaluator returned `HOLD_PRIVILEGE_EXPOSURE`.
+This is a **review hold**, not a claim those functions are currently
+exploitable; trusted schema permissions, temporary-object resolution,
+unqualified references, function bodies and Data API routes need
+independent examination before any privileges or definitions change.
+
+PostgreSQL reference: https://www.postgresql.org/docs/current/sql-createfunction.html
+Supabase function guidance: https://supabase.com/docs/guides/database/functions
+Raw metadata remains in the authorized private host receipt folder,
+never in GitHub. Neither the probe nor this change alters the database.

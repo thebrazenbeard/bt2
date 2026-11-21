@@ -25,7 +25,16 @@ fn AS (
  SELECT n.nspname AS schema,p.proname AS name,p.prosecdef AS security_definer,
         has_function_privilege('anon',p.oid,'EXECUTE') AS anon_execute,
         has_function_privilege('authenticated',p.oid,'EXECUTE') AS authenticated_execute,
-        (coalesce(array_to_string(p.proconfig,','),'') LIKE 'search_path=pg_catalog%') AS search_path_limited
+        COALESCE((
+          SELECT bool_and(cfg.entry IN (
+            'search_path=',
+            'search_path=pg_catalog',
+            'search_path=pg_catalog,pg_temp',
+            'search_path=pg_catalog, pg_temp'
+          ))
+          FROM unnest(p.proconfig) AS cfg(entry)
+          WHERE cfg.entry LIKE 'search_path=%'
+        ),false) AS search_path_limited
  FROM pg_catalog.pg_proc p
  JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace
  WHERE (n.nspname='public' AND p.proname LIKE 'vera_memory_%')
