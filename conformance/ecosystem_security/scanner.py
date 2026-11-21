@@ -547,7 +547,8 @@ def main()->int:
         try:
             changed=subprocess.run(['git','-C',str(root),'status','--porcelain',
                 '--untracked-files=all','--', '.vscode','public/fonts','packages',
-                ':(glob)**/.vscode/**','**/*.code-workspace','**/package.json'],
+                '.github', 'conformance/ecosystem_security', '.gitattributes', '.gitignore',
+                '.gitmodules', ':(glob)**/.vscode/**','**/*.code-workspace','**/package.json'],
                 capture_output=True,text=True,timeout=15,check=True)
             if changed.stdout.strip():
                 ap.error('SOURCE_TREE_DIRTY')
