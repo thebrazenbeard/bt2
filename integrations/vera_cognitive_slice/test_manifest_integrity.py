@@ -56,7 +56,7 @@ class PinManifestIntegrityTests(unittest.TestCase):
         with patch.object(qualify, "__file__", str(self.directory / "qualify.py")):
             with self.assertRaisesRegex(ValueError, "source pin manifest"):
                 qualify._verify_sources(self.fake_sources)
-    def test_autocrlf_checkout_keeps_exact_manifest_bytes(self):
+    def test_autocrlf_checkout_keeps_manifest_and_qualifier_bytes(self):
         with TemporaryDirectory(prefix="bt2-win-checkout-") as work:
             clone = Path(work) / "checkout"
             subprocess.run(
@@ -64,13 +64,15 @@ class PinManifestIntegrityTests(unittest.TestCase):
                  str(self.repo), str(clone)],
                 capture_output=True, text=True, timeout=30, check=True,
             )
-            checked = (clone / "integrations" / "vera_cognitive_slice"
-                       / "source_pins.json").read_bytes()
-            canonical = (self.directory / "source_pins.json").read_bytes()
-            self.assertEqual(
-                checked, canonical,
-                "autocrlf transformed a hash-bound manifest during checkout",
-            )
+            for filename in ("source_pins.json", "qualify.py"):
+                with self.subTest(filename=filename):
+                    checked = (clone / "integrations" / "vera_cognitive_slice"
+                               / filename).read_bytes()
+                    canonical = (self.directory / filename).read_bytes()
+                    self.assertEqual(
+                        checked, canonical,
+                        f"autocrlf transformed hash-bound {filename}",
+                    )
 
     def test_clean_manifest_reaches_normal_missing_donor_rejection(self):
         with patch.object(qualify, "__file__", str(self.directory / "qualify.py")):
