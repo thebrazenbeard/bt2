@@ -181,3 +181,31 @@ construct Context with empty trusted sets and no authority.
 Old callers may need an explicit separately authorized input-schema
 migration, not a silent conversion of legacy JSON lists into trusted
 runtime facts. No host, scheduling, memory or notification effects.
+
+
+## Signal type admission and release-prerequisite character spoof (2026-11-21)
+
+Prior exact BT2 main: 9d24177bebad09c9720f5338ec202c3c8be6f3a3.
+Context trust containers were hardened in PR136, but Signal policy
+scores/time windows were not checked as true integers. Python accepted
+True/False and fractional floats in score/time comparisons. Signal
+needed_capabilities also permitted bare strings, which Python iterates
+character-by-character. When purported release prerequisite "abc" was
+passed as a string, an unrelated qualified-capability set containing
+a,b,c could make the release dependency appear satisfied. Source
+input-contract flaw, not an observed real released artifact or deployment.
+
+Eight new adversarial synthetic test methods on original exact main were
+RED with 24 assertion failures; one valid typed urgent signal control
+passed. A minimal patch enforces actual integer types for six numeric
+fields, tuple evidence containers, bounded tuple capability IDs and a
+real string next-step. After fix, eight focused tests passed and full
+103/103 normal and optimized source tests passed locally. Same-model
+author/test verification is not independent review or runtime proof.
+
+Intentional fail-closed compatibility break: caller JSON arrays, bare
+strings, boolean/float numeric values and mutable evidence lists must
+be explicitly vetted and converted under a separate authenticated owner
+contract, never silently promoted into trusted state. No notifier,
+scheduler, qualified Lantern backend, memory admission, external
+publication or live execution has been installed by this code.

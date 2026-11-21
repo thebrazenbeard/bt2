@@ -155,3 +155,27 @@ typed Context. Syntax is not attestation: verified_signal_ids and
 other trusted fields must still come from a separately verified
 authorized host. No producer, notifier or live currentness backend
 is created by this source change.
+
+
+## Signal integer, evidence, and release-capability admission (2026-11-21)
+
+The Signal dataclass now fails closed on malformed values in six discrete
+numeric policy fields (four 0..5 scores, freshness_hours, hours_to_impact).
+Boolean values are not valid integers for these fields, and fractional
+floats cannot silently change urgency thresholds.
+
+Release dependency IDs must be a tuple of bounded string IDs. Python
+iterates a bare string by character; a caller supplying
+needed_capabilities="abc" could incorrectly satisfy a release prerequisite
+when Context.qualified_capabilities contained the unrelated individual
+letters a, b, and c. Bare-string prerequisites and invalid tuple members
+are now rejected before decide_one runs. A valid tuple ("abc",) still
+requires the actual capability "abc" in the separately provided Context.
+Evidence references and evidence classes require tuple containers rather
+than accepting a string or mutable list; next steps must be actual text.
+
+This is a SOURCE input-contract change. It may intentionally reject older
+untyped caller values; adapters must validate source inputs and construct
+the documented types without granting any new authority. Correct types do
+not authenticate a source, owner, evidence, dependency, recipient, or
+currentness backend. All decisions remain read-only proposals, not effects.
