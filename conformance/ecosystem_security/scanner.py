@@ -285,9 +285,9 @@ def _enumerate_security_paths(root: Path, repo: str, head: str) -> list[Finding]
             # This is not proof the folder was opened or its contents executed.
             folded = name.casefold()
             if ((folded == '.vscode' and name != '.vscode')
-                    or (folded == 'public' and name != 'public')
                     or (current.name.casefold() == 'public'
-                        and folded == 'fonts' and name != 'fonts')):
+                        and folded == 'fonts'
+                        and (current.name != 'public' or name != 'fonts'))):
                 alias = (current / name).relative_to(root).as_posix()
                 out.append(_make(repo, head, alias, 'SECURITY_PATH_CASE_ALIAS', 'HIGH',
                     'Case-aliased security directory requires cross-platform inspection',

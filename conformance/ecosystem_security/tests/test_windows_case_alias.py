@@ -72,6 +72,25 @@ class WindowsCaseAliasTests(unittest.TestCase):
                                 and f.severity == "HIGH"
                                 and f.path == "office.CODE-WORKSPACE" for f in out), out)
 
+    def test_unrelated_capitalized_public_without_fonts_is_not_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / "Public"
+            folder.mkdir()
+            (folder / "readme.txt").write_text("inert ordinary project document")
+            out = self.findings(root)
+            self.assertFalse(any(f.rule_id == "SECURITY_PATH_CASE_ALIAS" for f in out), out)
+
+    def test_capitalized_public_with_fonts_is_blocked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / "PUBLIC" / "fonts"
+            folder.mkdir(parents=True)
+            (folder / "good.ttf").write_bytes(bytes.fromhex("00010000") + b"x" * 8)
+            out = self.findings(root)
+            self.assertTrue(any(f.rule_id == "SECURITY_PATH_CASE_ALIAS"
+                                and f.severity == "HIGH" for f in out), out)
+
     def test_canonical_and_unrelated_uppercase_names_do_not_hold(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
