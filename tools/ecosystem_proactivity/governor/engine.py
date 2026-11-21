@@ -188,6 +188,11 @@ class Batch:
     currentness_source_only: bool = True
     monitor_is_active: bool = False
     external_effects: bool = False
+    # Derived exclusively from public source signals. This is deliberately
+    # distinct from internal decisions, which may be influenced by private
+    # fingerprint collisions and same-incident duplicates.
+    _public_decisions: tuple[Decision, ...] = field(default_factory=tuple,
+                                                      repr=False, compare=False)
 
     def public_record(self) -> dict:
         """Explicit safe projection, not a generic dataclass serializer.
@@ -199,7 +204,7 @@ class Batch:
         return {
             # A masked private record still discloses the existence,
             # domain and priority of a local-only finding.
-            "decisions": [d.public_record() for d in self.decisions
+            "decisions": [d.public_record() for d in self._public_decisions
                           if not d.private_subject],
             "currentness_source_only": True,
             "monitor_is_active": False,
@@ -308,8 +313,8 @@ def decide_one(s: Signal, c: Context, slots_used: int = 0) -> Decision:
                     s.owner_lane, s.exact_head, private_subject=private_local)
 
 
-def evaluate(signals: Sequence[Signal], context: Context, *, max_scan: int = 40) -> Batch:
-    """Returns decision proposals. Does not deliver alerts, create tasks, or persist state."""
+def _evaluate_core(signals: Sequence[Signal], context: Context, *, max_scan: int = 40) -> Batch:
+    """Evaluate one internally scoped batch; never serialize directly."""
     if not 1 <= max_scan <= 100:
         raise ValueError("bounded scan required")
     if len(signals) > max_scan:
@@ -351,6 +356,27 @@ def evaluate(signals: Sequence[Signal], context: Context, *, max_scan: int = 40)
                 notices += 1
         outputs.append(dec)
     return Batch(tuple(outputs), tuple(dropped), len(signals))
+
+
+def evaluate(signals: Sequence[Signal], context: Context, *, max_scan: int = 40) -> Batch:
+    """Return internal decisions and a public view independent of private signals.
+
+    Public decisions are computed from public-only inputs *before* deduplication,
+    collision quarantine and notification-slot allocation. A public and private
+    signal describing the exact same incident is ambiguous and cannot be
+    declassified merely because one input says it is publicly visible.
+    """
+    internal = _evaluate_core(signals, context, max_scan=max_scan)
+    def identity(s: Signal):
+        return (s.fingerprint, s.subject, s.exact_head)
+
+    private_keys = {identity(s) for s in signals
+                    if s.contains_private_data or not s.externally_visible}
+    public_signals = tuple(s for s in signals
+                           if not s.contains_private_data and s.externally_visible
+                           and identity(s) not in private_keys)
+    visible = _evaluate_core(public_signals, context, max_scan=max_scan)
+    return replace(internal, _public_decisions=visible.decisions)
 
 
 def measure(decisions: Sequence[Decision], ground_truth: Mapping[tuple[str, str, str], str], k: int = 3) -> dict:

@@ -59,3 +59,29 @@ subjects, heads, references, next steps, duplicate IDs and raw observation
 counts. This is explicit opt-in safe projection, NOT a change to internal
 deduplication, any automatic serializer, upstream privacy classification,
 or authenticated notification authorization.
+
+## Public projection noninterference (2026-11-20)
+
+The existing Batch.public_record() filtered private Decision objects, but
+that alone did not prevent leaks: evaluate() calculates fingerprint collisions,
+deduplication, and notice slots across *all* input signals. A private signal
+sharing a fingerprint with a separate public signal could change the public
+action and reason codes even though the private Decision itself was omitted.
+
+The governor now evaluates public output from a separate public-only source
+slice, before collision handling, dedupe and notification-slot allocation.
+The internal Batch.decisions remains computed from the complete input and is
+unchanged for authorized internal analysis. For the public slice, any
+(fingerprint, subject, exact-head) incident containing a private or
+externally-invisible report is excluded entirely, even if another input claims
+that same incident is public. This is conservative declassification refusal,
+not verified source identity or proof that separate fingerprints describe
+separate real-world events.
+
+Batch.public_record() remains opt-in and must not be confused with raw Batch
+serialization, which includes internal IDs and private decisions. Tests show
+that a private *different* incident with an identical fingerprint no longer
+changes the public projection. A conflicting privacy label for the *same*
+incident is intentionally withheld. A missing public result in that situation
+does not prove an authenticated private event; it may reflect untrusted inputs.
+No provider admission, monitor, notifier, or recipient is installed.
