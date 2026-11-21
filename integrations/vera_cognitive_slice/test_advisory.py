@@ -105,8 +105,8 @@ class ReadOnlyAdvisoryTests(unittest.TestCase):
             if Path(path).name == "qualify.py":
                 actual_verify = module._verify_sources
 
-                def arm_after_full_verification(*args):
-                    result = actual_verify(*args)
+                def arm_after_full_verification(*args, **kwargs):
+                    result = actual_verify(*args, **kwargs)
                     swapped["armed"] = True
                     return result
 

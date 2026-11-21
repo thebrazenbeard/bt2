@@ -128,7 +128,7 @@ def propose(repos: Path, request: AdvisoryRequest) -> ReadOnlyAdvisory:
             commit_sha=own_commit,
         ),
     )
-    pins = guard._verify_sources(Path(repos))
+    pins = guard._verify_sources(Path(repos), manifest_commit=own_commit)
     humility_repo = Path(repos) / "humility"
     humility = _load_exact_module(
         humility_repo / "humility" / "core.py",
