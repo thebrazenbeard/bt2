@@ -142,5 +142,25 @@ class SemanticHostile(unittest.TestCase):
         self.assertEqual(r["semantic_authority"],"RESEARCH_ONLY")
         self.assertEqual(r["phenomenology"],"UNRESOLVED")
 
+    def test_13_unhashable_domain_or_evidence_class_rejected_with_bounded_error(self):
+        for field in ("domain", "claimed_evidence_class"):
+            for payload in (["MODEL_INFERENCE"], {"candidate": "USER_DIRECT"}):
+                with self.subTest(field=field, form=type(payload).__name__):
+                    x=frame()
+                    x["vsns"]["candidates"][0][field]=payload
+                    with self.assertRaisesRegex(
+                        SemanticExchangeError, "UNTRUSTED_SEMANTIC_CANDIDATE"
+                    ):
+                        exchange(x)
+
+    def test_14_unhashable_empathy_policy_is_bounded_rejection(self):
+        for payload in (["PRESERVE_PLAY"], {"policy": "TASK_DIRECT"}):
+            with self.subTest(form=type(payload).__name__):
+                x=frame()
+                x["empathy"]["policy"]=payload
+                with self.assertRaisesRegex(SemanticExchangeError, "EMPATHY_AUTHORITY_FENCE"):
+                    exchange(x)
+
+
 if __name__=="__main__":
     unittest.main()

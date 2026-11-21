@@ -130,7 +130,9 @@ def exchange(data: dict) -> dict:
              and meaning not in seen,"INVALID_MEANING_ID")
         seen.add(meaning)
         ids.append(meaning)
-        need(c["domain"] in DOMAINS and c["claimed_evidence_class"] in EVIDENCE and
+        need(type(c["domain"]) is str and c["domain"] in DOMAINS and
+             type(c["claimed_evidence_class"]) is str and
+             c["claimed_evidence_class"] in EVIDENCE and
              c["evidence_origin_trust"]=="UNVERIFIED_CALLER_ASSERTION" and
              all(fraction(c[k]) for k in ("salience","uncertainty",
                                           "boundary_tension","semantic_relevance")),
@@ -144,7 +146,7 @@ def exchange(data: dict) -> dict:
          e["persistence"]=="EPHEMERAL" and
          e["volition_want_authority"] is False and
          e["effect_authority"] is False and
-         e["policy"] in POLICIES and
+         type(e["policy"]) is str and e["policy"] in POLICIES and
          e["confidence_band"] in ("NONE","TENTATIVE","HIGH_SCORE") and
          type(e["focus_needed"]) is bool and
          type(e["reason_code"]) is str and OPAQUE.fullmatch(e["reason_code"]) is not None,
