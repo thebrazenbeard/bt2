@@ -53,3 +53,42 @@ Treat every scanner finding as a provisional `SOURCE_INSPECTION` claim. The A-ow
 **Trusted-main requirement:** the candidate source workflow now triggers on **every** pull request and main push; its earlier path filters could leave unrelated source and workflow changes entirely unchecked. Regression `test_workflow_trigger_coverage.py` was observed RED against the old workflow before the event filter was removed, then GREEN with unfiltered triggers. **This fixes trigger coverage, not trust:** the policy and tests within a PR can be changed by that PR. A separately trusted baseline policy/reusable workflow must fetch untrusted source as data, avoid executing PR-controlled security policy, and be enforced as a required check through branch protection or rulesets with CODEOWNERS/review for security-sensitive changes. The check's required status and enforceability have **not** been verified. Hosted green self-CI is not independent approval. A source-only 50-case replay is not a producer-to-Radar-to-delivery probe.
 
 **Updated currentness (2026-11-20):** exact GitHub source readback now shows `unbound-sol/main@cee23cff41fc614b84996114dd6104c54d2ffe5e` **source-clean for the known editor-startup pattern**: empty `.vscode/tasks.json`, no auto-task setting in `.vscode/settings.json`, and the known `.vscode/ini` and counterfeit pseudo-font not present. The separately owned, *stale* Draft PR #53 at `d849e6158e9c003212be5dda193fe92a2736d8c8` still contains hidden `folderOpen` -> Node `.vscode/ini` execution and must **not** be merged over clean main. VCP, selfimage and semanticatlas previously had the same known startup signature removed from current mains. This is not a universal source, host or historical-compromise assessment. No other owner branch, protected main, provider or credential was changed here.
+
+### Trusted-base source gate candidate (pending bootstrap and enforcement)
+
+`.github/workflows/ecosystem-security-trusted.yml` is a separate
+`pull_request_target` design intended for a **reviewed default-branch
+installation**, not a proof that protection is active today.
+
+It checks out the exact event-provided base and PR-head commits into disjoint
+directories with read-only permissions, no persisted checkout token, no LFS or
+submodules. Only the base checkout supplies executed scanner/tests; the PR
+checkout is untrusted source data. It verifies both checkout heads and compares
+the base and candidate Git tree IDs for `.github/workflows` and
+`conformance/ecosystem_security`; any change or removal in these policy
+directories fails closed. Authorized policy upgrades therefore need a distinct,
+owner-approved release procedure rather than self-approval through this gate.
+The candidate source is inspected with `--fail-on-high --require-git-head
+--require-clean-source`. It does **not** execute a PR's build scripts, test
+modules or dependency installers, dispatch external alerts, or carry production
+secrets.
+
+**Bootstrap:** this candidate workflow cannot run as trusted default-branch
+code until the owner has independently reviewed and merged its exact source
+into the base branch. The current PR's own green workflow is still
+PR-controlled. A repository administrator must separately establish an
+independent required-workflow/branch-ruleset policy and verify enforcement
+against both an ordinary PR and an adversarial PR that alters the scanner
+or workflow. A `pull_request_target` job alone is not proof that a protected
+required check exists or will be associated with every PR. Configure merge
+queue coverage separately if applicable. Do not turn off protection merely to
+make blocked policy changes pass. These permission/release effects are outside
+this source-only PR and have not been performed.
+
+**Acceptance evidence:** local tests
+`test_trusted_base_gate.py` verify event coverage, separation of trusted and
+candidate paths, exact SHA checks, policy immutability, and read-only token
+settings. These are structural source tests, not a completed GitHub
+`pull_request_target` runtime trial; the new workflow awaits reviewed
+default-branch presence. Source scanner tests and candidate CI are independent
+from any live alerting or host-compromise assessment.
