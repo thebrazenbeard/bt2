@@ -1,0 +1,135 @@
+{
+  "authority": "SOURCE_ONLY_NOT_INSTALLED_NOT_AUTHENTICATED_NOT_RELEASE",
+  "input": {
+    "evidence_classes": [
+      "SOURCE",
+      "CI",
+      "BUS_REPORT",
+      "DEPENDENCY_REPORT",
+      "HOST_REPORT"
+    ],
+    "head_requirement": "lowercase 40-character Git SHA-1 or null",
+    "kinds": {
+      "CI_RESULT": [
+        "FAILED",
+        "PASSED"
+      ],
+      "COORDINATION": [
+        "CONFLICT",
+        "DUPLICATE_ALERT",
+        "REVIEW_PENDING",
+        "RESOLVED"
+      ],
+      "PR_HEAD_CHANGE": [
+        "CHANGED",
+        "UNCHANGED"
+      ],
+      "RUNTIME_GAP": [
+        "MISSING",
+        "UNQUALIFIED",
+        "REPORTED_QUALIFIED"
+      ],
+      "SECURITY_DEPENDENCY_CHANGE": [
+        "INVALIDATED",
+        "UNCHANGED"
+      ]
+    },
+    "limits": {
+      "max_bytes": 512000,
+      "max_observations": 256,
+      "max_subjects": 128
+    },
+    "observation_optional": [
+      "previous_head"
+    ],
+    "observation_required": [
+      "id",
+      "kind",
+      "status",
+      "repository",
+      "subject",
+      "head",
+      "incident_key",
+      "observed_at",
+      "source_ref",
+      "evidence_class",
+      "claimed_owner",
+      "claimed_reviewer",
+      "claims_authenticated"
+    ],
+    "snapshot_required": [
+      "observed_at",
+      "subjects",
+      "host_access_cutoff"
+    ],
+    "source_ref_requirement": "HTTPS github.com or api.github.com; no credentials, query or port; optional GitHub #issuecomment-{digits} or #discussion_r{digits} fragment",
+    "subject_required": [
+      "repository",
+      "subject",
+      "head",
+      "runtime_required",
+      "reported_runtime_status"
+    ],
+    "time_requirement": "explicit UTC second YYYY-MM-DDTHH:MM:SSZ; no system-time inference",
+    "top_level_required": [
+      "schema",
+      "snapshot",
+      "observations"
+    ]
+  },
+  "input_schema": "BT2_ECOSYSTEM_SIGNAL_INPUT_V1",
+  "output": {
+    "candidate_observation": "Research signal only; not an instruction, approval, task or release",
+    "fields": [
+      "schema",
+      "snapshot_observed_at",
+      "observations",
+      "runtime",
+      "host_access_cutoff",
+      "host_task_start_permitted",
+      "host_task_proposals",
+      "external_effects",
+      "release_permission",
+      "policy_decision",
+      "side_effects_performed",
+      "limitations"
+    ],
+    "observation_fields": [
+      "observation_key",
+      "repository",
+      "subject",
+      "head",
+      "incident_key",
+      "categories",
+      "statuses",
+      "head_currentness",
+      "candidate_observation",
+      "observation_timestamp",
+      "reports",
+      "source_refs",
+      "claimed_owners",
+      "confidence_limitations",
+      "independently_authenticated",
+      "release_permission"
+    ],
+    "observation_grouping": [
+      "repository",
+      "subject",
+      "head",
+      "incident_key"
+    ],
+    "owner_and_reviewer_authentication": "NEVER inferred from a reported field or public Bus comment",
+    "policy_decision": "NOT_MADE",
+    "release_permission": false,
+    "runtime_currentness": "UNKNOWN without authenticated exact-runtime proof; source claims never qualify",
+    "side_effects": "none; host_task_proposals, external_effects are always empty",
+    "source_authentication": "UNVERIFIED without independent verifier"
+  },
+  "output_schema": "BT2_ECOSYSTEM_SIGNAL_OUTPUT_V1",
+  "related_distinct_contract": {
+    "path": "docs/protocol/RADAR_DEDUPE_V1.md",
+    "purpose": "500ms message-envelope idempotency dedupe, not cross-reporter engineering incident equivalence",
+    "repository": "thebrazenbeard/chat-communication-bus"
+  },
+  "schema": "BT2_ECOSYSTEM_SIGNAL_CONTRACT_V1"
+}
