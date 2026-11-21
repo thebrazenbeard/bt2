@@ -92,3 +92,8 @@ settings. These are structural source tests, not a completed GitHub
 `pull_request_target` runtime trial; the new workflow awaits reviewed
 default-branch presence. Source scanner tests and candidate CI are independent
 from any live alerting or host-compromise assessment.
+
+
+### Windows path-case alias review hold
+
+The source scanner is commonly run on Linux CI, while workspace consumers may run on Windows. A noncanonical spelling of a security-sensitive path (`.VSCODE`, `TASKS.JSON`, `PACKAGE.JSON`, `.CODE-WORKSPACE`, or `PUBLIC/FONTS`) may be a distinct pathname on Linux but case-equivalent on Windows. The scanner emits a HIGH `SECURITY_PATH_CASE_ALIAS` **review hold**, and `--fail-on-high` blocks it. This is not a claim that a task ran, a dependency hook executed, or the aliased file is malicious. No source payload is executed during detection. Review exact Git tree paths and host checkout semantics rather than treating Linux CI silence as Windows clearance.

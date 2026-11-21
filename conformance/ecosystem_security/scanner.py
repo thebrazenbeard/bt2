@@ -279,6 +279,19 @@ def _enumerate_security_paths(root: Path, repo: str, head: str) -> list[Finding]
             dirnames.clear()
             continue
         for name in sorted(dirnames[:]):
+            # GitHub Linux checks are case-sensitive; VS Code and package/file
+            # lookup on a typical Windows checkout are not. Treat a spelling
+            # alias of an execution-relevant directory as an explicit HOLD.
+            # This is not proof the folder was opened or its contents executed.
+            folded = name.casefold()
+            if ((folded == '.vscode' and name != '.vscode')
+                    or (folded == 'public' and name != 'public')
+                    or (current.name.casefold() == 'public'
+                        and folded == 'fonts' and name != 'fonts')):
+                alias = (current / name).relative_to(root).as_posix()
+                out.append(_make(repo, head, alias, 'SECURITY_PATH_CASE_ALIAS', 'HIGH',
+                    'Case-aliased security directory requires cross-platform inspection',
+                    b'', ('windows_casefold_path_alias',)))
             if name in SKIP_DIRS:
                 dirnames.remove(name)
             elif (current/name).is_symlink():
@@ -302,6 +315,20 @@ def _enumerate_security_paths(root: Path, repo: str, head: str) -> list[Finding]
         if '.vscode' in dirnames:
             dirnames.remove('.vscode')
         for name in sorted(filenames):
+            folded = name.casefold()
+            canonical = ('package.json' if folded == 'package.json'
+                         else ('tasks.json' if folded == 'tasks.json'
+                               and current.name.casefold() == '.vscode'
+                               else ('settings.json' if folded == 'settings.json'
+                                     and current.name.casefold() == '.vscode'
+                                     else None)))
+            if canonical is None and folded.endswith('.code-workspace'):
+                canonical = folded
+            if canonical is not None and name != canonical:
+                alias = (current / name).relative_to(root).as_posix()
+                out.append(_make(repo, head, alias, 'SECURITY_PATH_CASE_ALIAS', 'HIGH',
+                    'Case-aliased executable configuration cannot count as clean',
+                    b'', ('windows_casefold_path_alias',)))
             path=current/name
             if (current.name=='fonts' and current.parent.name=='public' and
                     path.suffix.lower() in MAGIC):
