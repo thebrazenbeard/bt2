@@ -5,7 +5,7 @@ sources, install schedulers, send notifications, or authorize effects.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace, asdict
+from dataclasses import dataclass, field, fields, replace, asdict
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Iterable, Mapping, Sequence
@@ -378,23 +378,49 @@ def _evaluate_core(signals: Sequence[Signal], context: Context, *, max_scan: int
         raise ValueError("bounded scan required")
     if len(signals) > max_scan:
         raise ValueError("batch exceeds analysis budget; paginate with stable cursor")
-    # Never discard a second distinct subject/head merely because two
-    # reporters reused one fingerprint. Exact repeats are coalesced; a
-    # conflicting fingerprint is quarantined as a source trust problem.
-    by_instance: dict[tuple[str, str, str | None], Signal] = {}
-    dropped: list[str] = []
+    # Group equal incident IDs before deciding; selecting the first report
+    # would let an unverified low-risk claim suppress a verified severe one,
+    # or let a forged high-risk claim win simply by reversing input order.
+    grouped_by_instance: dict[tuple[str, str, str | None], list[Signal]] = {}
     for s in signals:
-        key = (s.fingerprint, s.subject, s.exact_head)
-        if key in by_instance:
-            dropped.append(s.signal_id)
-        else:
-            by_instance[key] = s
+        grouped_by_instance.setdefault((s.fingerprint, s.subject, s.exact_head), []).append(s)
+    by_instance: dict[tuple[str, str, str | None], Signal] = {}
+    exact_conflicts: set[tuple[str, str, str | None]] = set()
+    dropped: list[str] = []
+    material_fields = tuple(f.name for f in fields(Signal)
+                            if f.name not in ("signal_id", "evidence_refs"))
+    for key, reports in grouped_by_instance.items():
+        # Equivalent duplicate reporters may differ in ID and evidence
+        # location only if their independently asserted ID verification state
+        # is also identical. Neither source text nor arrival order grants trust.
+        ordered = sorted(reports, key=lambda s: (s.signal_id, s.evidence_refs))
+        first = ordered[0]
+        by_instance[key] = first
+        # Preserve the existing private coalescing audit trail, including
+        # conflicting reports; the Decision itself is now held for review.
+        dropped.extend(s.signal_id for s in ordered[1:])
+        for candidate in ordered[1:]:
+            if (any(getattr(candidate, name) != getattr(first, name)
+                    for name in material_fields)
+                    or ((candidate.signal_id in context.verified_signal_ids)
+                        != (first.signal_id in context.verified_signal_ids))):
+                exact_conflicts.add(key)
+                break
     grouped: dict[str, list[tuple[str, str, str | None]]] = {}
     for key in by_instance:
         grouped.setdefault(key[0], []).append(key)
     collisions = {fp for fp, keys in grouped.items() if len(keys) > 1}
     proposals = []
     for key, s in by_instance.items():
+        if key in exact_conflicts:
+            # A constant internal hold (not a public Decision), regardless
+            # of severity, ownership or which conflicting report came first.
+            # No external decision or priority may inherit either claim.
+            proposals.append(Decision(
+                key[0], key[1], "coordination", Action.DRAFT, 0.0,
+                ("EXACT_INCIDENT_CONFLICT",), (), "Review privately in authorized scope",
+                "UNASSIGNED", key[2], private_subject=True))
+            continue
         if s.fingerprint in collisions:
             s = replace(s, source_verified_by_evaluator=False, corroborated=False)
         dec = decide_one(s, context)
