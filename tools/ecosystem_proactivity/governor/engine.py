@@ -96,6 +96,23 @@ class Signal:
         )
         if any(type(getattr(self, name)) is not bool for name in boolean_fields):
             raise ValueError("signal boolean flags require actual booleans")
+        # Numeric policy thresholds are discrete. Boolean is a subclass of
+        # int, while fractional values change scoring and urgency semantics.
+        integer_fields = ("freshness_hours", "hours_to_impact",
+                          "severity", "relevance", "actionability", "confidence")
+        if any(type(getattr(self, name)) is not int for name in integer_fields):
+            raise ValueError("signal policy scores and time windows require integers")
+        # Bare strings iterate by character in Python. For release
+        # prerequisites this can falsely satisfy a claimed capability.
+        if type(self.needed_capabilities) is not tuple or any(
+            type(cap) is not str or ISO_KEY.fullmatch(cap) is None
+            for cap in self.needed_capabilities
+        ):
+            raise ValueError("needed capabilities require bounded tuple IDs")
+        if type(self.evidence_refs) is not tuple or type(self.evidence_classes) is not tuple:
+            raise ValueError("evidence containers require tuples")
+        if type(self.concrete_next_step) is not str:
+            raise ValueError("next step requires text")
         if not all(ISO_KEY.fullmatch(v or "") for v in
                    (self.signal_id, self.fingerprint, self.subject, self.cause, self.owner_lane)):
             raise ValueError("invalid non-identifying ID")
