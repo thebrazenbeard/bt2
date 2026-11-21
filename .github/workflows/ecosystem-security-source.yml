@@ -1,0 +1,50 @@
+name: BT2 ecosystem security source scan (candidate)
+
+# Candidate source scan runs on EVERY PR and main push. Path filters made
+# unrelated source/workflow edits silently skip this check. This event coverage
+# is necessary but NOT an independent trusted-main required status check.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Checkout pinned B signal-ingestion source without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: thebrazenbeard/bt2
+          ref: 3449ce3a94084722454345485cc12a10f0c91883
+          path: .sources/engineer-b
+          persist-credentials: false
+      - name: Verify exact B ingestion Git head and source blob
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C .sources/engineer-b rev-parse HEAD)" = "3449ce3a94084722454345485cc12a10f0c91883"
+          test "$(git hash-object .sources/engineer-b/signal_ingest/v1.py)" = "e27e5b56c9e7fb89833684a135300c92584cc3d9"
+      - name: Run scanner and exact B ingress regression suite (no network clients)
+        env:
+          B_SIGNAL_INGEST_DIR: .sources/engineer-b
+          B_SIGNAL_INGEST_REQUIRED: "1"
+        run: python3 -m unittest discover -s conformance/ecosystem_security/tests -q
+      - name: Scan checked-out source without running scanned tasks
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse HEAD)"
+          python3 conformance/ecosystem_security/scanner.py \
+            --root . --repo thebrazenbeard/bt2 --head "$SHA" \
+            --budget 4 --fail-on-high --require-git-head --require-clean-source > "$RUNNER_TEMP/ecosystem-security.json"
+          python3 -m json.tool "$RUNNER_TEMP/ecosystem-security.json" > /dev/null
