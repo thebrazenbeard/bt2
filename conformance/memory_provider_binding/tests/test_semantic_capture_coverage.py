@@ -36,8 +36,66 @@ class SemanticCaptureCoverage(unittest.TestCase):
     def test_live_probe_includes_semantic_capture_surfaces(self):
         sql = (Path(__file__).resolve().parents[1] / "provider_access_probe.sql").read_text()
         self.assertIn("OR n.nspname='semantic_atlas'", sql)
-        self.assertIn("p.proname LIKE 'capture_semantic_%'", sql)
-        self.assertIn("p.proname LIKE 'record_semantic_capture_%'", sql)
+        fn_cte = sql.split("fn AS (",1)[1].split("),\nsch AS",1)[0]
+        self.assertIn("OR n.nspname='semantic_atlas'", fn_cte)
+
+    def test_nonprefix_semantic_atlas_function_execute_holds(self):
+        value = snapshot()
+        fn = copy.deepcopy(value["functions"][1])
+        fn.update(name="secret_admin_dispatch_v1", anon_execute=True)
+        value["schema_rights"][1]["anon_usage"] = True
+        value["functions"].append(fn)
+        result = evaluate_access(value)
+        self.assertEqual(result["verdict"], "HOLD_PRIVILEGE_EXPOSURE")
+        self.assertIn("UNLISTED_MEMORY_FUNCTION_EXECUTE", result["reason_codes"])
+
+    def test_nonprefix_semantic_atlas_function_without_grant_still_reviewed(self):
+        value = snapshot()
+        fn = copy.deepcopy(value["functions"][1])
+        fn.update(name="out_of_band_route_v1", anon_execute=False,
+                  authenticated_execute=False)
+        value["functions"].append(fn)
+        result = evaluate_access(value)
+        self.assertEqual(result["verdict"], "REVIEW_UNLISTED_SURFACES")
+        self.assertIn("UNLISTED_MEMORY_FUNCTION_REVIEW", result["reason_codes"])
+
+    def test_live_probe_lists_all_semantic_atlas_routines(self):
+        sql = (Path(__file__).resolve().parents[1] / "provider_access_probe.sql").read_text()
+        functions_cte = sql.split("fn AS (",1)[1].split("),\nsch AS",1)[0]
+        self.assertIn("OR n.nspname='semantic_atlas'",functions_cte)
+
+    def test_live_inventory_fifty_functions_is_not_truncated(self):
+        # Current provider metadata has eight public memory functions and
+        # forty-two Atlas functions. This tests count, not actual private data.
+        value = snapshot()
+        template = value["functions"][1]
+        for index in range(48):
+            fn = copy.deepcopy(template)
+            fn.update(name=f"auxiliary_surface_{index:03d}",
+                      anon_execute=False, authenticated_execute=False)
+            value["functions"].append(fn)
+        self.assertEqual(len(value["functions"]),50)
+        result = evaluate_access(value)
+        self.assertEqual(result["verdict"], "REVIEW_UNLISTED_SURFACES")
+        self.assertIn("UNLISTED_MEMORY_FUNCTION_REVIEW",result["reason_codes"])
+
+    def test_unbounded_catalog_remains_fail_closed(self):
+        from provider_catalog import CatalogError
+        value = snapshot()
+        template = value["functions"][1]
+        for index in range(127):
+            fn = copy.deepcopy(template)
+            fn["name"]=f"over_budget_{index:03d}"
+            value["functions"].append(fn)
+        self.assertEqual(len(value["functions"]),129)
+        with self.assertRaises(CatalogError):
+            evaluate_access(value)
+
+    def test_sql_function_limit_has_fail_closed_overflow_sentinel(self):
+        sql = (Path(__file__).resolve().parents[1] / "provider_access_probe.sql").read_text()
+        fn_cte = sql.split("fn AS (",1)[1].split("),\nsch AS",1)[0]
+        self.assertIn("LIMIT 129",fn_cte)
+        self.assertIn("LIMIT 33",sql.split("fn AS (",1)[0])
 
     def test_semantic_capture_function_execute_holds(self):
         value = snapshot()

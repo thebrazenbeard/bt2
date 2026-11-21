@@ -72,7 +72,7 @@ def evaluate_access(snapshot: dict[str, Any]) -> dict[str, Any]:
     if "independently_authenticated" in snapshot:
         _flag(snapshot["independently_authenticated"])
     tables, functions = snapshot["tables"], snapshot["functions"]
-    if type(tables) is not list or len(tables) > 32 or type(functions) is not list or len(functions) > 32:
+    if type(tables) is not list or len(tables) > 32 or type(functions) is not list or len(functions) > 128:
         raise CatalogError("access snapshot size exceeded")
     table_map: dict[tuple[str,str],dict] = {}
     function_map: dict[tuple[str,str],dict] = {}
@@ -165,9 +165,10 @@ def evaluate_access(snapshot: dict[str, Any]) -> dict[str, Any]:
     for (schema, name), fn in function_map.items():
         if (schema, name) in EXPECTED_FUNCTIONS:
             continue
-        related = (schema == "public" and name.startswith("vera_memory_")) or (
-            schema == "semantic_atlas" and name.startswith(("search_current_", "runtime_", "memory_",
-                                                               "capture_semantic_", "record_semantic_capture_")))
+        # All functions in the dedicated Atlas schema may touch memory-backed
+        # objects, regardless of naming convention; never silently omit a new
+        # function merely because it has an unexpected prefix.
+        related = (schema == "public" and name.startswith("vera_memory_")) or schema == "semantic_atlas"
         if not related:
             continue
         any_grant = fn["anon_execute"] or fn["authenticated_execute"]

@@ -102,3 +102,33 @@ source-only program ALWAYS reports independently_authenticated=false,
 runtime_currentness UNKNOWN, memory admission/read/release NONE. Live
 provider receipt authentication, principal-bound privacy authorization,
 readback and action decisions remain separate held work.
+
+## November 20–21, 2026: complete function namespace and bounded inventory
+
+Later read-only Supabase metadata established **50** relevant routines: 8
+public vera_memory_* and 42 semantic_atlas routines. The prior function
+filter skipped differently named Atlas routines, and the old LIMIT 33 SQL
+sentinel combined with a 32-entry validator rejected the now-complete result.
+Both deficiencies were reproduced with synthetic negative tests before repair.
+
+The source probe now includes every function in the dedicated semantic_atlas
+schema (not merely known name prefixes), and accepts up to 128 function
+metadata entries. The SQL emits a 129th overflow sentinel, rejected by the
+evaluator; the independent table cap remains 32 with its 33rd sentinel.
+This is still a finite, fail-closed source inventory, not pagination,
+permission widening or authentication.
+
+The revised **actual** read-only provider query at 2026-11-21T02:04:47Z
+returned 14 table/view metadata entries, all 50 function entries and
+2 schema-rights entries. It passed the updated validator with
+REVIEW_UNLISTED_SURFACES and reason codes for unlisted functions, tables
+and EXECUTE grants without client-role schema USAGE. No required object
+was missing. A separately checked Tattler snapshot had zero matching
+tables/functions and remains UNKNOWN_INCOMPLETE_CATALOG for the Vera-only
+access contract; Tattler is not a Vera memory provider.
+
+Live metadata is a point-in-time observation, not an independent role
+attestation. Private data rows, function bodies, policy predicates,
+authoritative producer identity, Data API exposure and provider memory
+admission were NOT examined or authorized. Full raw metadata receipts
+remain outside the repository on the private authorized host.
