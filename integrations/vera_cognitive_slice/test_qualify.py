@@ -1,5 +1,7 @@
 ﻿"""Independent Lappy-only qualification against explicit source checkouts."""
 from __future__ import annotations
+import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -12,6 +14,27 @@ QUALIFY = Path(__file__).with_name("qualify.py")
 ROOT = os.environ.get("BT2_VERA_COGNITIVE_REPOS")
 
 class CognitiveVerticalSliceTests(unittest.TestCase):
+    def test_consumed_non_python_blob_is_bound_to_git_head(self):
+        """A clean Git index must not conceal altered JSON consumed by the slice."""
+        spec = importlib.util.spec_from_file_location("bt2_verified_qualify", QUALIFY)
+        qualify = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(qualify)
+        with tempfile.TemporaryDirectory(prefix="bt2-data-integrity-") as tmp:
+            source = Path(tmp) / "registry.json"
+            trusted = b'{"meaning":"Recording in progress"}\n'
+            source.write_bytes(trusted)
+            blob = hashlib.sha1(
+                b"blob " + str(len(trusted)).encode("ascii") + b"\0" + trusted
+            ).hexdigest().encode("ascii")
+            qualify._verify_tree_blob(
+                source, blob, b"100644", "semiotics/examples/registry.json"
+            )
+            source.write_bytes(b'{"meaning":"Unauthorized override"}\n')
+            with self.assertRaisesRegex(ValueError, "source blob changed.*registry.json"):
+                qualify._verify_tree_blob(
+                    source, blob, b"100644", "semiotics/examples/registry.json"
+                )
+
     def test_evidence_to_want_to_tool_free_turn_and_verified_completion(self):
         self.assertTrue(ROOT, "BT2_VERA_COGNITIVE_REPOS must be set")
         with tempfile.TemporaryDirectory(prefix="bt2-cognitive-slice-") as tmp:
