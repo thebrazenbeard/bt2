@@ -163,3 +163,42 @@ merged code or a qualified memory provider.
 Do not turn GitHub CI, semantic salience, Empathy policy hint, raw
 feedback, or historical source into a memory, current preference,
 consent, release permission, or runtime attestation on this evidence.
+
+
+## 2026-11-21 — optional adjacent-batch replay consistency, NOT trusted persistence
+
+The V1 GitHub signal bridge checks conflicting `event_id` values *within*
+one document, but `seen_receipt_digests` is a caller-owned hash list.
+When two bridge calls are processed separately, V1 can accept a changed
+report under the same event ID, even when the later caller reports
+having seen the old receipt digest. An empty reset cache similarly
+makes an exact replay appear new. This is a **bounded consistency
+gap**, not proof of a real-world attacker or memory corruption.
+
+New source-only `bridge_with_predecessor(previous, current)` explicitly
+revalidates **both** V1 input documents through the existing `bridge`,
+requires that the current caller's replay cache contains *all* hashes
+from the predecessor's `next_seen_receipt_digests`, and refuses a
+same-`event_id` report whose canonical SHA-256 changes between the
+two documents. It then returns **exactly the original V1 bridge
+output** for the current document: same schema, same source-authentication
+ceiling, same no-memory-admission and no-release fields. No current
+consumer or provider route invokes it automatically.
+
+Five new synthetic hostile/positive tests were RED before implementation
+(the function did not exist) and GREEN afterward. They include a
+conflicting ID re-used with a changed CI result, omitted prior cache,
+valid replay plus a new event, malformed predecessor, and exact
+legacy-V1 output preservation. Source-level tests alone cannot prove
+honest predecessor custody.
+
+**Critical limits:** The predecessor is supplied by the caller and
+may be forged, truncated, swapped or omitted. Reconciliation only
+compares the **two explicitly provided documents**, not a durable
+multi-process history. No encrypted/signed host checkpoint, trusted
+provider key, immutable replay registry, provenance attestation,
+semantic truth, memory write, consent, or runtime authority is created.
+A host-approved durable verifier and a separately authenticated
+predecessor readback are needed before any continuity claim. Do not
+silently replace the original V1 bridge API, its CONTRACT_V1.json,
+or the shared Radar/Bus lane with this optional research helper.

@@ -193,6 +193,39 @@ def bridge(document: dict) -> dict:
     }
 
 
+def bridge_with_predecessor(previous: dict, current: dict) -> dict:
+    """Opt-in source-only adjacent-batch replay reconciliation.
+
+    The ordinary V1 bridge has no independent replay storage and retains
+    its exact input/output schema. When a caller explicitly supplies both
+    consecutive documents, verify that its new cache retains the whole
+    previous digest frontier and that an event ID never changes content
+    between those two documents. Both documents remain caller-provided,
+    so this checks consistency, NOT authenticity, durable history, or
+    memory-admission authority. The caller can still omit or forge the
+    predecessor entirely.
+    """
+    prior = bridge(previous)
+    following = bridge(current)
+    prior_seen = set(prior["next_seen_receipt_digests"])
+    current_seen = set(current["seen_receipt_digests"])
+    require(prior_seen <= current_seen,
+            "CROSS_BATCH_REPLAY_HISTORY_DROPPED")
+    ids = {}
+    for record in previous["receipts"]:
+        digest = sha256(canonical(record)).hexdigest()
+        prior_digest = ids.get(record["event_id"])
+        require(prior_digest is None or prior_digest == digest,
+                "CROSS_BATCH_EVENT_ID_CONFLICT")
+        ids[record["event_id"]] = digest
+    for record in current["receipts"]:
+        digest = sha256(canonical(record)).hexdigest()
+        known = ids.get(record["event_id"])
+        require(known is None or known == digest,
+                "CROSS_BATCH_EVENT_ID_CONFLICT")
+    return following
+
+
 def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict:
     out = {}
     for key,value in pairs:
