@@ -169,7 +169,9 @@ def exchange(data: dict) -> dict:
         "empathy_source_ref_sha256":sha256(source["empathy_ref"].encode()).hexdigest(),
         "semantic_authority":"RESEARCH_ONLY",
         "semantic_currentness":"UNVERIFIED_SOURCE_SNAPSHOT",
-        "candidate_meaning_ids":sorted(ids),
+        # Local position aliases deliberately do not echo or hash caller ID text.
+        # Hashing low-entropy labels would still permit offline guessing.
+        "candidate_meaning_ids":[f"candidate_{i+1}" for i in range(len(ids))],
         "semantic_provenance":"UNVERIFIED_CALLER_ASSERTION",
         "salience_role":"ATTENTION_HINT_NOT_TRUTH",
         "reality_layer":v["reality_layer"],

@@ -100,11 +100,32 @@ class SemanticHostile(unittest.TestCase):
 
     def test_07_semantic_ids_are_opaque_not_person_model(self):
         r=exchange(frame())
-        self.assertEqual(r["candidate_meaning_ids"],["salience.test"])
+        self.assertEqual(r["candidate_meaning_ids"],["candidate_1"])
         self.assertEqual(r["vsns_source_head"],"c"*40)
         self.assertEqual(r["empathy_source_head"],"d"*40)
         self.assertNotIn("ev_b",str(r))
         self.assertEqual(r["semantic_currentness"],"UNVERIFIED_SOURCE_SNAPSHOT")
+
+    def test_11_freeform_meaning_id_never_echoed_to_exchange_output(self):
+        x=frame()
+        secret_id="PRIVATE_MEMBER_NAME_AND_LOCATION"
+        x["vsns"]["candidates"][0]["meaning_id"]=secret_id
+        result=exchange(x)
+        self.assertNotIn(secret_id,str(result))
+        self.assertNotIn("PRIVATE_MEMBER",str(result))
+        self.assertEqual(len(result["candidate_meaning_ids"]),1)
+        self.assertEqual(result["candidate_meaning_ids"],["candidate_1"])
+
+    def test_12_meaning_id_alias_is_ephemeral_and_not_cross_frame_linkable(self):
+        first=frame()
+        second=frame()
+        second["vsns"]["candidates"][0]["meaning_id"]="alternative.label"
+        a=exchange(first)
+        b=exchange(second)
+        self.assertEqual(a["candidate_meaning_ids"],exchange(frame())["candidate_meaning_ids"])
+        self.assertEqual(a["candidate_meaning_ids"],b["candidate_meaning_ids"])
+        self.assertEqual(a["memory_admission"],"NONE")
+        self.assertEqual(b["consent"],"NOT_GRANTED")
 
     def test_10_cross_repo_semantic_head_locator_mismatch_refused(self):
         x=frame()

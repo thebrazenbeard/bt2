@@ -26,6 +26,7 @@
     "source": "three independent EXACT DECLARED pinned GitHub source locators for Semantic Atlas, VSNS Vera and Empathy; no signed receipt",
     "vsns": "VERA_VSNS_RECEPTION_RESULT_V0_1 typed advisory, 1..8 candidates"
   },
+  "output_meaning_ids": "response-local candidate_1..candidate_8 aliases in input order, never raw caller meaning_id or reversible/guessable digest, not stable across sessions",
   "output_schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_OUTPUT_V1",
   "schema": "BT2_SEMANTIC_EVIDENCE_EXCHANGE_CONTRACT_V1"
 }
