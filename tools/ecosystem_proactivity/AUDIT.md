@@ -74,3 +74,27 @@ The tests then passed; existing source tests still pass. The raw Batch remains
 internal and unchanged for debugging; it is NOT safe to send via asdict().
 Privacy classification still depends on caller-supplied flags; no recipient
 authenticator or downstream notification transport exists in this package.
+
+## Public decision side-channel regression (2026-11-20)
+
+Exact prior source: BT2 main 2129f9db7f0ff97393c21874458d67fe1235b0e7.
+Post-PR132 Batch.public_record() filtered private decisions but still used
+public decisions produced from the full mixed input batch. Private signals
+could therefore influence a visible decision without revealing their own ID:
+a shared fingerprint across different subjects generated
+FINGERPRINT_COLLISION and demoted the public action; a same-incident
+privacy-label conflict could leak the public decision based on input order.
+
+Four synthetic tests on the exact main source initially had four failing
+assertions (including order variants), plus a passing private-noncollision
+control. No real private records were used. Repair preserves full internal
+batch decisions and separately computes public decisions from public-only
+input signals, excluding any key that is also private. GREEN focused 4/4,
+full 78/78 normal and optimized Python. Source-only tests are not independent
+privacy certification, nor proof of upstream privacy-classification integrity.
+If inputs conflict on the exact key, the public view fails closed; public
+decision omission is not independent evidence that a private signal existed.
+
+The output is not a general-purpose authenticated notification contract.
+Keep raw Batch private. The source still lacks independently verified producer,
+recipient authorization, persistent replay, and a qualified live runtime.
