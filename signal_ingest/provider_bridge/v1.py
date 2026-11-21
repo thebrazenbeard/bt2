@@ -207,6 +207,12 @@ def bridge_with_predecessor(previous: dict, current: dict) -> dict:
     """
     prior = bridge(previous)
     following = bridge(current)
+    # Both timestamps passed _utc's canonical fixed-width YYYY-MM-DDTHH:MM:SSZ
+    # validation during bridge(). Their lexical order is chronological.
+    # This is consistency of *reported* observation order, not a trusted clock.
+    require(current["snapshot"]["observed_at"] >=
+            previous["snapshot"]["observed_at"],
+            "CROSS_BATCH_SNAPSHOT_CLOCK_ROLLBACK")
     prior_seen = set(prior["next_seen_receipt_digests"])
     current_seen = set(current["seen_receipt_digests"])
     require(prior_seen <= current_seen,

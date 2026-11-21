@@ -202,3 +202,38 @@ A host-approved durable verifier and a separately authenticated
 predecessor readback are needed before any continuity claim. Do not
 silently replace the original V1 bridge API, its CONTRACT_V1.json,
 or the shared Radar/Bus lane with this optional research helper.
+
+
+## 2026-11-21 — rollback fence and the three-batch falsifier
+
+The opt-in `bridge_with_predecessor` previously checked replay hashes and
+event-ID consistency but did **not** order the batches' own snapshot
+observation times. Two individually valid documents could report
+`21:30:00Z` and `21:29:30Z` respectively and still pass as adjacent
+predecessor/successor.
+
+One new hostile test was **RED** on the old source, then **GREEN**
+after the helper required the successor's `snapshot.observed_at`
+to be no earlier than its predecessor's. Both source times already
+pass the V1 strict UTC timestamp validator; the comparison uses
+canonical fixed-width timestamp strings. A non-decreasing successor
+still passes and returns **exactly** the original V1 output.
+
+An additional **negative-control test** confirmed a more material
+limit: a three-batch chain with an event recorded in batch 1,
+no reports in batch 2, and the *same event ID with changed content*
+in batch 3 passes the two-batch helper when asked to compare only
+batches 2 and 3. The original digest may remain in the reported
+cache, but its event-ID binding is unavailable. This was **not
+repaired or falsely described as protected**; reconstructing
+multi-batch identity requires an independently authenticated history,
+not simply another method over arbitrary caller-provided documents.
+
+**Claim ceiling:** the clock values, predecessor document, digest
+cache and source identity remain caller claims. A consistently
+forged timeline can pass. No trusted time service, durable history,
+provider signature, memory admission, consent, permission, model
+training or production activation was added. Review this as a
+source-only adjacent-batch consistency improvement, and preserve
+the three-batch falsifier as a release blocker for any claimed
+persistent replay or autobiographical continuity.

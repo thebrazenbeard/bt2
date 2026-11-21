@@ -216,5 +216,50 @@ class ProviderBridgeHostile(unittest.TestCase):
         self.assertFalse(r["signal"]["release_permission"])
 
 
+    def test_20_adjacent_batch_cannot_roll_back_snapshot_clock(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_predecessor
+        predecessor = packet()
+        current = packet()
+        current["seen_receipt_digests"] = bridge(predecessor)["next_seen_receipt_digests"]
+        # The event is 21:29:00; an earlier 21:29:30 snapshot is valid in
+        # isolation but cannot be its predecessor's 21:30:00 successor.
+        current["snapshot"]["observed_at"] = "2026-11-20T21:29:30Z"
+        self.assertEqual(bridge(current)["memory_admission"], "NONE")
+        with self.assertRaisesRegex(BridgeError, "CROSS_BATCH_SNAPSHOT_CLOCK_ROLLBACK"):
+            bridge_with_predecessor(predecessor, current)
+
+    def test_21_adjacent_batch_accepts_non_decreasing_snapshot_clock(self):
+        from signal_ingest.provider_bridge.v1 import bridge_with_predecessor
+        predecessor = packet()
+        current = packet()
+        current["seen_receipt_digests"] = bridge(predecessor)["next_seen_receipt_digests"]
+        current["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        result = bridge_with_predecessor(predecessor, current)
+        self.assertEqual(result, bridge(current))
+        self.assertEqual(result["memory_admission"], "NONE")
+
+    def test_22_two_batch_helper_cannot_detect_reused_older_id_after_empty_middle_batch(self):
+        """Never claim a genuine durable ledger from two caller-supplied docs."""
+        from signal_ingest.provider_bridge.v1 import bridge_with_predecessor
+        first = packet()
+        middle = packet()
+        middle["receipts"] = []
+        middle["seen_receipt_digests"] = bridge(first)["next_seen_receipt_digests"]
+        middle["snapshot"]["observed_at"] = "2026-11-20T21:31:00Z"
+        assert bridge_with_predecessor(first, middle)["memory_admission"] == "NONE"
+        third = packet()
+        third["seen_receipt_digests"] = bridge(middle)["next_seen_receipt_digests"]
+        third["snapshot"]["observed_at"] = "2026-11-20T21:32:00Z"
+        third["receipts"][0]["observed_at"] = "2026-11-20T21:31:30Z"
+        third["receipts"][0]["status"] = "PASSED"
+        # The helper sees only the empty immediate predecessor, NOT the first
+        # document's old event_id -> digest binding. This is a retained gap.
+        outcome = bridge_with_predecessor(middle, third)
+        self.assertEqual(len(outcome["accepted_receipt_digests"]), 1)
+        self.assertFalse(outcome["independently_authenticated"])
+        self.assertEqual(outcome["memory_admission"], "NONE")
+        self.assertFalse(outcome["signal"]["release_permission"])
+
+
 if __name__=="__main__":
     unittest.main()
