@@ -105,6 +105,20 @@ calls a model or writes a ledger. Callers must govern source, privacy and
 external label custody separately. The qualification uses synthetic inputs;
 production conversational improvement is unproven.
 
+### Execution-byte binding (source-only candidate)
+
+The read-only advisory now resolves the immutable Git HEAD tree blob for its
+own `qualify.py` and for the pinned Humility `humility/core.py` immediately
+before loading. The exact bytes compiled are checked against those committed
+blob IDs. A source file exchanged after the initial eight-checkout verification
+is refused rather than executed; an absent or malformed binding fails closed.
+Synthetic unit and post-verification swap tests exercise this boundary.
+
+This closes the verified-to-executed byte gap at these two module loads; it
+does not authenticate a malicious Git executable, OS path ancestry, an
+attacker-controlled commit, or the GitHub source release process. It does not
+authorize any cognitive effect, runtime installation, or memory write.
+
 Production activation, real model behavior, cross-host state persistence,
 source authentication, and rollout to VN1/VN2 remain separate qualification
 gates. Re-run with new exact source pins when a participating main changes.

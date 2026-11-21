@@ -61,8 +61,8 @@ class ReadOnlyAdvisoryTests(unittest.TestCase):
         actual_loader = cognitive_advisory._load_exact_module
         observed = []
 
-        def instrument(path):
-            module = actual_loader(path)
+        def instrument(path, **kwargs):
+            module = actual_loader(path, **kwargs)
             if path.name == "core.py" and path.parent.name == "humility":
                 original = module.revise_distinct
 
@@ -87,6 +87,40 @@ class ReadOnlyAdvisoryTests(unittest.TestCase):
         ))
         with self.assertRaisesRegex(ValueError, "missing source checkout"):
             propose(Path(ROOT) / "nonexistent-root", request)
+
+    def test_verified_core_swap_is_denied_in_actual_advisory_path(self):
+        original_loader = cognitive_advisory._load_exact_module
+        original_read = Path.read_bytes
+        target = Path(ROOT) / "humility" / "humility" / "core.py"
+        swapped = {"armed": False, "served": False}
+
+        def adversarial_read(path):
+            if swapped["armed"] and Path(path) == target:
+                swapped["served"] = True
+                return b"raise RuntimeError('SYNTHETIC_UNVERIFIED_SOURCE_RAN')\n"
+            return original_read(path)
+
+        def instrument(path, **kwargs):
+            module = original_loader(path, **kwargs)
+            if Path(path).name == "qualify.py":
+                actual_verify = module._verify_sources
+
+                def arm_after_full_verification(*args):
+                    result = actual_verify(*args)
+                    swapped["armed"] = True
+                    return result
+
+                module._verify_sources = arm_after_full_verification
+            return module
+
+        request = AdvisoryRequest("synthetic claim", 0.5, (
+            EvidenceSignal("a", "independent", 0.9, 0.1),
+        ))
+        with patch.object(cognitive_advisory, "_load_exact_module", side_effect=instrument):
+            with patch.object(Path, "read_bytes", autospec=True, side_effect=adversarial_read):
+                with self.assertRaisesRegex(ValueError, "source bytes changed after verification"):
+                    propose(Path(ROOT), request)
+        self.assertEqual(swapped, {"armed": True, "served": True})
 
 
 if __name__ == "__main__":
