@@ -14,7 +14,7 @@ def fixture(i, domain, severity, relevance, actionability, confidence, impact):
         confidence=confidence, hours_to_impact=impact,
         concrete_next_step='Inspect a bounded synthetic fixture',
         source_verified_by_evaluator=True, corroborated=True,
-        owner_lane='EXAMPLE_REVIEWER')
+        externally_visible=True, owner_lane='EXAMPLE_REVIEWER')
 
 signals = [fixture('security','security',5,5,5,5,6),
            fixture('memory','memory',4,4,4,4,24),

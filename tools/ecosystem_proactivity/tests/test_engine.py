@@ -22,7 +22,8 @@ def sig(**kw):
                   exact_head=HEAD, observed_at=TIME, freshness_hours=48,
                   severity=5, relevance=5, actionability=5, confidence=5,
                   hours_to_impact=6, concrete_next_step='Prepare review-only containment patch',
-                  owner_lane='SECURITY', corroborated=True, source_verified_by_evaluator=True)
+                  owner_lane='SECURITY', corroborated=True, source_verified_by_evaluator=True,
+                  externally_visible=True)
     values.update(kw)
     return Signal(**values)
 

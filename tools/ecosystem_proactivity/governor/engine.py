@@ -83,9 +83,19 @@ class Signal:
     outcome_is_release: bool = False
     corroborated: bool = False
     source_verified_by_evaluator: bool = False  # caller assertion, never crypto proof
-    externally_visible: bool = True
+    externally_visible: bool = False  # opt in; not proof of source authenticity
 
     def __post_init__(self):
+        # Python treats non-empty strings and integers as truthy. Never allow
+        # textual "false" or 1 to impersonate privacy or trust booleans.
+        boolean_fields = (
+            "known_to_owner", "needs_user_decision", "protected_effect",
+            "contains_private_data", "runtime_claim", "model_subjectivity_claim",
+            "outcome_is_release", "corroborated",
+            "source_verified_by_evaluator", "externally_visible",
+        )
+        if any(type(getattr(self, name)) is not bool for name in boolean_fields):
+            raise ValueError("signal boolean flags require actual booleans")
         if not all(ISO_KEY.fullmatch(v or "") for v in
                    (self.signal_id, self.fingerprint, self.subject, self.cause, self.owner_lane)):
             raise ValueError("invalid non-identifying ID")
