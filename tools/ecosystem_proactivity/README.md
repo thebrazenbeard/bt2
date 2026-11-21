@@ -129,3 +129,29 @@ exposure use the conservative Batch.public_record() boundary, not a raw
 Batch or the B dry-run record. Upstream privacy classification is still
 a caller claim, not independent authentication, and Lantern live currentness
 is UNKNOWN.
+
+
+## Strict Context trust and policy container admission (2026-11-20)
+
+Operator-supplied Context does **not** become authenticated merely because
+a field has a trust-oriented name. The governor now rejects malformed
+Python container types for its seven typed frozenset policy/history fields.
+In particular, a string can no longer replace verified_signal_ids,
+owner_lanes, or qualified_capabilities: Python considers substring
+membership against a string true, silently making malformed caller input
+look like a verified-id, owner, or qualified-capability allowlist. The
+required sets must be real frozensets; text member values must satisfy
+the bounded incident-ID grammar, and verified head bindings must be
+subject/head pairs. Feedback and notification logs must be tuples.
+Policy limit numbers must be actual integers, not Python boolean values.
+
+This is a **breaking fail-closed source-input validation** for callers
+that previously supplied lists, tuples, strings, sets or untyped JSON
+directly. Such callers must explicitly validate and construct the
+documented Python types using independent authenticated authority
+before creating Context. Do not coerce bad inputs into trusted sets.
+The synthetic demo and untrusted-B dry run already build correctly
+typed Context. Syntax is not attestation: verified_signal_ids and
+other trusted fields must still come from a separately verified
+authorized host. No producer, notifier or live currentness backend
+is created by this source change.
