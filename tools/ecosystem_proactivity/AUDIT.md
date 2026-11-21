@@ -124,3 +124,31 @@ supply literal True where source authority is not verified. This library
 performs no external actions, privacy attestation, notification, service
 activation or Lantern currentness qualification. Runtime admission and
 review therefore remain held.
+
+
+## Private Decision public-summary metadata leak (2026-11-20)
+
+At exact main source 7aed3b589a8a8f5370a0fe838d1ec571f1358346,
+the governor had an opt-in public Batch projection that omits private
+Decisions, but callers could still invoke Decision.public_record() on a
+private result. It hid the fingerprint and refs but returned private action,
+domain, priority and policy reason codes; review_untrusted() did invoke it
+for B's untrusted, private proposals. No evidence that this was published
+externally; the exposure was a SOURCE API safety weakness.
+
+Five newly authored synthetic focused tests: one batch omission control
+PASS, one public Decision summary control PASS, and three failures RED on
+the exact original source. An initial test timestamp mismatch was corrected
+before the final valid RED, with no production code changed. The minimal
+repair makes Decision.public_record() return a constant redaction marker
+for private/local-only results; B's explicitly local dry-run record now
+projects just an empty fingerprint and draft/silent action. Existing
+private source review remains internal. Focused 5/5 and full 89/89 normal
+and optimized Python tests passed locally. These are same-model authored
+tests and not independent Engineer A/B review.
+
+The local dry-run response still contains an action and reviewed_count,
+so it must not be confused with an authenticated externally publishable
+record. Neither API proves privacy classification, source authenticity,
+recipient permission, owner acknowledgment, qualified runtime currentness,
+notification delivery or memory admission. No runtime service activated.

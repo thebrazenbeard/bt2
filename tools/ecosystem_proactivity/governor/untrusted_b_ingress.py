@@ -156,7 +156,11 @@ def review_untrusted(document: dict, *, now: str) -> dict:
     return {
         "schema": OUTPUT_SCHEMA,
         "reviewed_count": len(batch.decisions),
-        "decisions": [d.public_record() for d in batch.decisions],
+        # This API is an internal review summary, NOT a public Decision.
+        # Keep only the local action; never export private priority, reasons,
+        # domain, incident ID, source references or owner attributes.
+        "decisions": [{"fingerprint": "", "action": d.action.value}
+                      for d in batch.decisions],
         "source_authentication": "UNVERIFIED_NO_SIGNED_RECEIPT",
         "trusted_context_admitted": False,
         "notifier_active": False,
