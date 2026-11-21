@@ -98,3 +98,29 @@ decision omission is not independent evidence that a private signal existed.
 The output is not a general-purpose authenticated notification contract.
 Keep raw Batch private. The source still lacks independently verified producer,
 recipient authorization, persistent replay, and a qualified live runtime.
+
+
+## Default-private and strict-boolean input boundary (2026-11-20)
+
+Exact source baseline BT2 main 6a3417603a62cc7502753c9c04018fa4c3328c04.
+The Signal dataclass previously declared externally_visible=True and
+did not validate its boolean-typed fields. A caller's omitted visibility
+field could enter public projection implicitly; a string "false" was
+truthy in Python and could be misinterpreted as explicit disclosure or
+trusted attestation. This is an input-contract vulnerability in source,
+not a verified production leak.
+
+Six targeted synthetic test methods first produced fourteen failing
+assertions on exact baseline source (missing private default; textual and
+integer visibility; untyped corroboration, authenticity and all other
+boolean flags). After the change, six focused tests passed. The full
+suite passed 84/84 normal and 84/84 optimized; the synthetic demo and
+workflow security tests were checked separately. Existing public
+synthetic fixtures and demo now use explicit True. B untrusted ingress
+already sets externally_visible=False; it remains private.
+
+Strict typing is not independent authentication. An attacker can still
+supply literal True where source authority is not verified. This library
+performs no external actions, privacy attestation, notification, service
+activation or Lantern currentness qualification. Runtime admission and
+review therefore remain held.
