@@ -17,6 +17,20 @@ import subprocess
 import sys
 
 
+def _verify_tree_blob(file: Path, blob: bytes, mode: bytes, label: str) -> None:
+    """Authenticate every tracked worktree file, including consumed JSON/Markdown."""
+    if mode not in (b"100644", b"100755"):
+        raise ValueError(f"linked or unusual source mode: {label}")
+    if not file.is_file() or file.is_symlink():
+        raise ValueError(f"missing or linked source: {label}")
+    data = file.read_bytes()
+    actual = hashlib.sha1(
+        b"blob " + str(len(data)).encode("ascii") + b"\0" + data
+    ).hexdigest()
+    if actual != blob.decode("ascii"):
+        raise ValueError(f"source blob changed: {label}")
+
+
 def _verify_sources(repos: Path) -> dict[str, str]:
     pins = json.loads(Path(__file__).with_name("source_pins.json").read_text(encoding="utf-8"))
     if set(pins) != {
@@ -55,20 +69,11 @@ def _verify_sources(repos: Path) -> dict[str, str]:
             header, relraw = entry.split(b"\t", 1)
             mode, kind, blob = header.split()
             rel = relraw.decode("utf-8")
-            if not rel.endswith(".py"):
-                continue
-            tracked_python.add(rel.replace("\\", "/"))
-            file = checkout / rel
-            if mode != b"100644" and mode != b"100755":
-                raise ValueError(f"linked or unusual source mode: {name}/{rel}")
-            if not file.is_file() or file.is_symlink():
-                raise ValueError(f"missing or linked source: {name}/{rel}")
-            data = file.read_bytes()
-            actual = hashlib.sha1(
-                b"blob " + str(len(data)).encode("ascii") + b"\0" + data
-            ).hexdigest()
-            if actual != blob.decode("ascii"):
-                raise ValueError(f"source blob changed: {name}/{rel}")
+            if rel.endswith(".py"):
+                tracked_python.add(rel.replace("\\", "/"))
+            # Source identity includes data and policy files read by the code;
+            # a clean index can hide a malicious worktree JSON override.
+            _verify_tree_blob(checkout / rel, blob, mode, f"{name}/{rel}")
         for file in checkout.rglob("*.py"):
             rel = file.relative_to(checkout)
             if ".git" in rel.parts:
