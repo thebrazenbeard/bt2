@@ -13,6 +13,7 @@ import json
 import sqlite3
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -31,13 +32,60 @@ def _verify_tree_blob(file: Path, blob: bytes, mode: bytes, label: str) -> None:
         raise ValueError(f"source blob changed: {label}")
 
 
-def _verify_sources(repos: Path) -> dict[str, str]:
-    pins = json.loads(Path(__file__).with_name("source_pins.json").read_text(encoding="utf-8"))
-    if set(pins) != {
+_PIN_PATH = "integrations/vera_cognitive_slice/source_pins.json"
+_SHA = re.compile(r"^[0-9a-f]{40}$")
+
+
+def _verified_pins(manifest_commit: str | None) -> dict[str, str]:
+    """Accept only the exact manifest bytes in a captured Git commit."""
+    repository = Path(__file__).resolve().parents[2]
+    manifest = Path(__file__).with_name("source_pins.json")
+    if manifest.is_symlink() or not manifest.is_file():
+        raise ValueError("source pin manifest missing or linked")
+    if manifest_commit is None:
+        try:
+            capture = subprocess.run(
+                ["git", "-C", str(repository), "rev-parse", "--verify", "HEAD^{commit}"],
+                capture_output=True, text=True, check=True, timeout=20,
+            )
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            raise ValueError("source pin manifest commit unavailable") from exc
+        manifest_commit = capture.stdout.strip()
+    if type(manifest_commit) is not str or not _SHA.fullmatch(manifest_commit):
+        raise ValueError("source pin manifest requires exact commit")
+    try:
+        blob_output = subprocess.run(
+            ["git", "-C", str(repository), "rev-parse", "--verify",
+             f"{manifest_commit}:{_PIN_PATH}"],
+            capture_output=True, text=True, check=True, timeout=20,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise ValueError("source pin manifest blob unavailable") from exc
+    committed_blob = blob_output.stdout.strip()
+    if not _SHA.fullmatch(committed_blob):
+        raise ValueError("source pin manifest blob invalid")
+    raw = manifest.read_bytes()
+    actual = hashlib.sha1(
+        b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw
+    ).hexdigest()
+    if actual != committed_blob:
+        raise ValueError("source pin manifest bytes differ from committed source")
+    try:
+        pins = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("source pin manifest malformed") from exc
+    if type(pins) is not dict or set(pins) != {
         "volition", "pre-active", "meso-crct", "humility", "meta",
         "semiotics", "semanticatlas", "personification",
-    }:
-        raise ValueError("unexpected source manifest")
+    } or any(type(sha) is not str or not _SHA.fullmatch(sha) for sha in pins.values()):
+        raise ValueError("source pin manifest invalid names or hashes")
+    return pins
+
+
+def _verify_sources(
+    repos: Path, *, manifest_commit: str | None = None,
+) -> dict[str, str]:
+    pins = _verified_pins(manifest_commit)
     for name, expected in pins.items():
         checkout = repos / name
         if not checkout.is_dir():

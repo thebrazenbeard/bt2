@@ -118,10 +118,25 @@ cannot redefine the expected blob. Missing or malformed bindings fail closed.
 Synthetic unit tests cover swaps, and a real offline two-commit Git repository
 exercises the moved-HEAD case.
 
-This closes the verified-to-executed byte gap at these two module loads; it
-does not authenticate a malicious Git executable, OS path ancestry, an
-attacker-controlled commit, or the GitHub source release process. It does not
-authorize any cognitive effect, runtime installation, or memory write.
+This closes the verified-to-executed byte gap at these two module loads.
+The pin manifest itself is also admitted only when its exact raw worktree bytes
+match the Git blob in the same captured coordinator commit used to load
+`qualify.py`. Both the direct qualification path and the optional advisory
+now use this shared gate. A manipulated manifest, symlink, missing Git object,
+invalid commit or pin shape fails before any donor checkout is admitted; a
+changed HEAD cannot reinterpret the captured manifest. Offline tests include
+a real two-commit manifest-swap fixture and a post-load adversarial read.
+`integrations/vera_cognitive_slice/.gitattributes` marks only the
+hash-bound `source_pins.json` and `qualify.py` files as `-text` so Windows
+Git autocrlf checkout cannot rewrite their verified raw bytes. A regression
+clones a real temporary Git repository with `core.autocrlf=true` and asserts
+committed-byte identity for both files.
+The raw-byte guard remains strict rather than normalizing modified data.
+
+This does not authenticate a malicious Git executable, OS path ancestry,
+an attacker-controlled commit, or the GitHub source release process.
+It does not authorize any cognitive effect, runtime installation, or memory
+write.
 
 Production activation, real model behavior, cross-host state persistence,
 source authentication, and rollout to VN1/VN2 remain separate qualification
