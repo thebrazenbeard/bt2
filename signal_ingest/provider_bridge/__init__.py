@@ -1,0 +1,1 @@
+"""Source-only GitHub observation bridge. No effects."""

@@ -1,0 +1,38 @@
+name: BT2 GitHub source signal and semantic boundary V1
+on:
+  pull_request:
+    paths:
+      - 'signal_ingest/provider_bridge/**'
+      - '.github/workflows/bt2-source-provider-bridge-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-source-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Read-only checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 pinned
+        with:
+          persist-credentials: false
+      - name: Run deterministic synthetic source integration tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 -m unittest discover -s signal_ingest/tests -p 'test_*.py' -v
+          python3 -m unittest discover -s signal_ingest/provider_bridge/tests -p 'test_*.py' -v
+          python3 -O -m unittest discover -s signal_ingest/provider_bridge/tests -p 'test_*.py' -v
+          python3 -m signal_ingest.provider_bridge.v1 signal_ingest/provider_bridge/fixtures/synthetic_github_observation.json > /tmp/bridge-observation.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/bridge-observation.json").read_text())
+          assert d["schema"]=="BT2_GITHUB_PROVIDER_BRIDGE_OUTPUT_V1"
+          assert d["independently_authenticated"] is False
+          assert d["replay_scope"]=="CALLER_PROVIDED_CACHE_NOT_INDEPENDENT"
+          assert d["signal"]["release_permission"] is False
+          assert d["signal"]["external_effects"]==[]
+          assert d["side_effects"]==[]
+          print("BT2_GITHUB_SOURCE_SEMANTIC_BOUNDARY_PASS")
+          PY

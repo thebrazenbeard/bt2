@@ -1,0 +1,35 @@
+{
+  "receipts": [
+    {
+      "claimed_owner": "author-reported",
+      "claimed_reviewer": null,
+      "claims_authenticated": true,
+      "event_id": "ci-first",
+      "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "incident_key": "test-failure-300",
+      "kind": "CI_RESULT",
+      "observed_at": "2026-11-20T21:29:00Z",
+      "provider_response_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "repository": "example/app",
+      "source_ref": "https://github.com/example/app/actions/runs/300",
+      "status": "FAILED",
+      "subject": "pr:12",
+      "transport": "GITHUB_API_SESSION_READONLY"
+    }
+  ],
+  "schema": "BT2_GITHUB_PROVIDER_BRIDGE_INPUT_V1",
+  "seen_receipt_digests": [],
+  "snapshot": {
+    "host_access_cutoff": "2026-11-20T18:00:00Z",
+    "observed_at": "2026-11-20T21:30:00Z",
+    "subjects": [
+      {
+        "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "reported_runtime_status": "UNKNOWN",
+        "repository": "example/app",
+        "runtime_required": false,
+        "subject": "pr:12"
+      }
+    ]
+  }
+}
